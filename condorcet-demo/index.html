@@ -1,0 +1,1973 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Maximal Condorcet Domain Explorer</title>
+  <style>
+    :root {
+      --bg: #080b12;
+      --panel: #121926;
+      --panel-soft: #172235;
+      --line: rgba(186, 210, 255, 0.22);
+      --text: #eaf0ff;
+      --muted: #9fb0d0;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --err: #fb7185;
+      --mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", serif;
+      --sans: "Avenir Next", Avenir, "Segoe UI", Tahoma, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--sans);
+      background:
+        radial-gradient(900px 520px at 2% -10%, rgba(56, 189, 248, 0.18), transparent 62%),
+        radial-gradient(850px 500px at 98% -8%, rgba(74, 222, 128, 0.12), transparent 58%),
+        linear-gradient(180deg, #070a10 0%, #0a0f18 42%, #06090f 100%);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(11, 16, 26, 0.76);
+      backdrop-filter: blur(9px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 20px;
+      letter-spacing: 0.2px;
+      font-weight: 700;
+    }
+
+    header p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      max-width: 980px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 14px;
+      padding: 14px;
+      align-items: start;
+    }
+
+    @media (max-width: 1050px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(20, 30, 46, 0.94), rgba(12, 20, 32, 0.96));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.36);
+      overflow: hidden;
+    }
+
+    .panel > .hd {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(8, 14, 23, 0.52);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.18px;
+      text-transform: uppercase;
+    }
+
+    .panel > .bd {
+      padding: 12px;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    select,
+    input[type="number"],
+    input[type="file"],
+    button {
+      width: 100%;
+      border-radius: 11px;
+      border: 1px solid var(--line);
+      background: rgba(7, 12, 21, 0.58);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      padding: 9px 10px;
+      outline: none;
+    }
+
+    input[type="file"] {
+      padding: 9px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:hover:enabled {
+      border-color: rgba(186, 210, 255, 0.38);
+      background: rgba(7, 14, 24, 0.82);
+    }
+
+    button:disabled,
+    select:disabled,
+    input:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .primary {
+      border-color: rgba(56, 189, 248, 0.62);
+      background: var(--accent-soft);
+    }
+
+    .primary:hover:enabled {
+      border-color: rgba(56, 189, 248, 0.88);
+      background: rgba(56, 189, 248, 0.22);
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .muted {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .status {
+      margin-top: 7px;
+      font-size: 12px;
+      line-height: 1.3;
+      color: var(--muted);
+    }
+
+    .status.ok { color: #9ae6b4; }
+    .status.warn { color: #fde68a; }
+    .status.err { color: #fda4af; }
+
+    .stat-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      background: rgba(4, 9, 18, 0.46);
+      border-radius: 11px;
+      padding: 8px;
+    }
+
+    .stat .k {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.14px;
+    }
+
+    .stat .v {
+      font-size: 13px;
+      font-family: var(--mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .graph-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .graph-toolbar .inline {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .graph-toolbar select {
+      width: auto;
+      padding: 6px 8px;
+      font-size: 12px;
+      border-radius: 9px;
+    }
+
+    .graph-toolbar input[type="checkbox"] {
+      transform: translateY(1px);
+    }
+
+    .svg-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: radial-gradient(80% 60% at 50% 35%, rgba(39, 73, 116, 0.22), rgba(7, 12, 21, 0.72));
+    }
+
+    .graph-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .legend {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+    }
+
+    .legend .item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend .sw {
+      width: 11px;
+      height: 11px;
+      border-radius: 2px;
+      border: 1px solid rgba(186, 210, 255, 0.32);
+      display: inline-block;
+    }
+
+    .split {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 1200px) {
+      .split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid rgba(186, 210, 255, 0.14);
+      padding: 7px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      color: #c9d5ef;
+      background: rgba(12, 20, 33, 0.96);
+      font-weight: 600;
+      letter-spacing: 0.1px;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: auto;
+      max-height: 48vh;
+      background: rgba(7, 13, 22, 0.56);
+    }
+
+    tr.active td {
+      background: rgba(56, 189, 248, 0.18);
+    }
+
+    tr:hover td {
+      background: rgba(186, 210, 255, 0.08);
+    }
+
+    .mono { font-family: var(--mono); }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #dbe7ff;
+      letter-spacing: 0.18px;
+    }
+
+    .hint {
+      margin-top: 7px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      color: #d1e2ff;
+      background: rgba(8, 14, 24, 0.5);
+    }
+
+    .pill.warn {
+      border-color: rgba(251, 191, 36, 0.46);
+      color: #fde68a;
+    }
+
+    .pill.ok {
+      border-color: rgba(74, 222, 128, 0.5);
+      color: #bef5d0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Maximal Condorcet Domain Explorer</h1>
+    <p>
+      Explore maximal Condorcet domains as adjacent-swap graphs. Each node is one permutation; edges connect permutations that differ by
+      a single adjacent transposition.
+    </p>
+  </header>
+
+  <div class="app">
+    <aside class="stack">
+      <section class="panel">
+        <div class="hd">Data Source</div>
+        <div class="bd stack">
+          <button id="loadBundledBtn" class="primary" disabled>Load bundled UMCD files</button>
+          <div>
+            <label for="fileInput">Load local file(s) or folder</label>
+            <input id="fileInput" type="file" multiple webkitdirectory directory />
+            <div class="hint">Input format: one permutation per line; domain separators are lines starting with <span class="mono">-1</span>.</div>
+          </div>
+          <div id="loadStatus" class="status">Checking for bundled data...</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="hd">Domain Selection</div>
+        <div class="bd stack">
+          <div>
+            <label for="kFilter">Filter by dataset n</label>
+            <select id="kFilter" disabled>
+              <option value="all">All</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="datasetSelect">Dataset file</label>
+            <select id="datasetSelect" disabled>
+              <option value="">Load data first</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="domainIndex">Domain # in selected dataset</label>
+            <input id="domainIndex" type="number" min="1" step="1" disabled />
+          </div>
+
+          <div class="row2">
+            <button id="prevBtn" disabled>Prev</button>
+            <button id="nextBtn" disabled>Next</button>
+          </div>
+
+          <div class="row2">
+            <button id="randomBtn" disabled>Random domain</button>
+            <button id="copyDomainBtn" disabled>Copy domain JSON</button>
+          </div>
+
+          <div id="datasetBadges"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="hd">Domain Statistics</div>
+        <div class="bd">
+          <div id="statsGrid" class="stat-grid"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="hd">Selected Permutation</div>
+        <div class="bd">
+          <div id="selectedInfo" class="muted">Select a permutation in the graph or table.</div>
+        </div>
+      </section>
+    </aside>
+
+    <main>
+      <section class="panel">
+        <div class="hd">Adjacent-Swap Graph</div>
+        <div class="bd">
+          <div class="graph-toolbar">
+            <span class="inline">
+              layout
+              <select id="layoutSelect">
+                <option value="layers">Inversion layers</option>
+                <option value="force">Force-directed</option>
+              </select>
+            </span>
+
+            <span class="inline">
+              labels
+              <select id="labelModeSelect">
+                <option value="index">Index</option>
+                <option value="perm">Permutation</option>
+              </select>
+            </span>
+
+            <span class="inline">
+              colors
+              <select id="colorModeSelect">
+                <option value="component">component</option>
+                <option value="degree">degree</option>
+                <option value="distance">distance from selected</option>
+                <option value="eccentricity">eccentricity</option>
+                <option value="closeness">closeness centrality</option>
+                <option value="betweenness">betweenness centrality</option>
+                <option value="kcore">k-core index</option>
+                <option value="clustering">clustering coefficient</option>
+                <option value="wl">WL refinement class</option>
+                <option value="triple">triple class (label-dependent)</option>
+              </select>
+            </span>
+
+            <span class="inline">
+              size
+              <select id="sizeModeSelect">
+                <option value="fixed">fixed</option>
+                <option value="degree">degree</option>
+                <option value="kcore">k-core index</option>
+                <option value="closeness">closeness</option>
+                <option value="betweenness">betweenness</option>
+              </select>
+            </span>
+
+            <span class="inline">
+              edges
+              <select id="edgeModeSelect">
+                <option value="uniform">uniform</option>
+                <option value="swap">swap position</option>
+                <option value="layers">BFS layers from selected</option>
+              </select>
+            </span>
+
+            <label class="inline"><input type="checkbox" id="showLabels" checked /> show labels</label>
+            <label class="inline"><input type="checkbox" id="showLegend" checked /> show legend</label>
+          </div>
+
+          <div id="graphIntro" class="muted">Load data to draw a graph.</div>
+          <div id="graphColorInfo" class="muted"></div>
+          <div id="graphLegend" class="legend"></div>
+
+          <div style="height:8px"></div>
+
+          <div class="svg-wrap">
+            <svg id="graphSvg" width="100%" height="600" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+
+          <div class="graph-note">
+            Two nodes are adjacent exactly when one permutation is obtained from the other by swapping one neighboring pair.
+          </div>
+        </div>
+      </section>
+
+      <div class="split">
+        <section class="panel">
+          <div class="hd">Permutations in Current Domain</div>
+          <div class="bd">
+            <div id="permIntro" class="muted">No domain loaded.</div>
+            <div style="height:8px"></div>
+            <div id="permTableWrap" class="table-wrap"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="hd">Neighbors of Selected Permutation</div>
+          <div class="bd">
+            <div id="neighborIntro" class="muted">Select a node to inspect its adjacent neighbors.</div>
+            <div style="height:8px"></div>
+            <div id="neighborTableWrap" class="table-wrap"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="./UMCDs/bundled-umcds.js"></script>
+  <script>
+    (() => {
+      const BUNDLED_MANIFEST_URL = "./UMCDs/manifest.json";
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      const COMPONENT_COLORS = ["#38bdf8", "#4ade80", "#f59e0b", "#fb7185", "#a78bfa", "#14b8a6", "#f472b6", "#22d3ee"];
+
+      const state = {
+        datasets: [],
+        datasetKeys: new Set(),
+        filteredDatasetIds: [],
+        currentDatasetId: null,
+        currentDomainIndex: 0,
+        selectedPermIndex: null,
+        modelCache: new Map(),
+        nextDatasetId: 1,
+        manifest: null,
+        bundledLoaded: false,
+      };
+
+      const $ = (id) => document.getElementById(id);
+
+      const loadBundledBtn = $("loadBundledBtn");
+      const fileInput = $("fileInput");
+      const loadStatus = $("loadStatus");
+
+      const kFilter = $("kFilter");
+      const datasetSelect = $("datasetSelect");
+      const domainIndexInput = $("domainIndex");
+      const prevBtn = $("prevBtn");
+      const nextBtn = $("nextBtn");
+      const randomBtn = $("randomBtn");
+      const copyDomainBtn = $("copyDomainBtn");
+
+      const datasetBadges = $("datasetBadges");
+      const statsGrid = $("statsGrid");
+      const selectedInfo = $("selectedInfo");
+
+      const layoutSelect = $("layoutSelect");
+      const labelModeSelect = $("labelModeSelect");
+      const colorModeSelect = $("colorModeSelect");
+      const sizeModeSelect = $("sizeModeSelect");
+      const edgeModeSelect = $("edgeModeSelect");
+      const showLabels = $("showLabels");
+      const showLegend = $("showLegend");
+      const graphIntro = $("graphIntro");
+      const graphColorInfo = $("graphColorInfo");
+      const graphLegend = $("graphLegend");
+      const graphSvg = $("graphSvg");
+
+      const permIntro = $("permIntro");
+      const permTableWrap = $("permTableWrap");
+
+      const neighborIntro = $("neighborIntro");
+      const neighborTableWrap = $("neighborTableWrap");
+
+      function escapeHtml(input) {
+        return String(input)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+      }
+
+      function permutationKey(p) {
+        return p.join(",");
+      }
+
+      function hideLeadingZeroColumn(domain) {
+        return domain.length > 0 && domain.every((p) => p.length > 0 && p[0] === 0);
+      }
+
+      function permutationText(p, dropLeadingZero = false) {
+        const shown = dropLeadingZero ? p.slice(1) : p;
+        return shown.join(" ");
+      }
+
+      function inversionCount(p) {
+        let inv = 0;
+        for (let i = 0; i < p.length; i++) {
+          for (let j = i + 1; j < p.length; j++) {
+            if (p[i] > p[j]) inv += 1;
+          }
+        }
+        return inv;
+      }
+
+      function normalizeDomain(rawDomain) {
+        const seen = new Set();
+        const dedup = [];
+
+        for (const p of rawDomain) {
+          if (new Set(p).size !== p.length) continue;
+          const key = permutationKey(p);
+          if (!seen.has(key)) {
+            seen.add(key);
+            dedup.push(p);
+          }
+        }
+
+        if (dedup.length === 0) return null;
+
+        const m = dedup[0].length;
+        if (!dedup.every((p) => p.length === m)) return null;
+
+        const baseSignature = dedup[0].slice().sort((a, b) => a - b).join(",");
+        if (!dedup.every((p) => p.slice().sort((a, b) => a - b).join(",") === baseSignature)) return null;
+
+        return dedup;
+      }
+
+      function parseMUCDText(text) {
+        const lines = text.split(/\r?\n/);
+        const domains = [];
+        let current = [];
+
+        function flushCurrent() {
+          if (current.length === 0) return;
+          const normalized = normalizeDomain(current);
+          if (normalized) domains.push(normalized);
+          current = [];
+        }
+
+        for (const raw of lines) {
+          const line = raw.trim();
+          if (!line) continue;
+          if (line.startsWith("#")) continue;
+
+          if (/^-1(?:\s|$|[,;\]])/.test(line)) {
+            flushCurrent();
+            continue;
+          }
+
+          const nums = line.match(/-?\d+/g);
+          if (!nums || nums.length === 0) continue;
+
+          const values = nums.map((s) => Number.parseInt(s, 10));
+          if (values.length === 1 && values[0] === -1) {
+            flushCurrent();
+            continue;
+          }
+
+          current.push(values);
+        }
+
+        flushCurrent();
+        return domains;
+      }
+
+      function pickDatasetK(domains) {
+        const counts = new Map();
+        for (const d of domains) {
+          const k = d[0].length;
+          counts.set(k, (counts.get(k) || 0) + 1);
+        }
+
+        let bestK = null;
+        let bestCount = -1;
+        for (const [k, c] of counts.entries()) {
+          if (c > bestCount) {
+            bestK = k;
+            bestCount = c;
+          }
+        }
+        return bestK;
+      }
+
+      function parseDatasetNFromName(name) {
+        const m = String(name).match(/(?:^|[-_])n=(\d+)(?:[-_]|$)/i);
+        if (!m) return null;
+        const n = Number.parseInt(m[1], 10);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function buildAdjacentEdges(domain) {
+        const m = domain[0].length;
+        const keyToIndex = new Map();
+        domain.forEach((p, i) => keyToIndex.set(permutationKey(p), i));
+
+        const edges = [];
+        for (let i = 0; i < domain.length; i++) {
+          const p = domain[i];
+          for (let j = 0; j < m - 1; j++) {
+            const q = p.slice();
+            [q[j], q[j + 1]] = [q[j + 1], q[j]];
+            const idx = keyToIndex.get(permutationKey(q));
+            if (idx !== undefined && i < idx) edges.push([i, idx, j]);
+          }
+        }
+        return edges;
+      }
+
+      function bfsDistances(start, adjacency) {
+        const n = adjacency.length;
+        const dist = Array(n).fill(-1);
+        const queue = [start];
+        dist[start] = 0;
+
+        for (let qi = 0; qi < queue.length; qi++) {
+          const v = queue[qi];
+          for (const w of adjacency[v]) {
+            if (dist[w] !== -1) continue;
+            dist[w] = dist[v] + 1;
+            queue.push(w);
+          }
+        }
+
+        return dist;
+      }
+
+      function computeAllPairsDistances(adjacency) {
+        const n = adjacency.length;
+        const distances = Array.from({ length: n }, () => Array(n).fill(-1));
+        for (let s = 0; s < n; s++) distances[s] = bfsDistances(s, adjacency);
+        return distances;
+      }
+
+      function computeEccentricityAndCloseness(distances, components) {
+        const n = distances.length;
+        const eccentricity = Array(n).fill(0);
+        const closeness = Array(n).fill(0);
+
+        for (const nodes of components) {
+          for (const s of nodes) {
+            let sum = 0;
+            let maxd = 0;
+            let reachable = 0;
+
+            for (const t of nodes) {
+              if (t === s) continue;
+              const d = distances[s][t];
+              if (d < 0) continue;
+              reachable += 1;
+              sum += d;
+              if (d > maxd) maxd = d;
+            }
+
+            eccentricity[s] = maxd;
+            closeness[s] = sum > 0 ? reachable / sum : 0;
+          }
+        }
+
+        return { eccentricity, closeness };
+      }
+
+      function computeBetweennessBrandes(adjacency) {
+        const n = adjacency.length;
+        const betweenness = Array(n).fill(0);
+
+        for (let s = 0; s < n; s++) {
+          const stack = [];
+          const preds = Array.from({ length: n }, () => []);
+          const sigma = Array(n).fill(0);
+          const dist = Array(n).fill(-1);
+          sigma[s] = 1;
+          dist[s] = 0;
+
+          const queue = [s];
+          for (let qi = 0; qi < queue.length; qi++) {
+            const v = queue[qi];
+            stack.push(v);
+            for (const w of adjacency[v]) {
+              if (dist[w] < 0) {
+                dist[w] = dist[v] + 1;
+                queue.push(w);
+              }
+              if (dist[w] === dist[v] + 1) {
+                sigma[w] += sigma[v];
+                preds[w].push(v);
+              }
+            }
+          }
+
+          const delta = Array(n).fill(0);
+          while (stack.length) {
+            const w = stack.pop();
+            for (const v of preds[w]) {
+              if (sigma[w] > 0) delta[v] += (sigma[v] / sigma[w]) * (1 + delta[w]);
+            }
+            if (w !== s) betweenness[w] += delta[w];
+          }
+        }
+
+        for (let i = 0; i < n; i++) betweenness[i] /= 2;
+        return betweenness;
+      }
+
+      function computeCoreNumbers(adjacency) {
+        const n = adjacency.length;
+        const deg = adjacency.map((arr) => arr.length);
+        const removed = Array(n).fill(false);
+        const core = Array(n).fill(0);
+
+        let remaining = n;
+        let k = 0;
+
+        while (remaining > 0) {
+          let changed = true;
+          while (changed) {
+            changed = false;
+            for (let v = 0; v < n; v++) {
+              if (removed[v] || deg[v] > k) continue;
+              removed[v] = true;
+              core[v] = k;
+              remaining -= 1;
+              changed = true;
+              for (const w of adjacency[v]) if (!removed[w]) deg[w] -= 1;
+            }
+          }
+          if (remaining > 0) k += 1;
+        }
+
+        return core;
+      }
+
+      function computeClusteringCoefficients(adjacency) {
+        const n = adjacency.length;
+        const neighborSets = adjacency.map((nbrs) => new Set(nbrs));
+        const clustering = Array(n).fill(0);
+
+        for (let v = 0; v < n; v++) {
+          const nbrs = adjacency[v];
+          const d = nbrs.length;
+          if (d < 2) {
+            clustering[v] = 0;
+            continue;
+          }
+
+          let links = 0;
+          for (let i = 0; i < d; i++) {
+            for (let j = i + 1; j < d; j++) {
+              if (neighborSets[nbrs[i]].has(nbrs[j])) links += 1;
+            }
+          }
+
+          clustering[v] = (2 * links) / (d * (d - 1));
+        }
+
+        return clustering;
+      }
+
+      function computeWLRefinementClasses(adjacency) {
+        const n = adjacency.length;
+        let colors = Array(n).fill("0");
+
+        for (let iter = 0; iter < n; iter++) {
+          const signatures = new Array(n);
+          for (let v = 0; v < n; v++) {
+            const nbrColors = adjacency[v].map((w) => colors[w]).sort();
+            signatures[v] = `${colors[v]}|${nbrColors.join(",")}`;
+          }
+
+          const unique = Array.from(new Set(signatures)).sort();
+          const idMap = new Map(unique.map((sig, idx) => [sig, String(idx)]));
+          const nextColors = signatures.map((sig) => idMap.get(sig));
+          const stable = nextColors.every((c, i) => c === colors[i]);
+          colors = nextColors;
+          if (stable) break;
+        }
+
+        const classIds = colors.map((c) => Number.parseInt(c, 10));
+        const classCount = classIds.length ? (Math.max(...classIds) + 1) : 0;
+        return { classIds, classCount };
+      }
+
+      function buildComponentColorOrder(components, degree) {
+        const infos = components.map((nodes, id) => {
+          const degSig = nodes.map((v) => degree[v]).sort((a, b) => a - b).join(",");
+          return { id, key: `${nodes.length}|${degSig}` };
+        });
+
+        infos.sort((a, b) => a.key.localeCompare(b.key) || a.id - b.id);
+        const order = Array(components.length).fill(0);
+        infos.forEach((info, idx) => {
+          order[info.id] = idx;
+        });
+        return order;
+      }
+
+      function buildDomainModel(domain) {
+        const n = domain.length;
+        const edges = buildAdjacentEdges(domain);
+        const adjacency = Array.from({ length: n }, () => []);
+        const degree = Array(n).fill(0);
+
+        for (const [u, v] of edges) {
+          adjacency[u].push(v);
+          adjacency[v].push(u);
+          degree[u] += 1;
+          degree[v] += 1;
+        }
+        adjacency.forEach((nbrs) => nbrs.sort((a, b) => a - b));
+
+        const components = [];
+        const componentOf = Array(n).fill(-1);
+
+        for (let start = 0; start < n; start++) {
+          if (componentOf[start] !== -1) continue;
+
+          const stack = [start];
+          const nodes = [];
+          componentOf[start] = components.length;
+
+          while (stack.length) {
+            const u = stack.pop();
+            nodes.push(u);
+            for (const v of adjacency[u]) {
+              if (componentOf[v] === -1) {
+                componentOf[v] = componentOf[start];
+                stack.push(v);
+              }
+            }
+          }
+
+          components.push(nodes.sort((a, b) => a - b));
+        }
+
+        const inversions = domain.map(inversionCount);
+        const maxInv = Math.max(...inversions, 0);
+        const distances = computeAllPairsDistances(adjacency);
+        const { eccentricity, closeness } = computeEccentricityAndCloseness(distances, components);
+        const betweenness = computeBetweennessBrandes(adjacency);
+        const kcore = computeCoreNumbers(adjacency);
+        const clustering = computeClusteringCoefficients(adjacency);
+        const wl = computeWLRefinementClasses(adjacency);
+        const componentColorOrder = buildComponentColorOrder(components, degree);
+
+        return {
+          n,
+          edges,
+          adjacency,
+          degree,
+          components,
+          componentOf,
+          inversions,
+          maxInv,
+          componentColorOrder,
+          metrics: {
+            distances,
+            eccentricity,
+            closeness,
+            betweenness,
+            kcore,
+            clustering,
+            wlClass: wl.classIds,
+            wlClassCount: wl.classCount,
+          },
+          alternatives: domain[0].slice().sort((a, b) => a - b),
+        };
+      }
+
+      function layoutByInversions(domain, model, width, height, padding) {
+        const byInv = new Map();
+        for (let i = 0; i < model.n; i++) {
+          const inv = model.inversions[i];
+          if (!byInv.has(inv)) byInv.set(inv, []);
+          byInv.get(inv).push(i);
+        }
+
+        const invLevels = Array.from(byInv.keys()).sort((a, b) => a - b);
+        const coords = new Array(model.n);
+
+        for (const inv of invLevels) {
+          const indices = byInv
+            .get(inv)
+            .slice()
+            .sort((a, b) => permutationKey(domain[a]).localeCompare(permutationKey(domain[b])));
+
+          const k = indices.length;
+          for (let t = 0; t < k; t++) {
+            const i = indices[t];
+            const x = padding + ((width - 2 * padding) * (t + 1)) / (k + 1);
+            const y =
+              model.maxInv === 0
+                ? height / 2
+                : padding + ((height - 2 * padding) * inv) / model.maxInv;
+            coords[i] = { x, y };
+          }
+        }
+
+        return { coords, invLevels };
+      }
+
+      function layoutForce(model, width, height, padding) {
+        const n = model.n;
+        if (n === 0) return [];
+
+        const cx = width / 2;
+        const cy = height / 2;
+        const baseRadius = Math.min(width, height) * 0.34;
+
+        const nodes = Array.from({ length: n }, (_, i) => {
+          const a = (2 * Math.PI * i) / Math.max(1, n);
+          const r = baseRadius * (0.82 + 0.26 * ((i % 7) / 6));
+          return {
+            x: cx + r * Math.cos(a),
+            y: cy + r * Math.sin(a),
+            vx: 0,
+            vy: 0,
+          };
+        });
+
+        const targetLen = Math.max(52, Math.min(width, height) * (0.26 + 0.35 / Math.sqrt(n)));
+
+        for (let iter = 0; iter < 320; iter++) {
+          for (let i = 0; i < n; i++) {
+            for (let j = i + 1; j < n; j++) {
+              const dx = nodes[j].x - nodes[i].x;
+              const dy = nodes[j].y - nodes[i].y;
+              const distSq = dx * dx + dy * dy + 0.1;
+              const dist = Math.sqrt(distSq);
+              const rep = 2600 / distSq;
+              const fx = (rep * dx) / dist;
+              const fy = (rep * dy) / dist;
+              nodes[i].vx -= fx;
+              nodes[i].vy -= fy;
+              nodes[j].vx += fx;
+              nodes[j].vy += fy;
+            }
+          }
+
+          for (const [u, v] of model.edges) {
+            const dx = nodes[v].x - nodes[u].x;
+            const dy = nodes[v].y - nodes[u].y;
+            const dist = Math.max(0.01, Math.sqrt(dx * dx + dy * dy));
+            const spring = (dist - targetLen) * 0.024;
+            const fx = (spring * dx) / dist;
+            const fy = (spring * dy) / dist;
+            nodes[u].vx += fx;
+            nodes[u].vy += fy;
+            nodes[v].vx -= fx;
+            nodes[v].vy -= fy;
+          }
+
+          for (const node of nodes) {
+            node.vx += (cx - node.x) * 0.0034;
+            node.vy += (cy - node.y) * 0.0034;
+
+            node.vx *= 0.82;
+            node.vy *= 0.82;
+
+            node.x += node.vx;
+            node.y += node.vy;
+
+            node.x = Math.max(padding, Math.min(width - padding, node.x));
+            node.y = Math.max(padding, Math.min(height - padding, node.y));
+          }
+        }
+
+        return nodes.map((n0) => ({ x: n0.x, y: n0.y }));
+      }
+
+      function degreeColor(degree, minDeg, maxDeg) {
+        return scalarColor(degree, minDeg, maxDeg);
+      }
+
+      function scalarColor(value, minValue, maxValue) {
+        if (maxValue <= minValue) return "#60a5fa";
+        const t = (value - minValue) / (maxValue - minValue);
+        const hue = 215 - 95 * Math.max(0, Math.min(1, t));
+        return `hsl(${hue.toFixed(1)} 82% 64%)`;
+      }
+
+      function valueRange(values) {
+        if (!values || values.length === 0) return { min: 0, max: 0 };
+        return { min: Math.min(...values), max: Math.max(...values) };
+      }
+
+      function discreteColor(index, total) {
+        if (total <= 1) return "#60a5fa";
+        const hue = (index * 360) / total;
+        return `hsl(${hue.toFixed(1)} 80% 63%)`;
+      }
+
+      function radiusFromMetric(value, minValue, maxValue) {
+        if (maxValue <= minValue) return 7.8;
+        const t = (value - minValue) / (maxValue - minValue);
+        return 6.2 + 4.2 * Math.max(0, Math.min(1, t));
+      }
+
+      function setLegendItems(items) {
+        if (!showLegend.checked || !items || items.length === 0) {
+          graphLegend.innerHTML = "";
+          return;
+        }
+
+        graphLegend.innerHTML = items
+          .map((item) => `<span class="item"><span class="sw" style="background:${item.color}"></span>${escapeHtml(item.label)}</span>`)
+          .join("");
+      }
+
+      function classifyBy123(perm) {
+        const pos = new Map();
+        for (let i = 0; i < perm.length; i++) pos.set(perm[i], i);
+        if (!pos.has(1) || !pos.has(2) || !pos.has(3)) return null;
+
+        const triple = [1, 2, 3];
+        let top = triple[0];
+        let bottom = triple[0];
+
+        for (const a of triple) {
+          if (pos.get(a) < pos.get(top)) top = a;
+          if (pos.get(a) > pos.get(bottom)) bottom = a;
+        }
+
+        const label = `${top}N${bottom}`;
+        let group = "other";
+        if (bottom === 3) group = "N3";
+        else if (bottom === 2) group = "N2";
+        else if (bottom === 1) group = "N1";
+
+        return { label, group };
+      }
+
+      function classColor(group) {
+        if (group === "N3") return "#f59e0b";
+        if (group === "N2") return "#22d3ee";
+        if (group === "N1") return "#4ade80";
+        return "#94a3b8";
+      }
+
+      function setStatus(message, level = "normal") {
+        loadStatus.textContent = message;
+        loadStatus.className = `status ${level === "normal" ? "" : level}`.trim();
+      }
+
+      function getInlineBundledFiles() {
+        const raw = globalThis.BUNDLED_UMCDS_FILES;
+        if (!Array.isArray(raw)) return [];
+
+        const out = [];
+        for (let i = 0; i < raw.length; i++) {
+          const item = raw[i];
+          if (!item || typeof item.text !== "string") continue;
+          const file = String(item.file || item.name || `bundled-${i + 1}`);
+          out.push({ file, text: item.text });
+        }
+        return out;
+      }
+
+      function addBundledPayloads(payloads) {
+        let added = 0;
+        for (const item of payloads) {
+          if (addDataset(item.file, item.text, "bundled", false)) added += 1;
+        }
+        refreshAfterDatasetChange();
+        return added;
+      }
+
+      function datasetById(id) {
+        return state.datasets.find((d) => d.id === id) || null;
+      }
+
+      function currentDataset() {
+        if (state.currentDatasetId === null) return null;
+        return datasetById(state.currentDatasetId);
+      }
+
+      function currentDomain() {
+        const ds = currentDataset();
+        if (!ds) return null;
+        return ds.domains[state.currentDomainIndex] || null;
+      }
+
+      function clearSvg(svg) {
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+      }
+
+      function addDataset(name, text, source, refresh = true) {
+        const key = `${source}:${name}`;
+        if (state.datasetKeys.has(key)) return false;
+
+        const domains = parseMUCDText(text);
+        if (domains.length === 0) return false;
+
+        const permLength = pickDatasetK(domains);
+        const nLabel = parseDatasetNFromName(name) ?? permLength;
+
+        state.datasets.push({
+          id: state.nextDatasetId,
+          name,
+          source,
+          nLabel,
+          permLength,
+          domains,
+        });
+        state.nextDatasetId += 1;
+        state.datasetKeys.add(key);
+        state.modelCache.clear();
+
+        if (refresh) refreshAfterDatasetChange();
+        return true;
+      }
+
+      function refreshKFilter() {
+        const previous = kFilter.value;
+        const values = Array.from(new Set(state.datasets.map((d) => d.nLabel))).sort((a, b) => a - b);
+
+        kFilter.innerHTML = "";
+        const allOpt = document.createElement("option");
+        allOpt.value = "all";
+        allOpt.textContent = "All";
+        kFilter.appendChild(allOpt);
+
+        for (const k of values) {
+          const opt = document.createElement("option");
+          opt.value = String(k);
+          opt.textContent = String(k);
+          kFilter.appendChild(opt);
+        }
+
+        kFilter.disabled = values.length === 0;
+
+        if (previous && (previous === "all" || values.includes(Number.parseInt(previous, 10)))) {
+          kFilter.value = previous;
+        } else {
+          kFilter.value = "all";
+        }
+      }
+
+      function refreshDatasetSelect() {
+        const filter = kFilter.value || "all";
+        const visible = state.datasets.filter((ds) => filter === "all" || String(ds.nLabel) === filter);
+        state.filteredDatasetIds = visible.map((ds) => ds.id);
+
+        datasetSelect.innerHTML = "";
+
+        if (visible.length === 0) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "No matching datasets";
+          datasetSelect.appendChild(opt);
+
+          datasetSelect.disabled = true;
+          state.currentDatasetId = null;
+          state.currentDomainIndex = 0;
+          state.selectedPermIndex = null;
+          setControlsEnabled(false);
+          renderAll();
+          return;
+        }
+
+        for (const ds of visible) {
+          const opt = document.createElement("option");
+          opt.value = String(ds.id);
+          opt.textContent = `${ds.name}  (n=${ds.nLabel}, perm-len=${ds.permLength}, domains=${ds.domains.length})`;
+          datasetSelect.appendChild(opt);
+        }
+
+        if (!visible.some((d) => d.id === state.currentDatasetId)) {
+          state.currentDatasetId = visible[0].id;
+          state.currentDomainIndex = 0;
+          state.selectedPermIndex = null;
+        }
+
+        datasetSelect.value = String(state.currentDatasetId);
+        datasetSelect.disabled = false;
+        setControlsEnabled(true);
+        updateDomainIndexBounds();
+        renderAll();
+      }
+
+      function refreshAfterDatasetChange() {
+        refreshKFilter();
+        refreshDatasetSelect();
+      }
+
+      function setControlsEnabled(enabled) {
+        domainIndexInput.disabled = !enabled;
+        prevBtn.disabled = !enabled;
+        nextBtn.disabled = !enabled;
+        randomBtn.disabled = !enabled;
+        copyDomainBtn.disabled = !enabled;
+      }
+
+      function updateDomainIndexBounds() {
+        const ds = currentDataset();
+        if (!ds) {
+          domainIndexInput.value = "";
+          domainIndexInput.min = 1;
+          domainIndexInput.max = 1;
+          return;
+        }
+
+        const maxDomains = ds.domains.length;
+        state.currentDomainIndex = Math.max(0, Math.min(maxDomains - 1, state.currentDomainIndex));
+
+        domainIndexInput.min = 1;
+        domainIndexInput.max = maxDomains;
+        domainIndexInput.value = String(state.currentDomainIndex + 1);
+      }
+
+      function drawEmptyState() {
+        datasetBadges.innerHTML = "";
+        statsGrid.innerHTML = "";
+        selectedInfo.textContent = "Select a permutation in the graph or table.";
+
+        graphIntro.textContent = "Load data to draw a graph.";
+        graphColorInfo.textContent = "";
+        graphLegend.innerHTML = "";
+        clearSvg(graphSvg);
+
+        permIntro.textContent = "No domain loaded.";
+        permTableWrap.innerHTML = "";
+
+        neighborIntro.textContent = "Select a node to inspect its adjacent neighbors.";
+        neighborTableWrap.innerHTML = "";
+      }
+
+      function renderBadges(dataset, model, domain) {
+        const connected = model.components.length === 1;
+        const altMin = Math.min(...model.alternatives);
+        const altMax = Math.max(...model.alternatives);
+
+        datasetBadges.innerHTML = "";
+        const parts = [
+          { text: `${dataset.source}`, cls: "" },
+          { text: `n=${dataset.nLabel}`, cls: "" },
+          { text: `perm-len=${dataset.permLength}`, cls: "" },
+          { text: `domains: ${dataset.domains.length}`, cls: "" },
+          { text: `|D|=${domain.length}`, cls: "" },
+          { text: `alts ${altMin}..${altMax}`, cls: "" },
+          { text: connected ? "adj-swap connected" : "adj-swap disconnected", cls: connected ? "ok" : "warn" },
+        ];
+
+        for (const part of parts) {
+          const span = document.createElement("span");
+          span.className = `pill ${part.cls}`.trim();
+          span.textContent = part.text;
+          datasetBadges.appendChild(span);
+        }
+      }
+
+      function statCard(label, value) {
+        const card = document.createElement("div");
+        card.className = "stat";
+        card.innerHTML = `<div class="k">${escapeHtml(label)}</div><div class="v">${escapeHtml(value)}</div>`;
+        return card;
+      }
+
+      function renderStats(dataset, domain, model) {
+        const degMin = Math.min(...model.degree);
+        const degMax = Math.max(...model.degree);
+        const degAvg = model.degree.reduce((a, b) => a + b, 0) / model.degree.length;
+
+        statsGrid.innerHTML = "";
+        statsGrid.appendChild(statCard("Dataset", dataset.name));
+        statsGrid.appendChild(statCard("Domain", `${state.currentDomainIndex + 1} / ${dataset.domains.length}`));
+        statsGrid.appendChild(statCard("n (from file)", String(dataset.nLabel)));
+        statsGrid.appendChild(statCard("Permutation length", String(dataset.permLength)));
+        statsGrid.appendChild(statCard("Permutations", String(domain.length)));
+        statsGrid.appendChild(statCard("Edges", String(model.edges.length)));
+        statsGrid.appendChild(statCard("Components", String(model.components.length)));
+        statsGrid.appendChild(statCard("Degree range", `${degMin}..${degMax}`));
+        statsGrid.appendChild(statCard("Degree avg", degAvg.toFixed(2)));
+      }
+
+      function renderSelectedInfo(dataset, domain, model) {
+        const idx = state.selectedPermIndex;
+        if (idx === null || idx < 0 || idx >= domain.length) {
+          selectedInfo.textContent = "Select a permutation in the graph or table.";
+          return;
+        }
+
+        const comp = model.componentOf[idx] + 1;
+        const neighbors = model.adjacency[idx].slice().sort((a, b) => a - b).map((i) => i + 1);
+        const cls = classifyBy123(domain[idx]);
+        const dropLeadingZero = hideLeadingZeroColumn(domain);
+
+        selectedInfo.innerHTML = [
+          `<div><strong>#${idx + 1}</strong> <span class="mono">${escapeHtml(permutationText(domain[idx], dropLeadingZero))}</span></div>`,
+          `<div class="hint">inversions: <span class="mono">${model.inversions[idx]}</span> &nbsp; degree: <span class="mono">${model.degree[idx]}</span> &nbsp; component: <span class="mono">${comp}</span>${cls ? ` &nbsp; class: <span class="mono">${cls.label}</span>` : ""}</div>`,
+          `<div class="hint">ecc: <span class="mono">${model.metrics.eccentricity[idx]}</span> &nbsp; close: <span class="mono">${model.metrics.closeness[idx].toFixed(3)}</span> &nbsp; between: <span class="mono">${model.metrics.betweenness[idx].toFixed(2)}</span> &nbsp; core: <span class="mono">${model.metrics.kcore[idx]}</span> &nbsp; WL: <span class="mono">${model.metrics.wlClass[idx]}</span></div>`,
+          `<div class="hint">neighbors: <span class="mono">${neighbors.length ? neighbors.join(", ") : "none"}</span></div>`,
+        ].join("");
+      }
+
+      function renderPermutationTable(domain, model) {
+        const dropLeadingZero = hideLeadingZeroColumn(domain);
+        const suffix = dropLeadingZero ? " (display omits leading 0 column)" : "";
+        permIntro.textContent = `Domain #${state.currentDomainIndex + 1} has ${domain.length} permutations.${suffix}`;
+
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th style="width:62px">#</th>
+              <th>Permutation</th>
+              <th style="width:72px">Inv</th>
+              <th style="width:72px">Deg</th>
+              <th style="width:72px">Comp</th>
+            </tr>
+          </thead>
+        `;
+
+        const tbody = document.createElement("tbody");
+
+        domain.forEach((p, i) => {
+          const tr = document.createElement("tr");
+          if (state.selectedPermIndex === i) tr.classList.add("active");
+
+          tr.innerHTML = `
+            <td class="mono">${i + 1}</td>
+            <td class="mono">${escapeHtml(permutationText(p, dropLeadingZero))}</td>
+            <td class="mono">${model.inversions[i]}</td>
+            <td class="mono">${model.degree[i]}</td>
+            <td class="mono">${model.componentOf[i] + 1}</td>
+          `;
+
+          tr.addEventListener("click", () => {
+            state.selectedPermIndex = state.selectedPermIndex === i ? null : i;
+            renderAll();
+          });
+
+          tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+        permTableWrap.innerHTML = "";
+        permTableWrap.appendChild(table);
+      }
+
+      function renderNeighborTable(domain, model) {
+        const idx = state.selectedPermIndex;
+        if (idx === null || idx < 0 || idx >= domain.length) {
+          neighborIntro.textContent = "Select a node to inspect its adjacent neighbors.";
+          neighborTableWrap.innerHTML = "";
+          return;
+        }
+
+        const dropLeadingZero = hideLeadingZeroColumn(domain);
+        const neighbors = model.adjacency[idx].slice().sort((a, b) => a - b);
+        neighborIntro.innerHTML = `Neighbors of <span class="mono">#${idx + 1} ${escapeHtml(permutationText(domain[idx], dropLeadingZero))}</span>: ${neighbors.length}`;
+
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th style="width:62px">#</th>
+              <th>Permutation</th>
+              <th style="width:72px">Inv</th>
+              <th style="width:72px">Deg</th>
+            </tr>
+          </thead>
+        `;
+
+        const tbody = document.createElement("tbody");
+        for (const j of neighbors) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="mono">${j + 1}</td>
+            <td class="mono">${escapeHtml(permutationText(domain[j], dropLeadingZero))}</td>
+            <td class="mono">${model.inversions[j]}</td>
+            <td class="mono">${model.degree[j]}</td>
+          `;
+          tr.addEventListener("click", () => {
+            state.selectedPermIndex = j;
+            renderAll();
+          });
+          tbody.appendChild(tr);
+        }
+
+        table.appendChild(tbody);
+        neighborTableWrap.innerHTML = "";
+        neighborTableWrap.appendChild(table);
+      }
+
+      function renderGraph(domain, model) {
+        const W = 1200;
+        const H = 600;
+        const PAD = 44;
+        const dropLeadingZero = hideLeadingZeroColumn(domain);
+
+        graphSvg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+        clearSvg(graphSvg);
+
+        const layoutMode = layoutSelect.value;
+        const colorMode = colorModeSelect.value;
+        const sizeMode = sizeModeSelect.value;
+        const edgeMode = edgeModeSelect.value;
+        const selected = state.selectedPermIndex;
+        const selectedDist = selected !== null && selected >= 0 && selected < model.n ? model.metrics.distances[selected] : null;
+        let coords;
+        let invLevels = [];
+
+        if (layoutMode === "layers") {
+          const layered = layoutByInversions(domain, model, W, H, PAD);
+          coords = layered.coords;
+          invLevels = layered.invLevels;
+
+          if (model.maxInv > 0) {
+            for (const inv of invLevels) {
+              const y = PAD + ((H - 2 * PAD) * inv) / model.maxInv;
+
+              const line = document.createElementNS(SVG_NS, "line");
+              line.setAttribute("x1", 0);
+              line.setAttribute("x2", W);
+              line.setAttribute("y1", y.toFixed(2));
+              line.setAttribute("y2", y.toFixed(2));
+              line.setAttribute("stroke", "rgba(186,210,255,0.12)");
+              line.setAttribute("stroke-width", "1");
+              graphSvg.appendChild(line);
+
+              const txt = document.createElementNS(SVG_NS, "text");
+              txt.setAttribute("x", "9");
+              txt.setAttribute("y", (y - 6).toFixed(2));
+              txt.setAttribute("font-size", "11");
+              txt.setAttribute("font-family", "SFMono-Regular, Menlo, Monaco, Consolas, monospace");
+              txt.setAttribute("fill", "rgba(186,210,255,0.6)");
+              txt.textContent = `inv=${inv}`;
+              graphSvg.appendChild(txt);
+            }
+          }
+        } else {
+          coords = layoutForce(model, W, H, PAD);
+        }
+
+        const swapCount = Math.max(1, domain[0].length - 1);
+        for (const [u, v, swapPos] of model.edges) {
+          const a = coords[u];
+          const b = coords[v];
+          const touchesSelected = selected !== null && (u === selected || v === selected);
+
+          let stroke = "rgba(186,210,255,0.34)";
+          let width = 1.2;
+
+          if (edgeMode === "swap") {
+            stroke = discreteColor(swapPos, swapCount);
+            width = 1.45;
+          } else if (edgeMode === "layers" && selectedDist) {
+            const du = selectedDist[u];
+            const dv = selectedDist[v];
+            if (du >= 0 && dv >= 0) {
+              const diff = Math.abs(du - dv);
+              if (diff === 1) {
+                stroke = "rgba(56,189,248,0.86)";
+                width = 2.0;
+              } else if (diff === 0) {
+                stroke = "rgba(186,210,255,0.46)";
+                width = 1.35;
+              } else {
+                stroke = "rgba(186,210,255,0.18)";
+                width = 1.0;
+              }
+            } else {
+              stroke = "rgba(186,210,255,0.16)";
+              width = 1.0;
+            }
+          }
+
+          if (touchesSelected) {
+            stroke = "rgba(56,189,248,0.95)";
+            width = Math.max(width, 2.3);
+          }
+
+          const edge = document.createElementNS(SVG_NS, "line");
+          edge.setAttribute("x1", a.x.toFixed(2));
+          edge.setAttribute("y1", a.y.toFixed(2));
+          edge.setAttribute("x2", b.x.toFixed(2));
+          edge.setAttribute("y2", b.y.toFixed(2));
+          edge.setAttribute("stroke", stroke);
+          edge.setAttribute("stroke-width", width.toFixed(2));
+          graphSvg.appendChild(edge);
+        }
+
+        const minDeg = Math.min(...model.degree);
+        const maxDeg = Math.max(...model.degree);
+        const rangeClose = valueRange(model.metrics.closeness);
+        const rangeBetween = valueRange(model.metrics.betweenness);
+        const rangeCore = valueRange(model.metrics.kcore);
+        const rangeCluster = valueRange(model.metrics.clustering);
+        const rangeEcc = valueRange(model.metrics.eccentricity);
+        const wlCount = Math.max(1, model.metrics.wlClassCount);
+        const maxDist = selectedDist ? Math.max(...selectedDist.filter((d) => d >= 0), 0) : 0;
+
+        for (let i = 0; i < model.n; i++) {
+          const g = document.createElementNS(SVG_NS, "g");
+          g.setAttribute("cursor", "pointer");
+
+          const isSelected = selected === i;
+          const cls = classifyBy123(domain[i]);
+
+          let fill = "#94a3b8";
+          if (colorMode === "component") {
+            const cidx = model.componentColorOrder[model.componentOf[i]];
+            fill = COMPONENT_COLORS[cidx % COMPONENT_COLORS.length];
+          } else if (colorMode === "degree") {
+            fill = degreeColor(model.degree[i], minDeg, maxDeg);
+          } else if (colorMode === "distance") {
+            if (selectedDist && selectedDist[i] >= 0) fill = discreteColor(selectedDist[i], Math.max(2, maxDist + 1));
+            else fill = "#64748b";
+          } else if (colorMode === "eccentricity") {
+            fill = scalarColor(model.metrics.eccentricity[i], rangeEcc.min, rangeEcc.max);
+          } else if (colorMode === "closeness") {
+            fill = scalarColor(model.metrics.closeness[i], rangeClose.min, rangeClose.max);
+          } else if (colorMode === "betweenness") {
+            fill = scalarColor(model.metrics.betweenness[i], rangeBetween.min, rangeBetween.max);
+          } else if (colorMode === "kcore") {
+            fill = scalarColor(model.metrics.kcore[i], rangeCore.min, rangeCore.max);
+          } else if (colorMode === "clustering") {
+            fill = scalarColor(model.metrics.clustering[i], rangeCluster.min, rangeCluster.max);
+          } else if (colorMode === "wl") {
+            fill = discreteColor(model.metrics.wlClass[i], wlCount);
+          } else {
+            fill = classColor(cls ? cls.group : "other");
+          }
+
+          let baseRadius = 7.2;
+          if (sizeMode === "degree") {
+            baseRadius = radiusFromMetric(model.degree[i], minDeg, maxDeg);
+          } else if (sizeMode === "kcore") {
+            baseRadius = radiusFromMetric(model.metrics.kcore[i], rangeCore.min, rangeCore.max);
+          } else if (sizeMode === "closeness") {
+            baseRadius = radiusFromMetric(model.metrics.closeness[i], rangeClose.min, rangeClose.max);
+          } else if (sizeMode === "betweenness") {
+            baseRadius = radiusFromMetric(model.metrics.betweenness[i], rangeBetween.min, rangeBetween.max);
+          }
+          const radius = baseRadius + (isSelected ? 2.0 : 0.0);
+
+          const node = document.createElementNS(SVG_NS, "circle");
+          node.setAttribute("cx", coords[i].x.toFixed(2));
+          node.setAttribute("cy", coords[i].y.toFixed(2));
+          node.setAttribute("r", radius.toFixed(2));
+          node.setAttribute("fill", fill);
+          node.setAttribute("stroke", isSelected ? "#f8fafc" : "rgba(3,7,18,0.88)");
+          node.setAttribute("stroke-width", isSelected ? "2.4" : "1.8");
+
+          const title = document.createElementNS(SVG_NS, "title");
+          title.textContent = `#${i + 1} ${permutationText(domain[i], dropLeadingZero)} | inv=${model.inversions[i]} | deg=${model.degree[i]} | comp=${model.componentOf[i] + 1}${cls ? ` | class=${cls.label}` : ""}`;
+          node.appendChild(title);
+
+          g.appendChild(node);
+
+          if (showLabels.checked) {
+            const label = document.createElementNS(SVG_NS, "text");
+            label.setAttribute("x", (coords[i].x + radius + 4).toFixed(2));
+            label.setAttribute("y", (coords[i].y + 4).toFixed(2));
+            label.setAttribute("font-size", layoutMode === "force" ? "10" : "11");
+            label.setAttribute("font-family", "SFMono-Regular, Menlo, Monaco, Consolas, monospace");
+            label.setAttribute("fill", "rgba(236,244,255,0.92)");
+            label.textContent = labelModeSelect.value === "perm" ? permutationText(domain[i], dropLeadingZero) : String(i + 1);
+            g.appendChild(label);
+          }
+
+          g.addEventListener("click", () => {
+            state.selectedPermIndex = state.selectedPermIndex === i ? null : i;
+            renderAll();
+          });
+
+          graphSvg.appendChild(g);
+        }
+
+        const connected = model.components.length === 1;
+        graphIntro.textContent = `Nodes: ${model.n}. Edges: ${model.edges.length}. Components: ${model.components.length} (${connected ? "connected" : "disconnected"}).`;
+        if (colorMode === "triple") {
+          graphColorInfo.textContent = "Node colors: 1N3/2N3 amber, 1N2/3N2 cyan, 2N1/3N1 green. This mode depends on labels 1,2,3 (not relabeling-invariant).";
+          setLegendItems([
+            { color: "#f59e0b", label: "1N3, 2N3" },
+            { color: "#22d3ee", label: "1N2, 3N2" },
+            { color: "#4ade80", label: "2N1, 3N1" },
+          ]);
+        } else if (colorMode === "component") {
+          graphColorInfo.textContent = "Node colors: connected components (graph-invariant up to color permutation).";
+          const items = [];
+          for (let c = 0; c < model.components.length; c++) {
+            const rank = model.componentColorOrder[c];
+            items.push({ color: COMPONENT_COLORS[rank % COMPONENT_COLORS.length], label: `comp ${c + 1} (|C|=${model.components[c].length})` });
+          }
+          setLegendItems(items);
+        } else if (colorMode === "distance") {
+          graphColorInfo.textContent = selectedDist
+            ? "Node colors: BFS distance from selected node (shortest-path layers)."
+            : "Node colors: select a node to show BFS distance layers.";
+          if (selectedDist) {
+            const items = [];
+            for (let d = 0; d <= maxDist; d++) items.push({ color: discreteColor(d, Math.max(2, maxDist + 1)), label: `dist ${d}` });
+            setLegendItems(items);
+          } else {
+            setLegendItems([]);
+          }
+        } else if (colorMode === "wl") {
+          graphColorInfo.textContent = "Node colors: Weisfeiler-Lehman refinement classes (graph-structural signatures).";
+          const items = [];
+          for (let c = 0; c < wlCount; c++) items.push({ color: discreteColor(c, wlCount), label: `WL class ${c}` });
+          setLegendItems(items);
+        } else if (colorMode === "eccentricity") {
+          graphColorInfo.textContent = "Node colors: eccentricity (max shortest-path distance inside component).";
+          setLegendItems([{ color: scalarColor(rangeEcc.min, rangeEcc.min, rangeEcc.max), label: "low" }, { color: scalarColor(rangeEcc.max, rangeEcc.min, rangeEcc.max), label: "high" }]);
+        } else if (colorMode === "closeness") {
+          graphColorInfo.textContent = "Node colors: closeness centrality.";
+          setLegendItems([{ color: scalarColor(rangeClose.min, rangeClose.min, rangeClose.max), label: "low" }, { color: scalarColor(rangeClose.max, rangeClose.min, rangeClose.max), label: "high" }]);
+        } else if (colorMode === "betweenness") {
+          graphColorInfo.textContent = "Node colors: betweenness centrality (Brandes).";
+          setLegendItems([{ color: scalarColor(rangeBetween.min, rangeBetween.min, rangeBetween.max), label: "low" }, { color: scalarColor(rangeBetween.max, rangeBetween.min, rangeBetween.max), label: "high" }]);
+        } else if (colorMode === "kcore") {
+          graphColorInfo.textContent = "Node colors: k-core index.";
+          setLegendItems([{ color: scalarColor(rangeCore.min, rangeCore.min, rangeCore.max), label: "low" }, { color: scalarColor(rangeCore.max, rangeCore.min, rangeCore.max), label: "high" }]);
+        } else if (colorMode === "clustering") {
+          graphColorInfo.textContent = "Node colors: local clustering coefficient.";
+          setLegendItems([{ color: scalarColor(rangeCluster.min, rangeCluster.min, rangeCluster.max), label: "low" }, { color: scalarColor(rangeCluster.max, rangeCluster.min, rangeCluster.max), label: "high" }]);
+        } else {
+          graphColorInfo.textContent = "Node colors: degree (adjacent-swap neighbors inside the domain).";
+          setLegendItems([{ color: degreeColor(minDeg, minDeg, maxDeg), label: "low degree" }, { color: degreeColor(maxDeg, minDeg, maxDeg), label: "high degree" }]);
+        }
+
+        if (edgeMode === "swap") {
+          graphColorInfo.textContent += " Edges: colored by swapped position j/j+1.";
+        } else if (edgeMode === "layers") {
+          graphColorInfo.textContent += selectedDist
+            ? " Edges: highlighted when they connect consecutive BFS layers from selected node."
+            : " Edges: select a node to activate BFS-layer highlighting.";
+        }
+      }
+
+      function renderAll() {
+        const ds = currentDataset();
+        const domain = currentDomain();
+
+        if (!ds || !domain) {
+          drawEmptyState();
+          return;
+        }
+
+        const cacheKey = `${ds.id}:${state.currentDomainIndex}`;
+        let model = state.modelCache.get(cacheKey);
+        if (!model) {
+          model = buildDomainModel(domain);
+          state.modelCache.set(cacheKey, model);
+        }
+
+        renderBadges(ds, model, domain);
+        renderStats(ds, domain, model);
+        renderSelectedInfo(ds, domain, model);
+        renderPermutationTable(domain, model);
+        renderNeighborTable(domain, model);
+        renderGraph(domain, model);
+      }
+
+      async function loadManifest() {
+        const inline = getInlineBundledFiles();
+        if (inline.length > 0) {
+          loadBundledBtn.disabled = false;
+          setStatus(`Embedded bundled data found (${inline.length} files).`, "ok");
+          return;
+        }
+
+        try {
+          const res = await fetch(BUNDLED_MANIFEST_URL, { cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const manifest = await res.json();
+          if (!manifest || !Array.isArray(manifest.files)) throw new Error("invalid manifest format");
+
+          state.manifest = manifest;
+          loadBundledBtn.disabled = false;
+          setStatus(`Bundled data found (${manifest.files.length} files).`, "ok");
+        } catch (err) {
+          loadBundledBtn.disabled = true;
+          setStatus("Bundled fetch unavailable. Use local folder upload, or run a local web server in this folder.", "warn");
+        }
+      }
+
+      async function loadBundledDatasets() {
+        const inline = getInlineBundledFiles();
+        if (inline.length > 0) {
+          if (state.bundledLoaded) {
+            setStatus("Bundled files are already loaded.", "ok");
+            return;
+          }
+
+          setStatus("Loading embedded bundled UMCD files...", "normal");
+          const added = addBundledPayloads(inline);
+          state.bundledLoaded = true;
+          loadBundledBtn.disabled = false;
+          setStatus(`Loaded ${added} bundled files from embedded data.`, "ok");
+          return;
+        }
+
+        if (!state.manifest) {
+          await loadManifest();
+          if (!state.manifest) return;
+        }
+
+        if (state.bundledLoaded) {
+          setStatus("Bundled files are already loaded.", "ok");
+          return;
+        }
+
+        loadBundledBtn.disabled = true;
+        setStatus("Loading bundled UMCD files...", "normal");
+
+        try {
+          const base = state.manifest.base_path || "UMCDs";
+          const entries = state.manifest.files;
+
+          const payloads = await Promise.all(
+            entries.map(async (entry) => {
+              const fileName = entry.file || entry.name;
+              const path = entry.path || `./${base}/${fileName}`;
+              const response = await fetch(path, { cache: "no-store" });
+              if (!response.ok) throw new Error(`${fileName} (HTTP ${response.status})`);
+              return { fileName, text: await response.text() };
+            })
+          );
+
+          const added = addBundledPayloads(payloads.map((p) => ({ file: p.fileName, text: p.text })));
+          state.bundledLoaded = true;
+          setStatus(`Loaded ${added} bundled files.`, "ok");
+        } catch (err) {
+          setStatus(`Could not load bundled files: ${err.message}`, "err");
+        } finally {
+          loadBundledBtn.disabled = false;
+        }
+      }
+
+      async function loadLocalFiles(fileList) {
+        const files = Array.from(fileList || []);
+        if (files.length === 0) return;
+
+        setStatus(`Reading ${files.length} local file(s)...`, "normal");
+
+        let added = 0;
+        for (const file of files) {
+          const name = file.webkitRelativePath || file.name;
+          const text = await file.text();
+          if (addDataset(name, text, "local", false)) added += 1;
+        }
+
+        refreshAfterDatasetChange();
+        setStatus(`Added ${added} dataset(s) from local files.`, "ok");
+      }
+
+      function changeDomainBy(delta) {
+        const ds = currentDataset();
+        if (!ds) return;
+
+        const max = ds.domains.length;
+        state.currentDomainIndex = Math.max(0, Math.min(max - 1, state.currentDomainIndex + delta));
+        state.selectedPermIndex = null;
+        updateDomainIndexBounds();
+        renderAll();
+      }
+
+      async function copyCurrentDomainJson() {
+        const ds = currentDataset();
+        const domain = currentDomain();
+        if (!ds || !domain) return;
+
+        const payload = {
+          dataset: ds.name,
+          source: ds.source,
+          n: ds.nLabel,
+          permutation_length: ds.permLength,
+          domain_index_1_based: state.currentDomainIndex + 1,
+          permutations: domain,
+        };
+
+        const text = JSON.stringify(payload, null, 2);
+
+        try {
+          await navigator.clipboard.writeText(text);
+          copyDomainBtn.textContent = "Copied";
+          setTimeout(() => {
+            copyDomainBtn.textContent = "Copy domain JSON";
+          }, 900);
+        } catch (err) {
+          setStatus("Clipboard blocked by browser. Use developer console if needed.", "warn");
+        }
+      }
+
+      loadBundledBtn.addEventListener("click", loadBundledDatasets);
+
+      fileInput.addEventListener("change", async (event) => {
+        await loadLocalFiles(event.target.files);
+        fileInput.value = "";
+      });
+
+      kFilter.addEventListener("change", () => {
+        refreshDatasetSelect();
+      });
+
+      datasetSelect.addEventListener("change", () => {
+        if (!datasetSelect.value) return;
+        state.currentDatasetId = Number.parseInt(datasetSelect.value, 10);
+        state.currentDomainIndex = 0;
+        state.selectedPermIndex = null;
+        updateDomainIndexBounds();
+        renderAll();
+      });
+
+      domainIndexInput.addEventListener("change", () => {
+        const ds = currentDataset();
+        if (!ds) return;
+
+        const max = ds.domains.length;
+        const wanted = Number.parseInt(domainIndexInput.value, 10);
+        if (!Number.isFinite(wanted)) return;
+
+        state.currentDomainIndex = Math.max(0, Math.min(max - 1, wanted - 1));
+        state.selectedPermIndex = null;
+        updateDomainIndexBounds();
+        renderAll();
+      });
+
+      prevBtn.addEventListener("click", () => changeDomainBy(-1));
+      nextBtn.addEventListener("click", () => changeDomainBy(1));
+
+      randomBtn.addEventListener("click", () => {
+        const ds = currentDataset();
+        if (!ds) return;
+        state.currentDomainIndex = Math.floor(Math.random() * ds.domains.length);
+        state.selectedPermIndex = null;
+        updateDomainIndexBounds();
+        renderAll();
+      });
+
+      copyDomainBtn.addEventListener("click", copyCurrentDomainJson);
+
+      layoutSelect.addEventListener("change", renderAll);
+      labelModeSelect.addEventListener("change", renderAll);
+      colorModeSelect.addEventListener("change", renderAll);
+      sizeModeSelect.addEventListener("change", renderAll);
+      edgeModeSelect.addEventListener("change", renderAll);
+      showLabels.addEventListener("change", renderAll);
+      showLegend.addEventListener("change", renderAll);
+
+      drawEmptyState();
+      loadManifest();
+      loadBundledDatasets();
+    })();
+  </script>
+</body>
+</html>

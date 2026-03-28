@@ -1,0 +1,4 @@
+.DS_Store
+index.live-backup-*.html
+index.preupload-*.html
+index.recovery-before-restore-*.html

@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NIM: perfect play, noise, and abstraction</title>
+    <meta
+      name="description"
+      content="Play NIM against a near-perfect teacher and see why the key pattern is the nim-sum (xor), not the raw board position."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #0b1220;
+        --paper: rgba(255, 255, 255, 0.92);
+        --ink: #0f172a;
+        --muted: #475569;
+        --brand: #2563eb;
+        --brand-2: #06b6d4;
+        --good: #16a34a;
+        --bad: #dc2626;
+        --line: rgba(15, 23, 42, 0.12);
+        --shadow: 0 18px 40px rgba(2, 6, 23, 0.28);
+        --radius: 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        color: var(--ink);
+        line-height: 1.55;
+        background: radial-gradient(900px 400px at 8% 8%, rgba(37, 99, 235, 0.25), transparent 60%),
+          radial-gradient(700px 420px at 80% 20%, rgba(6, 182, 212, 0.22), transparent 55%),
+          radial-gradient(700px 420px at 45% 95%, rgba(2, 132, 199, 0.15), transparent 55%),
+          var(--bg);
+      }
+
+      a {
+        color: var(--brand);
+        text-underline-offset: 3px;
+      }
+
+      .container {
+        width: min(1180px, 92vw);
+        margin: 0 auto;
+        padding: 28px 0 56px;
+      }
+
+      header {
+        color: rgba(255, 255, 255, 0.92);
+        padding-bottom: 18px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: clamp(1.55rem, 1.1rem + 1.6vw, 2.4rem);
+        letter-spacing: -0.02em;
+        line-height: 1.12;
+      }
+
+      header p {
+        margin: 10px 0 0;
+        max-width: 86ch;
+        color: rgba(255, 255, 255, 0.74);
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .card__header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.82));
+      }
+
+      .card__header h2 {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: 0.01em;
+      }
+
+      .card__header .hint {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .card__body {
+        padding: 16px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
+
+      select,
+      input[type="number"],
+      input[type="text"] {
+        width: 100%;
+        border: 1px solid rgba(15, 23, 42, 0.2);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      input[type="range"] {
+        width: 100%;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        align-items: end;
+      }
+
+      .row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        align-items: end;
+      }
+
+      @media (max-width: 520px) {
+        .row,
+        .row-3 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .btn {
+        border: 1px solid rgba(15, 23, 42, 0.14);
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-weight: 780;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .btn--primary {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.92), rgba(6, 182, 212, 0.88));
+        color: #fff;
+        border: none;
+      }
+
+      .btn[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.88rem;
+        font-weight: 760;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .tag--good {
+        color: var(--good);
+      }
+
+      .tag--bad {
+        color: var(--bad);
+      }
+
+      .board {
+        display: grid;
+        gap: 10px;
+      }
+
+      .banner {
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 16px;
+        padding: 12px 12px;
+        background: rgba(255, 255, 255, 0.9);
+        margin-bottom: 12px;
+      }
+
+      .banner--good {
+        border-color: rgba(22, 163, 74, 0.28);
+        box-shadow: 0 10px 26px rgba(22, 163, 74, 0.12);
+      }
+
+      .banner--bad {
+        border-color: rgba(220, 38, 38, 0.28);
+        box-shadow: 0 10px 26px rgba(220, 38, 38, 0.12);
+      }
+
+      .banner__title {
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        font-size: 1.05rem;
+      }
+
+      .banner__sub {
+        margin-top: 4px;
+        color: rgba(15, 23, 42, 0.72);
+        font-size: 0.94rem;
+      }
+
+      .pile {
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.85);
+        padding: 10px 12px;
+      }
+
+      .pile__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .pile__title {
+        display: grid;
+        gap: 2px;
+      }
+
+      .pile__title strong {
+        font-weight: 850;
+        letter-spacing: -0.01em;
+      }
+
+      .pile__title span {
+        color: rgba(15, 23, 42, 0.72);
+        font-size: 0.9rem;
+      }
+
+      .pile__pick {
+        border-radius: 999px;
+        padding: 8px 10px;
+        border: 1px solid rgba(15, 23, 42, 0.14);
+        background: rgba(255, 255, 255, 0.92);
+        font-weight: 780;
+        cursor: pointer;
+      }
+
+      .pile[data-selected="true"] {
+        outline: 2px solid rgba(37, 99, 235, 0.35);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+      }
+
+      .tokens {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .token {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(37, 99, 235, 0.85));
+        border: 1px solid rgba(15, 23, 42, 0.12);
+      }
+
+      .token--ghost {
+        background: rgba(15, 23, 42, 0.07);
+      }
+
+      .tokens__more {
+        color: rgba(15, 23, 42, 0.7);
+        font-size: 0.92rem;
+        font-weight: 780;
+        margin-left: 4px;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      @media (max-width: 520px) {
+        .kpi-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .kpi {
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        padding: 12px 12px 10px;
+      }
+
+      .kpi .label {
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      .kpi .value {
+        margin-top: 4px;
+        font-size: 1.08rem;
+        font-weight: 880;
+        letter-spacing: -0.01em;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 10px 8px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+        vertical-align: top;
+      }
+
+      th {
+        color: rgba(15, 23, 42, 0.85);
+        font-weight: 850;
+        font-size: 0.9rem;
+      }
+
+      .img-wrap {
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.7);
+        overflow: hidden;
+      }
+
+      .img-wrap img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      details summary {
+        cursor: pointer;
+        font-weight: 820;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>NIM: abstraction beats “raw board recognition”</h1>
+        <p>
+          NIM is solved by a simple invariant: the <span class="mono">nim-sum</span> (bitwise xor) of the pile sizes.
+          This page lets you play against a near-perfect “teacher” (perfect play, except with probability
+          <span class="mono">ε</span> it makes a random move) and see the winning/losing structure.
+        </p>
+        <p style="margin-top: 6px; color: rgba(255, 255, 255, 0.74)">
+          <a href="research-demos.html" style="color: rgba(255, 255, 255, 0.9)">← Research demos</a>
+        </p>
+      </header>
+
+      <section class="grid">
+        <article class="card">
+          <div class="card__header">
+            <h2>Play NIM</h2>
+            <p id="statusLine" class="hint">—</p>
+          </div>
+          <div class="card__body">
+            <div id="gameOverBanner" class="banner" style="display: none" aria-live="polite"></div>
+            <div class="board" id="board"></div>
+
+            <div style="margin-top: 12px" class="kpi-grid">
+              <div class="kpi">
+                <div class="label">Current piles</div>
+                <div id="pilesKpi" class="value mono">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">nim-sum (xor)</div>
+                <div id="xorKpi" class="value mono">—</div>
+              </div>
+            </div>
+
+            <details style="margin-top: 12px">
+              <summary>Show the “winning test” (why xor matters)</summary>
+              <p style="margin: 10px 0 0">
+                Let <span class="mono">x = a₁ ⊕ a₂ ⊕ … ⊕ a_m</span>, where <span class="mono">⊕</span> is bitwise xor.
+                If <span class="mono">x = 0</span>, the position is losing for the next player (with perfect play).
+                If <span class="mono">x ≠ 0</span>, there is a move that makes the nim-sum zero.
+              </p>
+              <p style="margin: 10px 0 0">
+                In other words: many “different looking” boards have the same strategic type. This mismatch is one
+                reason a single-frame network that tries to directly associate patterns in the board image with the
+                best move can struggle, compared to a model that can compute or represent the xor-structure.
+              </p>
+            </details>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__header">
+            <h2>Controls</h2>
+            <p class="hint">Choose a start, then play a move.</p>
+          </div>
+          <div class="card__body">
+            <div class="row">
+              <label>
+                Starting position
+                <select id="startPreset"></select>
+              </label>
+              <label>
+                Or custom piles (comma-separated)
+                <input id="customPiles" type="text" placeholder="e.g. 1,2,3,4,5" />
+              </label>
+            </div>
+
+            <div class="row" style="margin-top: 10px">
+              <label>
+                Who starts?
+                <select id="starter">
+                  <option value="human" selected>You</option>
+                  <option value="teacher">Teacher</option>
+                </select>
+              </label>
+              <label>
+                Teacher randomness ε
+                <div style="display: grid; grid-template-columns: 1fr 92px; gap: 10px; align-items: center">
+                  <input id="epsilonRange" type="range" min="0" max="1" step="0.01" value="0.05" />
+                  <input id="epsilonNum" type="number" min="0" max="1" step="0.01" value="0.05" />
+                </div>
+              </label>
+            </div>
+
+            <div class="row-3" style="margin-top: 10px">
+              <label>
+                Selected pile
+                <select id="pileSelect"></select>
+              </label>
+              <label>
+                Remove tokens
+                <input id="removeCount" type="number" min="1" step="1" value="1" />
+              </label>
+              <button id="btnMove" class="btn btn--primary" type="button">Make your move</button>
+            </div>
+
+            <div class="row" style="margin-top: 10px">
+              <button id="btnNewGame" class="btn" type="button">New game</button>
+              <button id="btnHint" class="btn" type="button">Show perfect move hint</button>
+            </div>
+
+            <p id="hintLine" class="hint" style="margin: 10px 2px 0; color: var(--muted)">—</p>
+          </div>
+        </article>
+      </section>
+
+      <section style="margin-top: 14px">
+        <article class="card">
+          <div class="card__header">
+            <h2>Move log</h2>
+            <p class="hint">Winning/losing is decided by nim-sum.</p>
+          </div>
+          <div class="card__body">
+            <table aria-label="Move log">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Player</th>
+                  <th>Move</th>
+                  <th>Piles after</th>
+                  <th>nim-sum after</th>
+                </tr>
+              </thead>
+              <tbody id="logBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section style="margin-top: 14px">
+        <article class="card">
+          <div class="card__header">
+            <h2>Figure</h2>
+            <p class="hint">Single-frame vs two-frame learning behaviour on NIM.</p>
+          </div>
+          <div class="card__body">
+            <figure style="margin: 0; max-width: 980px">
+              <div class="img-wrap">
+                <img
+                  src="arXiv-2411.06403v2/figValAccH20k4.png"
+                  alt="Validation accuracy comparing single-frame and two-frame models on NIM"
+                />
+              </div>
+              <figcaption class="hint" style="margin: 10px 2px 0; color: var(--muted)">
+                The one-frame model conditions only on the current board state, and tends to stay near chance because
+                optimal play depends on the global xor invariant (nim-sum). The two-frame model also sees the previous
+                position, making it possible to learn a local “restoration” rule from the observed change.
+              </figcaption>
+            </figure>
+            <details style="margin-top: 12px">
+              <summary>References</summary>
+              <ul style="margin: 8px 0 0; padding-left: 18px">
+                <li>
+                  S. Riis, <em>Mastering NIM and Impartial Games with Weak Neural Networks: An AlphaZero-inspired
+                  Multi-Frame Approach</em>, arXiv preprint (local copy:
+                  <span class="mono">arXiv-2411.06403v2/paper_arxiv3_arxivready_H20k4_UK.tex</span>).
+                </li>
+                <li>
+                  B. Zhou &amp; S. Riis, <em>Impartial Games: A Challenge for Reinforcement Learning</em>, forthcoming in
+                  <em>Machine Learning</em>.
+                </li>
+              </ul>
+            </details>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <script>
+      "use strict";
+
+      const boardEl = document.getElementById("board");
+      const statusLine = document.getElementById("statusLine");
+      const pilesKpi = document.getElementById("pilesKpi");
+      const xorKpi = document.getElementById("xorKpi");
+      const logBody = document.getElementById("logBody");
+
+      const startPreset = document.getElementById("startPreset");
+      const customPiles = document.getElementById("customPiles");
+      const starterEl = document.getElementById("starter");
+
+      const epsilonRange = document.getElementById("epsilonRange");
+      const epsilonNum = document.getElementById("epsilonNum");
+
+      const pileSelect = document.getElementById("pileSelect");
+      const removeCount = document.getElementById("removeCount");
+      const btnMove = document.getElementById("btnMove");
+      const btnNewGame = document.getElementById("btnNewGame");
+      const btnHint = document.getElementById("btnHint");
+      const hintLine = document.getElementById("hintLine");
+
+      const PRESETS = [
+        { id: "12345", label: "(1,2,3,4,5)", piles: [1, 2, 3, 4, 5] },
+        { id: "345", label: "(3,4,5)", piles: [3, 4, 5] },
+        { id: "2468", label: "(2,4,6,8)", piles: [2, 4, 6, 8] },
+        { id: "777", label: "(7,7,7)", piles: [7, 7, 7] },
+        { id: "101215", label: "(10,12,15)", piles: [10, 12, 15] },
+      ];
+
+      let piles = [1, 2, 3, 4, 5];
+      let selectedPile = 0;
+      let turn = "human"; // "human" | "teacher"
+      let moveIndex = 0;
+      let gameOver = false;
+      let gameWinner = null; // "human" | "teacher" | null
+
+      function nimSum(arr) {
+        let x = 0;
+        for (const v of arr) x ^= v;
+        return x;
+      }
+
+      function allZero(arr) {
+        for (const v of arr) if (v !== 0) return false;
+        return true;
+      }
+
+      function clamp(n, lo, hi) {
+        return Math.min(hi, Math.max(lo, n));
+      }
+
+      function fmtPiles(arr) {
+        return "(" + arr.join(",") + ")";
+      }
+
+      function syncEpsilon(from) {
+        const v = clamp(Number(from.value), 0, 1);
+        epsilonRange.value = String(v);
+        epsilonNum.value = String(v);
+      }
+
+      function parseCustomPiles(text) {
+        const raw = String(text).trim();
+        if (!raw) return { ok: false, error: "Custom piles is empty.", piles: null };
+
+        const cleaned = raw
+          .replace(/[\(\)\[\]\{\}]/g, "")
+          .replace(/;/g, ",")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        const parts = cleaned.split(/[,\s]+/g).map((s) => s.trim()).filter(Boolean);
+        if (parts.length === 0) return { ok: false, error: "No pile sizes found.", piles: null };
+
+        const nums = [];
+        for (const p of parts) {
+          if (!/^\d+$/.test(p)) {
+            return { ok: false, error: "Custom piles must be non-negative integers (e.g. 1,2,3,4,5).", piles: null };
+          }
+          const n = Number(p);
+          if (!Number.isFinite(n) || n < 0) {
+            return { ok: false, error: "Custom piles must be non-negative integers.", piles: null };
+          }
+          nums.push(n);
+        }
+
+        if (nums.length === 0) return { ok: false, error: "No pile sizes found.", piles: null };
+        return { ok: true, error: null, piles: nums };
+      }
+
+      function chooseRandomMove(arr) {
+        const nonEmpty = [];
+        for (let i = 0; i < arr.length; i += 1) if (arr[i] > 0) nonEmpty.push(i);
+        if (nonEmpty.length === 0) return null;
+        const i = nonEmpty[Math.floor(Math.random() * nonEmpty.length)];
+        const k = 1 + Math.floor(Math.random() * arr[i]);
+        return { pile: i, remove: k, kind: "random" };
+      }
+
+      function choosePerfectMove(arr) {
+        const x = nimSum(arr);
+        if (x === 0) {
+          // Losing position: any move.
+          const m = chooseRandomMove(arr);
+          if (!m) return null;
+          return { ...m, kind: "perfect(losing)" };
+        }
+        // Winning position: move to make nim-sum 0.
+        for (let i = 0; i < arr.length; i += 1) {
+          const a = arr[i];
+          const target = a ^ x;
+          if (target < a) {
+            const remove = a - target;
+            return { pile: i, remove, kind: "perfect" };
+          }
+        }
+        // Should never happen for normal NIM.
+        return chooseRandomMove(arr);
+      }
+
+      function teacherMove(arr, eps) {
+        const roll = Math.random();
+        if (roll < eps) return chooseRandomMove(arr);
+        return choosePerfectMove(arr);
+      }
+
+      function setStatus() {
+        const x = nimSum(piles);
+        const losing = x === 0;
+        const who = gameOver
+          ? ("Game over" + (gameWinner ? (" · " + (gameWinner === "human" ? "You win" : "Teacher wins")) : ""))
+          : (turn === "human" ? "Your turn" : "Teacher's turn");
+        const tag = losing
+          ? '<span class="tag tag--bad">nim-sum = 0</span>'
+          : '<span class="tag tag--good">nim-sum ≠ 0</span>';
+        statusLine.innerHTML = who + " · " + tag;
+        pilesKpi.textContent = fmtPiles(piles);
+        xorKpi.textContent = String(x);
+      }
+
+      function updatePileSelect() {
+        pileSelect.innerHTML = "";
+        for (let i = 0; i < piles.length; i += 1) {
+          const opt = document.createElement("option");
+          opt.value = String(i);
+          opt.textContent = "Pile " + (i + 1) + " (size " + piles[i] + ")";
+          pileSelect.appendChild(opt);
+        }
+        selectedPile = clamp(selectedPile, 0, piles.length - 1);
+        pileSelect.value = String(selectedPile);
+        removeCount.min = "1";
+        removeCount.max = String(Math.max(1, piles[selectedPile]));
+        removeCount.value = String(clamp(Number(removeCount.value) || 1, 1, Math.max(1, piles[selectedPile])));
+      }
+
+      function renderBoard() {
+        boardEl.innerHTML = "";
+        const maxToRender = 36;
+        for (let i = 0; i < piles.length; i += 1) {
+          const pile = document.createElement("div");
+          pile.className = "pile";
+          pile.dataset.selected = String(i === selectedPile);
+
+          const top = document.createElement("div");
+          top.className = "pile__top";
+
+          const title = document.createElement("div");
+          title.className = "pile__title";
+          const strong = document.createElement("strong");
+          strong.textContent = "Pile " + (i + 1);
+          const span = document.createElement("span");
+          span.textContent = "size " + piles[i];
+          title.appendChild(strong);
+          title.appendChild(span);
+
+          const pick = document.createElement("button");
+          pick.type = "button";
+          pick.className = "pile__pick";
+          pick.textContent = i === selectedPile ? "Selected" : "Select";
+          pick.addEventListener("click", () => {
+            if (gameOver) return;
+            selectedPile = i;
+            updatePileSelect();
+            renderBoard();
+            hintLine.textContent = "—";
+          });
+
+          top.appendChild(title);
+          top.appendChild(pick);
+          pile.appendChild(top);
+
+          const tokens = document.createElement("div");
+          tokens.className = "tokens";
+
+          const n = piles[i];
+          const show = Math.min(n, maxToRender);
+          for (let t = 0; t < show; t += 1) {
+            const dot = document.createElement("div");
+            dot.className = "token";
+            tokens.appendChild(dot);
+          }
+          if (n > maxToRender) {
+            const more = document.createElement("span");
+            more.className = "tokens__more";
+            more.textContent = "+" + (n - maxToRender);
+            tokens.appendChild(more);
+          }
+
+          // If empty, show a subtle ghost token so the row doesn't collapse visually.
+          if (n === 0) {
+            const ghost = document.createElement("div");
+            ghost.className = "token token--ghost";
+            tokens.appendChild(ghost);
+          }
+
+          pile.appendChild(tokens);
+          boardEl.appendChild(pile);
+        }
+      }
+
+      function appendLogRow(player, move, afterArr) {
+        moveIndex += 1;
+        const tr = document.createElement("tr");
+
+        const tdN = document.createElement("td");
+        tdN.textContent = String(moveIndex);
+        tr.appendChild(tdN);
+
+        const tdP = document.createElement("td");
+        tdP.textContent = player;
+        tr.appendChild(tdP);
+
+        const tdM = document.createElement("td");
+        tdM.textContent =
+          "remove " + move.remove + " from pile " + (move.pile + 1) + (move.kind ? " (" + move.kind + ")" : "");
+        tr.appendChild(tdM);
+
+        const tdA = document.createElement("td");
+        tdA.textContent = fmtPiles(afterArr);
+        tr.appendChild(tdA);
+
+        const tdX = document.createElement("td");
+        tdX.textContent = String(nimSum(afterArr));
+        tdX.className = "mono";
+        tr.appendChild(tdX);
+
+        logBody.appendChild(tr);
+      }
+
+      function setGameOver(winner) {
+        gameOver = true;
+        gameWinner = winner;
+        turn = "human";
+        btnMove.disabled = true;
+        btnHint.disabled = true;
+        const banner = document.getElementById("gameOverBanner");
+        if (banner) {
+          const humanWon = gameWinner === "human";
+          banner.className = "banner " + (humanWon ? "banner--good" : "banner--bad");
+          banner.innerHTML =
+            '<div class="banner__title">' +
+            (humanWon ? "You win." : "Teacher wins.") +
+            "</div>" +
+            '<div class="banner__sub">Click “New game” to play again, or adjust ε / starting position.</div>';
+          banner.style.display = "";
+        }
+        hintLine.textContent = gameWinner === "human" ? "You win." : "Teacher wins.";
+        setStatus();
+      }
+
+      function applyMove(move, playerLabel) {
+        const i = move.pile;
+        const k = move.remove;
+        if (i < 0 || i >= piles.length) return false;
+        if (k <= 0 || k > piles[i]) return false;
+        piles[i] -= k;
+        appendLogRow(playerLabel, move, piles.slice());
+        updatePileSelect();
+        renderBoard();
+        setStatus();
+        if (allZero(piles)) {
+          setGameOver(playerLabel === "You" ? "human" : "teacher");
+          return true;
+        }
+        return true;
+      }
+
+      function maybeTeacherTurn() {
+        if (gameOver) return;
+        if (turn !== "teacher") return;
+
+        const eps = clamp(Number(epsilonNum.value), 0, 1);
+        const move = teacherMove(piles.slice(), eps);
+        if (!move) return;
+
+        const ok = applyMove(move, "Teacher");
+        if (!ok) {
+          hintLine.textContent = "Teacher attempted an illegal move (unexpected).";
+          gameOver = true;
+          return;
+        }
+
+        if (!gameOver) {
+          turn = "human";
+          setStatus();
+        }
+      }
+
+      function doHumanMove() {
+        if (gameOver) return;
+        if (turn !== "human") return;
+
+        const i = Number(pileSelect.value);
+        const k = Number(removeCount.value);
+        if (!Number.isFinite(i) || !Number.isFinite(k)) return;
+        if (piles[i] <= 0) {
+          hintLine.textContent = "That pile is empty.";
+          return;
+        }
+        if (k < 1 || k > piles[i]) {
+          hintLine.textContent = "Choose a number between 1 and " + piles[i] + ".";
+          return;
+        }
+
+        hintLine.textContent = "—";
+        applyMove({ pile: i, remove: k, kind: "human" }, "You");
+        if (!gameOver) {
+          turn = "teacher";
+          setStatus();
+          // Give UI a moment to paint before teacher moves.
+          setTimeout(maybeTeacherTurn, 70);
+        }
+      }
+
+      function showHint() {
+        if (gameOver) return;
+        const move = choosePerfectMove(piles.slice());
+        if (!move) {
+          hintLine.textContent = "No legal moves.";
+          return;
+        }
+        const after = piles.slice();
+        after[move.pile] -= move.remove;
+        hintLine.textContent =
+          "Perfect move: remove " +
+          move.remove +
+          " from pile " +
+          (move.pile + 1) +
+          " to reach " +
+          fmtPiles(after) +
+          " (nim-sum " +
+          nimSum(after) +
+          ").";
+      }
+
+      function newGame() {
+        const rawCustom = String(customPiles.value || "").trim();
+        let custom = null;
+        if (rawCustom) {
+          const parsed = parseCustomPiles(rawCustom);
+          if (!parsed.ok) {
+            hintLine.textContent = parsed.error;
+            return;
+          }
+          custom = parsed.piles;
+        }
+        const preset = PRESETS.find((p) => p.id === String(startPreset.value));
+        piles = (custom || (preset ? preset.piles : [1, 2, 3, 4, 5])).slice();
+        if (piles.every((x) => x === 0)) piles = [1, 2, 3, 4, 5];
+
+        selectedPile = 0;
+        moveIndex = 0;
+        gameOver = false;
+        gameWinner = null;
+        logBody.innerHTML = "";
+        btnMove.disabled = false;
+        btnHint.disabled = false;
+        hintLine.textContent = "—";
+        const banner = document.getElementById("gameOverBanner");
+        if (banner) banner.style.display = "none";
+
+        turn = String(starterEl.value || "human") === "teacher" ? "teacher" : "human";
+
+        updatePileSelect();
+        renderBoard();
+        setStatus();
+
+        if (turn === "teacher") setTimeout(maybeTeacherTurn, 70);
+      }
+
+      function populatePresets() {
+        startPreset.innerHTML = "";
+        for (const p of PRESETS) {
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.textContent = p.label;
+          startPreset.appendChild(opt);
+        }
+        startPreset.value = "12345";
+      }
+
+      populatePresets();
+      syncEpsilon(epsilonRange);
+      newGame();
+
+      epsilonRange.addEventListener("input", () => syncEpsilon(epsilonRange));
+      epsilonNum.addEventListener("input", () => syncEpsilon(epsilonNum));
+
+      startPreset.addEventListener("change", () => newGame());
+      starterEl.addEventListener("change", () => newGame());
+      customPiles.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          newGame();
+        }
+      });
+
+      pileSelect.addEventListener("change", () => {
+        selectedPile = Number(pileSelect.value);
+        updatePileSelect();
+        renderBoard();
+        hintLine.textContent = "—";
+      });
+
+      removeCount.addEventListener("input", () => {
+        const i = Number(pileSelect.value);
+        const max = Math.max(1, piles[i] || 1);
+        removeCount.value = String(clamp(Number(removeCount.value) || 1, 1, max));
+      });
+
+      btnMove.addEventListener("click", doHumanMove);
+      btnNewGame.addEventListener("click", newGame);
+      btnHint.addEventListener("click", showHint);
+
+      window.addEventListener("error", function (event) {
+        const msg = event && event.message ? event.message : "Unknown error";
+        hintLine.textContent = "Runtime error: " + msg;
+      });
+
+      window.addEventListener("unhandledrejection", function (event) {
+        const reason = event && event.reason ? event.reason : null;
+        const msg = reason && reason.message ? reason.message : String(reason);
+        hintLine.textContent = "Runtime error: " + msg;
+      });
+    </script>
+  </body>
+</html>

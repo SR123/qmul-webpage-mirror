@@ -1,0 +1,1838 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Waiting Times & Non-Transitivity (Riis–Paterson)</title>
+    <meta
+      name="description"
+      content="Interactive demo: non-transitivity in pattern waiting times (Riis–Paterson). Visualize the non-transitive region and run simulations."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #0b1220;
+        --paper: rgba(255, 255, 255, 0.92);
+        --ink: #0f172a;
+        --muted: #475569;
+        --brand: #2563eb;
+        --brand-2: #06b6d4;
+        --good: #16a34a;
+        --bad: #dc2626;
+        --line: rgba(15, 23, 42, 0.12);
+        --shadow: 0 18px 40px rgba(2, 6, 23, 0.28);
+        --radius: 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        color: var(--ink);
+        line-height: 1.5;
+        background: radial-gradient(900px 400px at 8% 8%, rgba(37, 99, 235, 0.25), transparent 60%),
+          radial-gradient(700px 420px at 80% 20%, rgba(6, 182, 212, 0.22), transparent 55%),
+          radial-gradient(700px 420px at 45% 95%, rgba(2, 132, 199, 0.15), transparent 55%),
+          var(--bg);
+      }
+
+      a {
+        color: var(--brand);
+        text-underline-offset: 3px;
+      }
+
+      .container {
+        width: min(1180px, 92vw);
+        margin: 0 auto;
+        padding: 28px 0 56px;
+      }
+
+      header {
+        color: rgba(255, 255, 255, 0.92);
+        padding-bottom: 18px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: clamp(1.55rem, 1.1rem + 1.6vw, 2.4rem);
+        letter-spacing: -0.02em;
+        line-height: 1.12;
+      }
+
+      header p {
+        margin: 10px 0 0;
+        max-width: 78ch;
+        color: rgba(255, 255, 255, 0.74);
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .card__header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.82));
+      }
+
+      .card__header h2 {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: 0.01em;
+      }
+
+      .card__header .hint {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .card__body {
+        padding: 16px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.25fr 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
+
+      select,
+      input[type="number"],
+      input[type="range"] {
+        width: 100%;
+        font: inherit;
+      }
+
+      select,
+      input[type="number"] {
+        border: 1px solid rgba(15, 23, 42, 0.2);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      @media (max-width: 680px) {
+        .controls-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .btn {
+        border: 1px solid rgba(15, 23, 42, 0.14);
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .btn--primary {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.92), rgba(6, 182, 212, 0.88));
+        color: #fff;
+        border: none;
+      }
+
+      .btn[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .viz {
+        width: 100%;
+        height: 360px;
+        border-radius: 14px;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.6);
+        display: block;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      @media (max-width: 520px) {
+        .kpi-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .kpi {
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        padding: 12px 12px 10px;
+      }
+
+      .kpi .label {
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      .kpi .value {
+        margin-top: 4px;
+        font-size: 1.14rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.88rem;
+        font-weight: 750;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .tag--good {
+        color: var(--good);
+      }
+
+      .tag--bad {
+        color: var(--bad);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 10px 8px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+        vertical-align: top;
+      }
+
+      th {
+        color: rgba(15, 23, 42, 0.85);
+        font-weight: 800;
+        font-size: 0.9rem;
+      }
+
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      @media (max-width: 760px) {
+        .toolbar {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .toolbar .btn {
+        width: 100%;
+      }
+
+      .statusline {
+        margin: 10px 2px 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Waiting times & non-transitivity (Riis–Paterson)</h1>
+        <p>
+          Choose three length-3 patterns A, B, C over {H,T}, and give each its own biased coin:
+          pA=P(H on coin A), pB=P(H on coin B), pC=P(H on coin C). In each run we flip the three coins
+          independently until each pattern appears; then we compare who “wins first”. Pairwise wins can
+          form non-transitive cycles: A beats B, B beats C, yet C beats A (with random tie-breaks).
+        </p>
+        <p style="margin-top: 6px; color: rgba(255, 255, 255, 0.74)">
+          <a href="research-demos.html" style="color: rgba(255, 255, 255, 0.9)">← Research demos</a>
+        </p>
+      </header>
+
+      <section class="grid">
+        <article class="card">
+          <div class="card__header">
+            <h2>Non-transitive region (3D viewer)</h2>
+            <p class="hint">McDonald-shaped region: drag to rotate, scroll to zoom, click to select (pA,pB,pC).</p>
+          </div>
+          <div class="card__body">
+            <canvas id="region3dCanvas" class="viz" width="820" height="520"></canvas>
+            <div class="toolbar">
+              <label>
+                Grid step (coarser = faster)
+                <select id="gridStep">
+                  <option value="0.03">0.03 (fast)</option>
+                  <option value="0.02" selected>0.02</option>
+                  <option value="0.015">0.015</option>
+                  <option value="0.01">0.01 (slow)</option>
+                </select>
+              </label>
+              <label>
+                Points
+                <select id="pointMode">
+                  <option value="surface" selected>Surface only (recommended)</option>
+                  <option value="volume">Full volume</option>
+                </select>
+              </label>
+              <label>
+                Point size
+                <input id="pointSize" type="range" min="1" max="6" step="1" value="3" />
+              </label>
+              <div style="display: grid; gap: 10px; align-content: end">
+                <button id="resampleBtn" class="btn" type="button">Resample region</button>
+                <button id="resetViewBtn" class="btn" type="button">Reset view</button>
+              </div>
+            </div>
+            <p id="regionStatus" class="statusline">Sampling: ready.</p>
+            <p class="hint" style="margin: 10px 2px 0">
+              Region definition: 0&lt;pA,pB,pC&lt;1 and <span class="mono">G_AB(pA,pB)&gt;0</span>,
+              <span class="mono">G_BC(pB,pC)&gt;0</span>, <span class="mono">G_CA(pC,pA)&gt;0</span>.
+              (These polynomials correspond to the classic length-3 example A=HHH, B=HTH, C=HHT.)
+            </p>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__header">
+            <h2>Controls & simulation</h2>
+            <p class="hint">Run N Monte Carlo games at the selected (p,q).</p>
+          </div>
+          <div class="card__body">
+            <div class="controls-grid">
+              <label>
+                Pattern A
+                <select id="patternA"></select>
+              </label>
+              <label>
+                Pattern B
+                <select id="patternB"></select>
+              </label>
+              <label>
+                Pattern C
+                <select id="patternC"></select>
+              </label>
+            </div>
+
+            <div style="margin-top: 12px">
+              <label>
+                pA = P(H on coin A) <span class="mono" id="pALabel"></span>
+                <input id="pASlider" type="range" min="0" max="100" step="1" value="61" />
+              </label>
+              <label style="margin-top: 10px">
+                pB = P(H on coin B) <span class="mono" id="pBLabel"></span>
+                <input id="pBSlider" type="range" min="0" max="100" step="1" value="71" />
+              </label>
+              <label style="margin-top: 10px">
+                pC = P(H on coin C) <span class="mono" id="pCLabel"></span>
+                <input id="pCSlider" type="range" min="0" max="100" step="1" value="51" />
+              </label>
+            </div>
+
+            <div class="row" style="margin-top: 12px">
+              <label style="margin: 0">
+                Games N
+                <input id="gamesN" type="number" min="10000" step="10000" value="100000" />
+              </label>
+              <button id="runBtn" class="btn btn--primary" type="button">Run simulation</button>
+            </div>
+
+            <p id="runtimeStatus" class="hint" style="margin: 10px 2px 0; color: var(--muted)">
+              Runtime: ready.
+            </p>
+
+            <div class="row" style="margin-top: 12px">
+              <label style="margin: 0">
+                Pairwise N (for confidence intervals)
+                <input id="pairwiseN" type="number" min="10000" step="10000" value="20000" />
+              </label>
+              <button id="pairwiseBtn" class="btn" type="button">Compute pairwise matrix</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section style="margin-top: 14px" class="grid">
+        <article class="card">
+          <div class="card__header">
+            <h2>At current (pA,pB,pC)</h2>
+            <p class="hint">Means are exact; pairwise win probabilities are simulation estimates.</p>
+          </div>
+          <div class="card__body">
+            <div class="kpi-grid">
+              <div class="kpi">
+                <div class="label">P(A beats B)</div>
+                <div id="pAB" class="value">—</div>
+                <div id="pABci" class="hint" style="margin: 4px 0 0; color: var(--muted)">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">P(B beats C)</div>
+                <div id="pBC" class="value">—</div>
+                <div id="pBCci" class="hint" style="margin: 4px 0 0; color: var(--muted)">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">P(C beats A)</div>
+                <div id="pCA" class="value">—</div>
+                <div id="pCAci" class="hint" style="margin: 4px 0 0; color: var(--muted)">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">Non-transitive?</div>
+                <div id="nonTransitiveTag" class="value">—</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 12px" class="kpi-grid">
+              <div class="kpi">
+                <div class="label">E[τ(A)]</div>
+                <div id="eA" class="value">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">E[τ(B)]</div>
+                <div id="eB" class="value">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">E[τ(C)]</div>
+                <div id="eC" class="value">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">Ordering by mean</div>
+                <div id="meanOrder" class="value">—</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__header">
+            <h2>Simulation results (N runs)</h2>
+            <p class="hint">Counts based on first occurrence times in each run.</p>
+          </div>
+          <div class="card__body">
+            <table aria-label="Simulation results table">
+              <thead>
+                <tr>
+                  <th>Comparison</th>
+                  <th>Wins</th>
+                  <th>Estimated P</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono">A &lt; B</td>
+                  <td id="simAB">—</td>
+                  <td id="simABp">—</td>
+                </tr>
+                <tr>
+                  <td class="mono">B &lt; C</td>
+                  <td id="simBC">—</td>
+                  <td id="simBCp">—</td>
+                </tr>
+                <tr>
+                  <td class="mono">C &lt; A</td>
+                  <td id="simCA">—</td>
+                  <td id="simCAp">—</td>
+                </tr>
+                <tr>
+                  <td>Cycle frequency</td>
+                  <td id="simCycle">—</td>
+                  <td id="simCyclep">—</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="hint" style="margin: 10px 2px 0">
+              Each run flips 3 independent coins (A/B/C) until all three patterns have appeared, then records the
+              three pairwise outcomes (with random tie-breaks).
+            </p>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <script>
+      "use strict";
+
+      const patternAEl = document.getElementById("patternA");
+      const patternBEl = document.getElementById("patternB");
+      const patternCEl = document.getElementById("patternC");
+      const pASlider = document.getElementById("pASlider");
+      const pBSlider = document.getElementById("pBSlider");
+      const pCSlider = document.getElementById("pCSlider");
+      const pALabel = document.getElementById("pALabel");
+      const pBLabel = document.getElementById("pBLabel");
+      const pCLabel = document.getElementById("pCLabel");
+      const gamesNEl = document.getElementById("gamesN");
+      const runBtn = document.getElementById("runBtn");
+      const runtimeStatus = document.getElementById("runtimeStatus");
+
+      const pABEl = document.getElementById("pAB");
+      const pBCEl = document.getElementById("pBC");
+      const pCAEl = document.getElementById("pCA");
+      const pABciEl = document.getElementById("pABci");
+      const pBCciEl = document.getElementById("pBCci");
+      const pCAciEl = document.getElementById("pCAci");
+      const nonTransitiveTagEl = document.getElementById("nonTransitiveTag");
+      const eAEl = document.getElementById("eA");
+      const eBEl = document.getElementById("eB");
+      const eCEl = document.getElementById("eC");
+      const meanOrderEl = document.getElementById("meanOrder");
+
+      const pairwiseNEl = document.getElementById("pairwiseN");
+      const pairwiseBtn = document.getElementById("pairwiseBtn");
+
+      const simABEl = document.getElementById("simAB");
+      const simABpEl = document.getElementById("simABp");
+      const simBCEl = document.getElementById("simBC");
+      const simBCpEl = document.getElementById("simBCp");
+      const simCAEl = document.getElementById("simCA");
+      const simCApEl = document.getElementById("simCAp");
+      const simCycleEl = document.getElementById("simCycle");
+      const simCyclepEl = document.getElementById("simCyclep");
+
+      const regionCanvas = document.getElementById("region3dCanvas");
+      const regionStatusEl = document.getElementById("regionStatus");
+      const gridStepEl = document.getElementById("gridStep");
+      const pointModeEl = document.getElementById("pointMode");
+      const pointSizeEl = document.getElementById("pointSize");
+      const resampleBtn = document.getElementById("resampleBtn");
+      const resetViewBtn = document.getElementById("resetViewBtn");
+
+      function clamp01(x) {
+        return Math.max(0, Math.min(1, x));
+      }
+
+      function fmtProb(x) {
+        if (!Number.isFinite(x)) return "—";
+        return x.toFixed(4);
+      }
+
+      function fmtNum(x) {
+        if (!Number.isFinite(x)) return "—";
+        if (x > 1e7) return x.toExponential(3);
+        return x.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+      }
+
+      function allPatternsLen3() {
+        const out = [];
+        for (const a of ["H", "T"]) {
+          for (const b of ["H", "T"]) {
+            for (const c of ["H", "T"]) out.push(a + b + c);
+          }
+        }
+        return out;
+      }
+
+      function populatePatterns(selectEl) {
+        selectEl.innerHTML = "";
+        const pats = allPatternsLen3();
+        for (const p of pats) {
+          const opt = document.createElement("option");
+          opt.value = p;
+          opt.textContent = p;
+          selectEl.appendChild(opt);
+        }
+      }
+
+      function getParams() {
+        const pA = clamp01(Number(pASlider.value) / 100);
+        const pB = clamp01(Number(pBSlider.value) / 100);
+        const pC = clamp01(Number(pCSlider.value) / 100);
+        return { pA, pB, pC };
+      }
+
+      function setParams(pA, pB, pC) {
+        pASlider.value = String(Math.round(clamp01(pA) * 100));
+        pBSlider.value = String(Math.round(clamp01(pB) * 100));
+        if (pC !== undefined && pC !== null) pCSlider.value = String(Math.round(clamp01(pC) * 100));
+        syncLabels();
+      }
+
+      function syncLabels() {
+        const { pA, pB, pC } = getParams();
+        pALabel.textContent = "(" + pA.toFixed(2) + ")";
+        pBLabel.textContent = "(" + pB.toFixed(2) + ")";
+        pCLabel.textContent = "(" + pC.toFixed(2) + ")";
+      }
+
+      function ci95(p, n) {
+        if (!Number.isFinite(p) || !Number.isFinite(n) || n <= 0) return null;
+        const s = Math.sqrt((p * (1 - p)) / n);
+        const lo = Math.max(0, p - 1.96 * s);
+        const hi = Math.min(1, p + 1.96 * s);
+        return [lo, hi];
+      }
+
+      function fmtCI(ci) {
+        if (!ci) return "—";
+        return "95% CI [" + ci[0].toFixed(4) + ", " + ci[1].toFixed(4) + "]";
+      }
+
+      // --- Exact calculations for a single biased coin via small linear systems ---
+      // State is the last up to 2 symbols, drawn from {"", "H", "T", "HH", "HT", "TH", "TT"}.
+      // Transition appends next symbol from a Bernoulli(p) coin, then truncates to last 2.
+      const SUFFIX_STATES = ["", "H", "T", "HH", "HT", "TH", "TT"];
+      const SUFFIX_INDEX = new Map(SUFFIX_STATES.map((s, i) => [s, i]));
+
+      function nextSuffix(suffix, sym) {
+        const s = suffix + sym;
+        if (s.length <= 2) return s;
+        return s.slice(s.length - 2);
+      }
+
+      function endsWithPattern(suffix2, sym, pattern) {
+        // pattern length 3; check if (suffix2 + sym) ends with pattern
+        return (suffix2 + sym) === pattern;
+      }
+
+      function transProbIID(nextSym, p) {
+        return nextSym === "H" ? p : (1 - p);
+      }
+
+      function lastSymbolOfSuffix(suffix) {
+        if (!suffix) return "";
+        return suffix[suffix.length - 1];
+      }
+
+      // Solve Ax=b (A square) via Gaussian elimination (small n).
+      function solveLinear(A, b) {
+        const n = A.length;
+        const M = [];
+        for (let i = 0; i < n; i += 1) {
+          M[i] = A[i].slice();
+          M[i].push(b[i]);
+        }
+
+        for (let col = 0, row = 0; col < n && row < n; col += 1) {
+          let pivot = row;
+          for (let r = row; r < n; r += 1) {
+            if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
+          }
+          if (Math.abs(M[pivot][col]) < 1e-14) continue;
+          const tmp = M[row];
+          M[row] = M[pivot];
+          M[pivot] = tmp;
+
+          const div = M[row][col];
+          for (let c = col; c <= n; c += 1) M[row][c] /= div;
+
+          for (let r = 0; r < n; r += 1) {
+            if (r === row) continue;
+            const factor = M[r][col];
+            if (Math.abs(factor) < 1e-14) continue;
+            for (let c = col; c <= n; c += 1) M[r][c] -= factor * M[row][c];
+          }
+          row += 1;
+        }
+
+        const x = new Array(n).fill(0);
+        for (let i = 0; i < n; i += 1) x[i] = M[i][n];
+        return x;
+      }
+
+      // Expected waiting time to see pattern X.
+      function expectedTimeIID(X, p) {
+        const n = SUFFIX_STATES.length;
+        const idxStart = SUFFIX_INDEX.get("");
+        const A = [];
+        const b = [];
+        for (let i = 0; i < n; i += 1) {
+          A[i] = new Array(n).fill(0);
+          b[i] = 1; // constant 1 step
+          A[i][i] = 1;
+        }
+
+        for (let i = 0; i < n; i += 1) {
+          const suf = SUFFIX_STATES[i];
+          for (const sym of ["H", "T"]) {
+            const pr = transProbIID(sym, p);
+            if (suf.length === 2 && endsWithPattern(suf, sym, X)) {
+              // Absorb with remaining time 0; just constant term contributes already via b[i]=1.
+            } else {
+              const ns = nextSuffix(suf, sym);
+              const j = SUFFIX_INDEX.get(ns);
+              A[i][j] -= pr;
+            }
+          }
+        }
+
+        const sol = solveLinear(A, b);
+        return sol[idxStart];
+      }
+
+      // Numerically exact (up to floating error) waiting-time distribution for a length-3 pattern under IID coin flips.
+      // Returns { pmf, tail }, where pmf[t] = P(T = t) for t>=1 (pmf[0]=0), and tail = P(T > pmf.length-1).
+      function waitingTimePmfLen3(pattern, p, eps = 1e-12, maxT = 20000) {
+        const n = SUFFIX_STATES.length;
+        const idxStart = SUFFIX_INDEX.get("");
+        let v = new Float64Array(n);
+        v[idxStart] = 1.0;
+        const pmf = [0];
+
+        function stepOnce() {
+          const nv = new Float64Array(n);
+          let absorb = 0.0;
+          for (let i = 0; i < n; i += 1) {
+            const mass = v[i];
+            if (mass === 0) continue;
+            const suf = SUFFIX_STATES[i];
+
+            // H transition
+            {
+              const pr = p;
+              if (suf.length === 2 && endsWithPattern(suf, "H", pattern)) absorb += mass * pr;
+              else {
+                const ns = nextSuffix(suf, "H");
+                nv[SUFFIX_INDEX.get(ns)] += mass * pr;
+              }
+            }
+
+            // T transition
+            {
+              const pr = 1 - p;
+              if (suf.length === 2 && endsWithPattern(suf, "T", pattern)) absorb += mass * pr;
+              else {
+                const ns = nextSuffix(suf, "T");
+                nv[SUFFIX_INDEX.get(ns)] += mass * pr;
+              }
+            }
+          }
+          v = nv;
+          return absorb;
+        }
+
+        for (let t = 1; t <= maxT; t += 1) {
+          const a = stepOnce();
+          pmf[t] = a;
+          let tail = 0.0;
+          for (let i = 0; i < n; i += 1) tail += v[i];
+          if (tail < eps) return { pmf, tail };
+        }
+
+        let tail = 0.0;
+        for (let i = 0; i < n; i += 1) tail += v[i];
+        return { pmf, tail };
+      }
+
+      // Probability that pattern A finishes before B, with random tie-breaks.
+      function probAbeatsBExactLen3(A, B, pA, pB) {
+        const distA = waitingTimePmfLen3(A, pA, 1e-13);
+        const distB = waitingTimePmfLen3(B, pB, 1e-13);
+        const pmfA = distA.pmf;
+        const pmfB = distB.pmf;
+        const T = Math.max(pmfA.length, pmfB.length) - 1;
+
+        let cdfB = 0.0;
+        let pStrict = 0.0;
+        let pTie = 0.0;
+
+        for (let t = 1; t <= T; t += 1) {
+          const a = t < pmfA.length ? pmfA[t] : 0.0;
+          const b = t < pmfB.length ? pmfB[t] : 0.0;
+          cdfB += b;
+          pStrict += a * (1 - cdfB);
+          pTie += a * b;
+        }
+
+        // Remaining tails are tiny (eps), ignore them; result is accurate to ~eps.
+        return pStrict + 0.5 * pTie;
+      }
+
+      function isNonTransitive(pAB, pBC, pCA) {
+        return pAB > 0.5 && pBC > 0.5 && pCA > 0.5;
+      }
+
+      function meanOrderLabel(A, B, C, eA, eB, eC) {
+        const list = [
+          { id: "A", pat: A, val: eA },
+          { id: "B", pat: B, val: eB },
+          { id: "C", pat: C, val: eC }
+        ];
+        list.sort((x, y) => y.val - x.val);
+        return list.map((x) => x.id).join(" > ");
+      }
+
+      // --- 3D region viewer (point cloud) ---
+      function mat4Mul(a, b) {
+        const out = new Float32Array(16);
+        for (let r = 0; r < 4; r += 1) {
+          for (let c = 0; c < 4; c += 1) {
+            out[r * 4 + c] =
+              a[r * 4 + 0] * b[0 * 4 + c] +
+              a[r * 4 + 1] * b[1 * 4 + c] +
+              a[r * 4 + 2] * b[2 * 4 + c] +
+              a[r * 4 + 3] * b[3 * 4 + c];
+          }
+        }
+        return out;
+      }
+
+      function mat4Identity() {
+        const m = new Float32Array(16);
+        m[0] = 1;
+        m[5] = 1;
+        m[10] = 1;
+        m[15] = 1;
+        return m;
+      }
+
+      function mat4Perspective(fovyRad, aspect, near, far) {
+        const f = 1.0 / Math.tan(fovyRad / 2);
+        const m = new Float32Array(16);
+        m[0] = f / aspect;
+        m[5] = f;
+        m[10] = (far + near) / (near - far);
+        m[11] = -1;
+        m[14] = (2 * far * near) / (near - far);
+        return m;
+      }
+
+      function mat4Translate(x, y, z) {
+        const m = mat4Identity();
+        m[12] = x;
+        m[13] = y;
+        m[14] = z;
+        return m;
+      }
+
+      function mat4RotateX(a) {
+        const c = Math.cos(a);
+        const s = Math.sin(a);
+        const m = mat4Identity();
+        m[5] = c;
+        m[6] = s;
+        m[9] = -s;
+        m[10] = c;
+        return m;
+      }
+
+      function mat4RotateY(a) {
+        const c = Math.cos(a);
+        const s = Math.sin(a);
+        const m = mat4Identity();
+        m[0] = c;
+        m[2] = -s;
+        m[8] = s;
+        m[10] = c;
+        return m;
+      }
+
+      function vec4MulMat4(m, v) {
+        const x = v[0],
+          y = v[1],
+          z = v[2],
+          w = v[3];
+        return [
+          m[0] * x + m[4] * y + m[8] * z + m[12] * w,
+          m[1] * x + m[5] * y + m[9] * z + m[13] * w,
+          m[2] * x + m[6] * y + m[10] * z + m[14] * w,
+          m[3] * x + m[7] * y + m[11] * z + m[15] * w
+        ];
+      }
+
+      function makeShader(gl, type, src) {
+        const sh = gl.createShader(type);
+        gl.shaderSource(sh, src);
+        gl.compileShader(sh);
+        if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+          const log = gl.getShaderInfoLog(sh);
+          gl.deleteShader(sh);
+          throw new Error("Shader compile failed: " + log);
+        }
+        return sh;
+      }
+
+      function makeProgram(gl, vsSrc, fsSrc) {
+        const vs = makeShader(gl, gl.VERTEX_SHADER, vsSrc);
+        const fs = makeShader(gl, gl.FRAGMENT_SHADER, fsSrc);
+        const prog = gl.createProgram();
+        gl.attachShader(prog, vs);
+        gl.attachShader(prog, fs);
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+          const log = gl.getProgramInfoLog(prog);
+          gl.deleteProgram(prog);
+          throw new Error("Program link failed: " + log);
+        }
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+        return prog;
+      }
+
+      function createRegionWorker() {
+        const TERMS_AB = [
+          [1, 9, 8],
+          [-1, 8, 9],
+          [-5, 9, 7],
+          [3, 8, 8],
+          [2, 7, 9],
+          [10, 9, 6],
+          [-8, 7, 8],
+          [-1, 6, 9],
+          [-10, 9, 5],
+          [-10, 8, 6],
+          [11, 7, 7],
+          [3, 6, 8],
+          [5, 9, 4],
+          [15, 8, 5],
+          [-4, 7, 6],
+          [-3, 6, 7],
+          [1, 5, 8],
+          [-1, 9, 3],
+          [-9, 8, 4],
+          [-5, 7, 5],
+          [2, 6, 6],
+          [-2, 5, 7],
+          [2, 8, 3],
+          [7, 7, 4],
+          [-2, 5, 6],
+          [-1, 4, 7],
+          [-4, 7, 3],
+          [-5, 6, 4],
+          [6, 5, 5],
+          [2, 4, 6],
+          [1, 7, 2],
+          [6, 6, 3],
+          [-2, 5, 4],
+          [-2, 4, 5],
+          [2, 3, 6],
+          [-2, 6, 2],
+          [-1, 5, 3],
+          [2, 4, 4],
+          [-3, 3, 5],
+          [-1, 5, 2],
+          [-1, 2, 5],
+          [1, 5, 1],
+          [-1, 4, 2],
+          [1, 3, 3],
+          [2, 2, 4],
+          [1, 3, 2],
+          [-2, 2, 3],
+          [-1, 3, 1],
+          [1, 2, 2],
+          [-1, 1, 3],
+          [-1, 3, 0],
+          [1, 1, 2],
+          [-1, 0, 3],
+          [1, 0, 2]
+        ];
+
+        const TERMS_BC = [
+          [-1, 8, 9],
+          [3, 8, 8],
+          [5, 7, 9],
+          [-3, 8, 7],
+          [-15, 7, 8],
+          [-10, 6, 9],
+          [1, 8, 6],
+          [15, 7, 7],
+          [30, 6, 8],
+          [10, 5, 9],
+          [-6, 7, 6],
+          [-30, 6, 7],
+          [-30, 5, 8],
+          [-5, 4, 9],
+          [2, 7, 5],
+          [13, 6, 6],
+          [30, 5, 7],
+          [15, 4, 8],
+          [1, 3, 9],
+          [-1, 7, 4],
+          [-6, 6, 5],
+          [-10, 5, 6],
+          [-15, 4, 7],
+          [-3, 3, 8],
+          [3, 6, 4],
+          [-2, 4, 6],
+          [3, 3, 7],
+          [14, 4, 5],
+          [6, 3, 6],
+          [-2, 5, 3],
+          [-7, 4, 4],
+          [-14, 3, 5],
+          [-2, 2, 6],
+          [2, 5, 2],
+          [4, 4, 3],
+          [7, 3, 4],
+          [4, 2, 5],
+          [-4, 4, 2],
+          [-2, 3, 3],
+          [-2, 2, 4],
+          [2, 3, 2],
+          [-1, 2, 3],
+          [1, 2, 2],
+          [1, 1, 3],
+          [-1, 3, 0],
+          [-1, 1, 2],
+          [1, 0, 3],
+          [1, 2, 0],
+          [-1, 0, 2]
+        ];
+
+        const TERMS_CA = [
+          [-1, 8, 9],
+          [3, 8, 8],
+          [2, 7, 9],
+          [-3, 8, 7],
+          [-6, 7, 8],
+          [-1, 6, 9],
+          [1, 8, 6],
+          [6, 7, 7],
+          [3, 6, 8],
+          [-2, 7, 6],
+          [-3, 6, 7],
+          [2, 6, 6],
+          [-2, 6, 5],
+          [-2, 5, 6],
+          [1, 6, 4],
+          [4, 5, 5],
+          [-1, 4, 6],
+          [-2, 5, 4],
+          [2, 4, 5],
+          [2, 3, 6],
+          [1, 5, 3],
+          [-1, 4, 4],
+          [-4, 3, 5],
+          [-1, 5, 2],
+          [1, 4, 3],
+          [2, 3, 4],
+          [-1, 4, 2],
+          [-1, 2, 3],
+          [1, 2, 2],
+          [-1, 1, 3],
+          [-1, 3, 0],
+          [1, 1, 2],
+          [-1, 0, 3],
+          [1, 0, 2]
+        ];
+
+        const workerSrc = `
+          "use strict";
+          const TERMS_AB = ${JSON.stringify(TERMS_AB)};
+          const TERMS_BC = ${JSON.stringify(TERMS_BC)};
+          const TERMS_CA = ${JSON.stringify(TERMS_CA)};
+
+          function powTable(x, maxPow) {
+            const p = new Float64Array(maxPow + 1);
+            p[0] = 1.0;
+            for (let i = 1; i <= maxPow; i += 1) p[i] = p[i - 1] * x;
+            return p;
+          }
+
+          function evalPoly2(x, y, terms) {
+            const px = powTable(x, 9);
+            const py = powTable(y, 9);
+            let s = 0.0;
+            for (let i = 0; i < terms.length; i += 1) {
+              const t = terms[i];
+              s += t[0] * px[t[1]] * py[t[2]];
+            }
+            return s;
+          }
+
+          function inRegion(pA, pB, pC) {
+            if (!(pA > 0 && pA < 1 && pB > 0 && pB < 1 && pC > 0 && pC < 1)) return false;
+            const gab = evalPoly2(pA, pB, TERMS_AB);
+            const gbc = evalPoly2(pB, pC, TERMS_BC);
+            const gca = evalPoly2(pA, pC, TERMS_CA); // terms written in (pA,pC)
+            return gab > 0 && gbc > 0 && gca > 0;
+          }
+
+          function singleWaitingTime(pattern, probH) {
+            let w0 = 0, w1 = 0, w2 = 0;
+            let t = 0;
+            const a = pattern.charCodeAt(0) === 72 ? 1 : 0;
+            const b = pattern.charCodeAt(1) === 72 ? 1 : 0;
+            const c = pattern.charCodeAt(2) === 72 ? 1 : 0;
+            while (true) {
+              const sym = Math.random() < probH ? 1 : 0;
+              w0 = w1; w1 = w2; w2 = sym;
+              t += 1;
+              if (t >= 3 && w0 === a && w1 === b && w2 === c) return t;
+            }
+          }
+
+          function pairwiseWins(N, A, B, pA, pB) {
+            let wins = 0;
+            for (let i = 0; i < N; i += 1) {
+              const tA = singleWaitingTime(A, pA);
+              const tB = singleWaitingTime(B, pB);
+              if (tA < tB) wins += 1;
+              else if (tA === tB && Math.random() < 0.5) wins += 1;
+            }
+            return wins;
+          }
+
+          function sampleRegion(step, mode) {
+            const n = Math.floor(1 / step) + 1;
+            const maxIndex = n - 2; // exclude 0 and 1
+            const pts = [];
+
+            if (mode !== "surface") {
+              for (let ia = 1; ia <= maxIndex; ia += 1) {
+                const pA = ia * step;
+                for (let ib = 1; ib <= maxIndex; ib += 1) {
+                  const pB = ib * step;
+                  for (let ic = 1; ic <= maxIndex; ic += 1) {
+                    const pC = ic * step;
+                    if (inRegion(pA, pB, pC)) pts.push(pA - 0.5, pB - 0.5, pC - 0.5);
+                  }
+                }
+                if (ia % 2 === 0) postMessage({ type: "progress", done: ia, total: maxIndex });
+              }
+              const arr = new Float32Array(pts);
+              postMessage({ type: "points", step, mode, count: arr.length / 3, points: arr }, [arr.buffer]);
+              return;
+            }
+
+            // Surface-only: compute occupancy grid, then keep boundary voxels (6-neighborhood).
+            const grid = new Uint8Array(n * n * n);
+            function idx(a, b, c) { return (a * n + b) * n + c; }
+
+            for (let ia = 1; ia <= maxIndex; ia += 1) {
+              const pA = ia * step;
+              for (let ib = 1; ib <= maxIndex; ib += 1) {
+                const pB = ib * step;
+                for (let ic = 1; ic <= maxIndex; ic += 1) {
+                  const pC = ic * step;
+                  if (inRegion(pA, pB, pC)) grid[idx(ia, ib, ic)] = 1;
+                }
+              }
+              if (ia % 2 === 0) postMessage({ type: "progress", done: ia, total: maxIndex, phase: 1 });
+            }
+
+            for (let ia = 1; ia <= maxIndex; ia += 1) {
+              const pA = ia * step;
+              for (let ib = 1; ib <= maxIndex; ib += 1) {
+                const pB = ib * step;
+                for (let ic = 1; ic <= maxIndex; ic += 1) {
+                  if (!grid[idx(ia, ib, ic)]) continue;
+                  const boundary =
+                    !grid[idx(ia - 1, ib, ic)] ||
+                    !grid[idx(ia + 1, ib, ic)] ||
+                    !grid[idx(ia, ib - 1, ic)] ||
+                    !grid[idx(ia, ib + 1, ic)] ||
+                    !grid[idx(ia, ib, ic - 1)] ||
+                    !grid[idx(ia, ib, ic + 1)];
+                  if (!boundary) continue;
+                  const pC = ic * step;
+                  pts.push(pA - 0.5, pB - 0.5, pC - 0.5);
+                }
+              }
+              if (ia % 2 === 0) postMessage({ type: "progress", done: ia, total: maxIndex, phase: 2 });
+            }
+
+            const arr = new Float32Array(pts);
+            postMessage({ type: "points", step, mode, count: arr.length / 3, points: arr }, [arr.buffer]);
+          }
+
+          onmessage = (ev) => {
+            const msg = ev.data;
+            if (!msg || !msg.type) return;
+            if (msg.type === "sample") {
+              try { sampleRegion(Number(msg.step), String(msg.mode || "surface")); }
+              catch (err) { postMessage({ type: "error", message: err && err.message ? err.message : String(err) }); }
+            } else if (msg.type === "pairwise") {
+              try {
+                const N = Math.max(1000, Math.floor(Number(msg.N) || 0));
+                const A = String(msg.A);
+                const B = String(msg.B);
+                const C = String(msg.C);
+                const pA = Number(msg.pA);
+                const pB = Number(msg.pB);
+                const pC = Number(msg.pC);
+                const ab = pairwiseWins(N, A, B, pA, pB);
+                const bc = pairwiseWins(N, B, C, pB, pC);
+                const ca = pairwiseWins(N, C, A, pC, pA);
+                postMessage({ type: "pairwise", N, ab, bc, ca });
+              } catch (err) {
+                postMessage({ type: "error", message: err && err.message ? err.message : String(err) });
+              }
+            }
+          };
+        `;
+
+        const blob = new Blob([workerSrc], { type: "text/javascript" });
+        const url = URL.createObjectURL(blob);
+        return new Worker(url);
+      }
+
+      function resizeCanvasToDisplaySize(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const displayW = Math.max(1, Math.floor(canvas.clientWidth * dpr));
+        const displayH = Math.max(1, Math.floor(canvas.clientHeight * dpr));
+        if (canvas.width !== displayW || canvas.height !== displayH) {
+          canvas.width = displayW;
+          canvas.height = displayH;
+        }
+        return { dpr, w: canvas.width, h: canvas.height };
+      }
+
+      const viewer = (() => {
+        // Prefer WebGL, but fall back to 2D canvas (some browsers block WebGL in file:// or on older machines).
+        const gl = regionCanvas.getContext("webgl", { antialias: true, alpha: false, premultipliedAlpha: false });
+
+        let points = new Float32Array(0);
+        let selected = null;
+        let yaw = -0.9;
+        let pitch = 0.6;
+        let distance = 1.9;
+        let glPointBuf = null;
+        let glSelectedBuf = null;
+        let glReady = false;
+        let glNeedsUpload = false;
+        let glNeedsSelectedUpload = false;
+
+        let dragging = false;
+        let dragMoved = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function resetView() {
+          yaw = -0.9;
+          pitch = 0.6;
+          distance = 1.9;
+        }
+
+        function setPoints(arr) {
+          points = arr;
+          if (gl && glReady && glPointBuf) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, glPointBuf);
+            gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+          } else if (gl) {
+            glNeedsUpload = true;
+          }
+        }
+
+        function setSelectedFromParams(pA, pB, pC) {
+          selected = [pA - 0.5, pB - 0.5, pC - 0.5];
+          if (gl && glReady && glSelectedBuf) {
+            const arr = new Float32Array(selected);
+            gl.bindBuffer(gl.ARRAY_BUFFER, glSelectedBuf);
+            gl.bufferData(gl.ARRAY_BUFFER, arr, gl.DYNAMIC_DRAW);
+          } else if (gl) {
+            glNeedsSelectedUpload = true;
+          }
+        }
+
+        regionCanvas.addEventListener("mousedown", (ev) => {
+          dragging = true;
+          dragMoved = false;
+          lastX = ev.clientX;
+          lastY = ev.clientY;
+        });
+        window.addEventListener("mouseup", () => {
+          dragging = false;
+        });
+        window.addEventListener("mousemove", (ev) => {
+          if (!dragging) return;
+          const dx = ev.clientX - lastX;
+          const dy = ev.clientY - lastY;
+          if (Math.abs(dx) + Math.abs(dy) > 2) dragMoved = true;
+          lastX = ev.clientX;
+          lastY = ev.clientY;
+          yaw += dx * 0.007;
+          pitch += dy * 0.007;
+          pitch = Math.max(-1.55, Math.min(1.55, pitch));
+        });
+        regionCanvas.addEventListener(
+          "wheel",
+          (ev) => {
+            ev.preventDefault();
+            distance *= Math.exp(ev.deltaY * 0.0012);
+            distance = Math.max(0.7, Math.min(5.5, distance));
+          },
+          { passive: false }
+        );
+
+        function onPick(hit) {
+          if (!hit) return;
+          const pA = clamp01(hit[0] + 0.5);
+          const pB = clamp01(hit[1] + 0.5);
+          const pC = clamp01(hit[2] + 0.5);
+          setParams(pA, pB, pC);
+          scheduleAll();
+          requestPairwise(true);
+        }
+
+        if (gl) {
+          // --- WebGL renderer ---
+          const vsSrc = `
+            attribute vec3 a_pos;
+            uniform mat4 u_mvp;
+            uniform float u_pointSize;
+            void main() {
+              gl_Position = u_mvp * vec4(a_pos, 1.0);
+              gl_PointSize = u_pointSize;
+            }
+          `;
+          const fsSrc = `
+            precision mediump float;
+            uniform vec4 u_color;
+            void main() {
+              vec2 c = gl_PointCoord.xy - vec2(0.5);
+              float d = dot(c,c);
+              if (d > 0.25) discard;
+              gl_FragColor = u_color;
+            }
+          `;
+
+          const prog = makeProgram(gl, vsSrc, fsSrc);
+          const locPos = gl.getAttribLocation(prog, "a_pos");
+          const locMVP = gl.getUniformLocation(prog, "u_mvp");
+          const locSize = gl.getUniformLocation(prog, "u_pointSize");
+          const locColor = gl.getUniformLocation(prog, "u_color");
+          glPointBuf = gl.createBuffer();
+          glSelectedBuf = gl.createBuffer();
+          glReady = true;
+
+          if (glNeedsUpload && glPointBuf) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, glPointBuf);
+            gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+            glNeedsUpload = false;
+          }
+          if (glNeedsSelectedUpload && glSelectedBuf && selected) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, glSelectedBuf);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(selected), gl.DYNAMIC_DRAW);
+            glNeedsSelectedUpload = false;
+          }
+
+          function currentMVP() {
+            const aspect = regionCanvas.width / Math.max(1, regionCanvas.height);
+            const proj = mat4Perspective(0.85, aspect, 0.01, 20);
+            const view = mat4Translate(0, 0, -distance);
+            const rot = mat4Mul(mat4RotateY(yaw), mat4RotateX(pitch));
+            return mat4Mul(proj, mat4Mul(view, rot));
+          }
+
+          function draw() {
+            resizeCanvasToDisplaySize(regionCanvas);
+            gl.viewport(0, 0, regionCanvas.width, regionCanvas.height);
+            gl.clearColor(1, 1, 1, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+            gl.useProgram(prog);
+            gl.uniformMatrix4fv(locMVP, false, currentMVP());
+            gl.enableVertexAttribArray(locPos);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, glPointBuf);
+            gl.vertexAttribPointer(locPos, 3, gl.FLOAT, false, 0, 0);
+            gl.uniform1f(locSize, Number(pointSizeEl.value) || 3);
+            gl.uniform4f(locColor, 0.0, 0.33, 0.58, 0.85);
+            gl.drawArrays(gl.POINTS, 0, points.length / 3);
+
+            if (selected) {
+              gl.bindBuffer(gl.ARRAY_BUFFER, glSelectedBuf);
+              gl.vertexAttribPointer(locPos, 3, gl.FLOAT, false, 0, 0);
+              gl.uniform1f(locSize, (Number(pointSizeEl.value) || 3) + 3);
+              gl.uniform4f(locColor, 0.95, 0.3, 0.2, 1.0);
+              gl.drawArrays(gl.POINTS, 0, 1);
+            }
+
+            requestAnimationFrame(draw);
+          }
+
+          function pickPoint(clientX, clientY) {
+            const rect = regionCanvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const x = (clientX - rect.left) * dpr;
+            const y = (clientY - rect.top) * dpr;
+            const mvp = currentMVP();
+            let best = -1;
+            let bestDist2 = Infinity;
+            const n = points.length / 3;
+            for (let i = 0; i < n; i += 1) {
+              const px = points[i * 3 + 0];
+              const py = points[i * 3 + 1];
+              const pz = points[i * 3 + 2];
+              const clip = vec4MulMat4(mvp, [px, py, pz, 1]);
+              const w = clip[3];
+              if (w === 0) continue;
+              const ndcX = clip[0] / w;
+              const ndcY = clip[1] / w;
+              const ndcZ = clip[2] / w;
+              if (ndcZ < -1 || ndcZ > 1) continue;
+              const sx = (ndcX * 0.5 + 0.5) * regionCanvas.width;
+              const sy = (1 - (ndcY * 0.5 + 0.5)) * regionCanvas.height;
+              const dx = sx - x;
+              const dy = sy - y;
+              const d2 = dx * dx + dy * dy;
+              if (d2 < bestDist2) {
+                bestDist2 = d2;
+                best = i;
+              }
+            }
+            const threshold = 12 * (window.devicePixelRatio || 1);
+            if (best < 0 || bestDist2 > threshold * threshold) return null;
+            return [points[best * 3 + 0], points[best * 3 + 1], points[best * 3 + 2]];
+          }
+
+          regionCanvas.addEventListener("click", (ev) => {
+            if (dragMoved) return;
+            onPick(pickPoint(ev.clientX, ev.clientY));
+          });
+
+          requestAnimationFrame(draw);
+          return { setPoints, setSelectedFromParams, resetView };
+        }
+
+        // --- 2D canvas fallback renderer ---
+        regionStatusEl.textContent = "Sampling: using 2D renderer (WebGL unavailable).";
+        const ctx2d = regionCanvas.getContext("2d");
+
+        function project(pt, w, h) {
+          // Rotate
+          const cy = Math.cos(yaw), sy = Math.sin(yaw);
+          const cx = Math.cos(pitch), sx = Math.sin(pitch);
+          let x = pt[0], y = pt[1], z = pt[2];
+          // yaw around Y
+          const x1 = cy * x - sy * z;
+          const z1 = sy * x + cy * z;
+          // pitch around X
+          const y2 = cx * y - sx * z1;
+          const z2 = sx * y + cx * z1;
+          const zz = z2 + distance;
+          const scale = Math.min(w, h) * 0.85;
+          const sxp = w / 2 + (x1 / zz) * scale;
+          const syp = h / 2 - (y2 / zz) * scale;
+          return [sxp, syp, zz];
+        }
+
+        function draw2d() {
+          const { w, h } = resizeCanvasToDisplaySize(regionCanvas);
+          ctx2d.clearRect(0, 0, w, h);
+          ctx2d.fillStyle = "rgba(255,255,255,1)";
+          ctx2d.fillRect(0, 0, w, h);
+
+          // draw points (painters algorithm by depth: quick bucket sort)
+          const n = points.length / 3;
+          const projPts = new Array(n);
+          for (let i = 0; i < n; i += 1) {
+            const p = [points[i * 3], points[i * 3 + 1], points[i * 3 + 2]];
+            const q = project(p, w, h);
+            projPts[i] = [q[2], q[0], q[1]]; // depth, x, y
+          }
+          projPts.sort((a, b) => b[0] - a[0]);
+
+          const r = Math.max(1, Number(pointSizeEl.value) || 3) * 0.8;
+          ctx2d.fillStyle = "rgba(0,85,148,0.55)";
+          for (let i = 0; i < projPts.length; i += 1) {
+            const x = projPts[i][1];
+            const y = projPts[i][2];
+            ctx2d.beginPath();
+            ctx2d.arc(x, y, r, 0, Math.PI * 2);
+            ctx2d.fill();
+          }
+
+          if (selected) {
+            const q = project(selected, w, h);
+            ctx2d.beginPath();
+            ctx2d.arc(q[0], q[1], r + 3, 0, Math.PI * 2);
+            ctx2d.fillStyle = "rgba(242,76,51,0.95)";
+            ctx2d.fill();
+            ctx2d.strokeStyle = "rgba(15,23,42,0.35)";
+            ctx2d.lineWidth = 2;
+            ctx2d.stroke();
+          }
+
+          // small axis triad
+          const origin = project([0, 0, 0], w, h);
+          const ax = project([0.4, 0, 0], w, h);
+          const ay = project([0, 0.4, 0], w, h);
+          const az = project([0, 0, 0.4], w, h);
+          ctx2d.lineWidth = 2;
+          ctx2d.strokeStyle = "rgba(239,68,68,0.85)"; // x
+          ctx2d.beginPath(); ctx2d.moveTo(origin[0], origin[1]); ctx2d.lineTo(ax[0], ax[1]); ctx2d.stroke();
+          ctx2d.strokeStyle = "rgba(34,197,94,0.85)"; // y
+          ctx2d.beginPath(); ctx2d.moveTo(origin[0], origin[1]); ctx2d.lineTo(ay[0], ay[1]); ctx2d.stroke();
+          ctx2d.strokeStyle = "rgba(59,130,246,0.85)"; // z
+          ctx2d.beginPath(); ctx2d.moveTo(origin[0], origin[1]); ctx2d.lineTo(az[0], az[1]); ctx2d.stroke();
+
+          requestAnimationFrame(draw2d);
+        }
+
+        function pick2d(clientX, clientY) {
+          const rect = regionCanvas.getBoundingClientRect();
+          const dpr = window.devicePixelRatio || 1;
+          const x = (clientX - rect.left) * dpr;
+          const y = (clientY - rect.top) * dpr;
+          const w = regionCanvas.width;
+          const h = regionCanvas.height;
+          let best = -1;
+          let bestDist2 = Infinity;
+          const n = points.length / 3;
+          for (let i = 0; i < n; i += 1) {
+            const p = [points[i * 3], points[i * 3 + 1], points[i * 3 + 2]];
+            const q = project(p, w, h);
+            const dx = q[0] - x;
+            const dy = q[1] - y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < bestDist2) { bestDist2 = d2; best = i; }
+          }
+          const threshold = 14 * (window.devicePixelRatio || 1);
+          if (best < 0 || bestDist2 > threshold * threshold) return null;
+          return [points[best * 3], points[best * 3 + 1], points[best * 3 + 2]];
+        }
+
+        regionCanvas.addEventListener("click", (ev) => {
+          if (dragMoved) return;
+          onPick(pick2d(ev.clientX, ev.clientY));
+        });
+
+        requestAnimationFrame(draw2d);
+        return { setPoints, setSelectedFromParams, resetView };
+      })();
+
+      const regionWorker = createRegionWorker();
+
+      function renderExact() {
+        const { pA, pB, pC } = getParams();
+        const A = String(patternAEl.value);
+        const B = String(patternBEl.value);
+        const C = String(patternCEl.value);
+
+        // Single-coin mean waiting times are exact.
+        // Pairwise win probabilities are computed numerically exactly (via small Markov chains) for length-3 patterns.
+        const pAB = probAbeatsBExactLen3(A, B, pA, pB);
+        const pBC = probAbeatsBExactLen3(B, C, pB, pC);
+        const pCA = probAbeatsBExactLen3(C, A, pC, pA);
+
+        pABEl.textContent = fmtProb(pAB);
+        pBCEl.textContent = fmtProb(pBC);
+        pCAEl.textContent = fmtProb(pCA);
+        pABciEl.textContent = "numerical exact (length-3)";
+        pBCciEl.textContent = "numerical exact (length-3)";
+        pCAciEl.textContent = "numerical exact (length-3)";
+
+        const nonT = isNonTransitive(pAB, pBC, pCA);
+        nonTransitiveTagEl.innerHTML = nonT
+          ? '<span class="tag tag--good">Yes</span>'
+          : '<span class="tag tag--bad">No</span>';
+
+        const eA = expectedTimeIID(A, pA);
+        const eB = expectedTimeIID(B, pB);
+        const eC = expectedTimeIID(C, pC);
+        eAEl.textContent = fmtNum(eA);
+        eBEl.textContent = fmtNum(eB);
+        eCEl.textContent = fmtNum(eC);
+        meanOrderEl.textContent = meanOrderLabel(A, B, C, eA, eB, eC);
+
+        if (viewer) viewer.setSelectedFromParams(pA, pB, pC);
+      }
+
+      // --- Simulation ---
+      function sampleNextIID(p) {
+        const r = Math.random();
+        return r < p ? "H" : "T";
+      }
+
+      function estimatePairwise(samples, A, B, pA, pB) {
+        let wins = 0;
+        for (let i = 0; i < samples; i += 1) {
+          const tA = singleWaitingTime(A, pA);
+          const tB = singleWaitingTime(B, pB);
+          if (tA < tB) wins += 1;
+          else if (tA === tB && Math.random() < 0.5) wins += 1;
+        }
+        return wins / Math.max(1, samples);
+      }
+
+      function singleWaitingTime(pattern, probH) {
+        let window = "";
+        let t = 0;
+        while (true) {
+          const sym = sampleNextIID(probH);
+          t += 1;
+          window += sym;
+          if (window.length > 3) window = window.slice(window.length - 3);
+          if (window.length === 3 && window === pattern) return t;
+        }
+      }
+
+      function estimateNonTransitive(samples, A, B, C, pA, pB, pC) {
+        let ab = 0;
+        let bc = 0;
+        let ca = 0;
+        for (let i = 0; i < samples; i += 1) {
+          const tA = singleWaitingTime(A, pA);
+          const tB = singleWaitingTime(B, pB);
+          const tC = singleWaitingTime(C, pC);
+
+          function lt(x, y) {
+            if (x < y) return true;
+            if (x > y) return false;
+            return Math.random() < 0.5;
+          }
+
+          if (lt(tA, tB)) ab += 1;
+          if (lt(tB, tC)) bc += 1;
+          if (lt(tC, tA)) ca += 1;
+        }
+        const pAB = ab / Math.max(1, samples);
+        const pBC = bc / Math.max(1, samples);
+        const pCA = ca / Math.max(1, samples);
+        return { pAB, pBC, pCA, nonT: isNonTransitive(pAB, pBC, pCA) };
+      }
+
+      async function runSimulation() {
+        const t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+        try {
+          runBtn.disabled = true;
+          const A = String(patternAEl.value);
+          const B = String(patternBEl.value);
+          const C = String(patternCEl.value);
+          const { pA, pB, pC } = getParams();
+          let N = Number(gamesNEl.value);
+          N = Number.isFinite(N) ? Math.max(10000, Math.floor(N / 10000) * 10000) : 100000;
+          gamesNEl.value = String(N);
+
+          runtimeStatus.textContent = "Runtime: running simulation…";
+          const res = await simulateRunsBiased(N, A, B, C, pA, pB, pC, (done, total) => {
+            runtimeStatus.textContent = "Runtime: simulation " + done + " / " + total;
+          });
+
+          const fmt = (x) => x + " / " + res.N;
+          const fp = (x) => (x / res.N).toFixed(4);
+
+          simABEl.textContent = fmt(res.ab);
+          simABpEl.textContent = fp(res.ab);
+          simBCEl.textContent = fmt(res.bc);
+          simBCpEl.textContent = fp(res.bc);
+          simCAEl.textContent = fmt(res.ca);
+          simCApEl.textContent = fp(res.ca);
+          simCycleEl.textContent = fmt(res.cycles);
+          simCyclepEl.textContent = fp(res.cycles);
+
+          const t1 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+          runtimeStatus.textContent = "Runtime: OK (simulation " + (t1 - t0).toFixed(1) + " ms)";
+        } catch (err) {
+          runtimeStatus.textContent = "Runtime error: " + (err && err.message ? err.message : String(err));
+          throw err;
+        } finally {
+          runBtn.disabled = false;
+        }
+      }
+
+      function simulateRunsBiased(N, A, B, C, pA, pB, pC, onProgress) {
+        let done = 0;
+        let ab = 0;
+        let bc = 0;
+        let ca = 0;
+        let cycles = 0;
+
+        function oneRun() {
+          const tA = singleWaitingTime(A, pA);
+          const tB = singleWaitingTime(B, pB);
+          const tC = singleWaitingTime(C, pC);
+
+          function lt(x, y) {
+            if (x < y) return true;
+            if (x > y) return false;
+            return Math.random() < 0.5;
+          }
+
+          const A_lt_B = lt(tA, tB);
+          const B_lt_C = lt(tB, tC);
+          const C_lt_A = lt(tC, tA);
+
+          if (A_lt_B) ab += 1;
+          if (B_lt_C) bc += 1;
+          if (C_lt_A) ca += 1;
+          if (A_lt_B && B_lt_C && C_lt_A) cycles += 1;
+        }
+
+        return new Promise((resolve) => {
+          const chunk = 220;
+          function step() {
+            const target = Math.min(N, done + chunk);
+            for (; done < target; done += 1) oneRun();
+            if (onProgress) onProgress(done, N);
+            if (done < N) requestAnimationFrame(step);
+            else resolve({ ab, bc, ca, cycles, N });
+          }
+          step();
+        });
+      }
+
+      function requestResample() {
+        if (!viewer) return;
+        const step = Number(gridStepEl.value) || 0.02;
+        const mode = String(pointModeEl && pointModeEl.value ? pointModeEl.value : "surface");
+        const A = String(patternAEl.value);
+        const B = String(patternBEl.value);
+        const C = String(patternCEl.value);
+        const regionNote =
+          A === "HHH" && B === "HTH" && C === "HHT"
+            ? ""
+            : " (Region corresponds to A=HHH, B=HTH, C=HHT.)";
+        regionStatusEl.textContent = "Sampling: working…" + regionNote;
+        resampleBtn.disabled = true;
+        regionWorker.postMessage({ type: "sample", step, mode });
+      }
+
+      function requestPairwise(autoFromClick) {
+        const { pA, pB, pC } = getParams();
+        const A = String(patternAEl.value);
+        const B = String(patternBEl.value);
+        const C = String(patternCEl.value);
+        let N = Number(pairwiseNEl.value);
+        N = Number.isFinite(N) ? Math.max(10000, Math.floor(N / 10000) * 10000) : 20000;
+        pairwiseNEl.value = String(N);
+        pairwiseBtn.disabled = true;
+        if (autoFromClick) runtimeStatus.textContent = "Runtime: computing pairwise matrix…";
+        regionWorker.postMessage({ type: "pairwise", N, A, B, C, pA, pB, pC });
+      }
+
+      regionWorker.onmessage = (ev) => {
+        const msg = ev.data;
+        if (!msg || !msg.type) return;
+        if (msg.type === "progress") {
+          const done = Number(msg.done) || 0;
+          const total = Number(msg.total) || 1;
+          const pct = Math.min(100, Math.max(0, Math.round((done / total) * 100)));
+          const phase = msg.phase ? " (phase " + msg.phase + "/2)" : "";
+          regionStatusEl.textContent = "Sampling: " + pct + "% …" + phase;
+        } else if (msg.type === "points") {
+          const count = Number(msg.count) || 0;
+          const arr = msg.points instanceof Float32Array ? msg.points : new Float32Array(msg.points);
+          if (viewer) viewer.setPoints(arr);
+          const mode = msg.mode ? String(msg.mode) : "surface";
+          regionStatusEl.textContent = "Sampling: done (" + count + " points, " + mode + ").";
+          resampleBtn.disabled = false;
+        } else if (msg.type === "pairwise") {
+          const N = Number(msg.N) || 1;
+          const pAB = (Number(msg.ab) || 0) / N;
+          const pBC = (Number(msg.bc) || 0) / N;
+          const pCA = (Number(msg.ca) || 0) / N;
+
+          pABEl.textContent = fmtProb(pAB);
+          pBCEl.textContent = fmtProb(pBC);
+          pCAEl.textContent = fmtProb(pCA);
+          pABciEl.textContent = fmtCI(ci95(pAB, N));
+          pBCciEl.textContent = fmtCI(ci95(pBC, N));
+          pCAciEl.textContent = fmtCI(ci95(pCA, N));
+
+          const nonT = isNonTransitive(pAB, pBC, pCA);
+          nonTransitiveTagEl.innerHTML = nonT
+            ? '<span class="tag tag--good">Yes</span>'
+            : '<span class="tag tag--bad">No</span>';
+
+          pairwiseBtn.disabled = false;
+          runtimeStatus.textContent = "Runtime: OK (pairwise matrix, N=" + N + ")";
+        } else if (msg.type === "error") {
+          const message = String(msg.message || "unknown");
+          regionStatusEl.textContent = "Sampling error: " + message;
+          runtimeStatus.textContent = "Runtime error: " + message;
+          resampleBtn.disabled = false;
+          pairwiseBtn.disabled = false;
+        }
+      };
+
+      function scheduleAll() {
+        if (scheduleAll._raf) cancelAnimationFrame(scheduleAll._raf);
+        scheduleAll._raf = requestAnimationFrame(() => {
+          scheduleAll._raf = null;
+          renderExact();
+        });
+      }
+
+      // Init
+      populatePatterns(patternAEl);
+      populatePatterns(patternBEl);
+      populatePatterns(patternCEl);
+
+      // Example from user prompt
+      patternAEl.value = "HHH";
+      patternBEl.value = "HTH";
+      patternCEl.value = "HHT";
+
+      syncLabels();
+      renderExact();
+      requestResample();
+
+      patternAEl.addEventListener("change", scheduleAll);
+      patternBEl.addEventListener("change", scheduleAll);
+      patternCEl.addEventListener("change", scheduleAll);
+      pASlider.addEventListener("input", () => {
+        syncLabels();
+        scheduleAll();
+      });
+      pBSlider.addEventListener("input", () => {
+        syncLabels();
+        scheduleAll();
+      });
+      pCSlider.addEventListener("input", () => {
+        syncLabels();
+        scheduleAll();
+      });
+      runBtn.addEventListener("click", runSimulation);
+      pairwiseBtn.addEventListener("click", () => requestPairwise(false));
+
+      resampleBtn.addEventListener("click", requestResample);
+      resetViewBtn.addEventListener("click", () => {
+        if (viewer) viewer.resetView();
+      });
+      if (pointModeEl) pointModeEl.addEventListener("change", requestResample);
+
+      window.addEventListener("error", function (event) {
+        const msg = event && event.message ? event.message : "Unknown error";
+        if (runtimeStatus) runtimeStatus.textContent = "Runtime error: " + msg;
+      });
+
+      window.addEventListener("unhandledrejection", function (event) {
+        const reason = event && event.reason ? event.reason : null;
+        const msg = reason && reason.message ? reason.message : String(reason);
+        if (runtimeStatus) runtimeStatus.textContent = "Runtime error: " + msg;
+      });
+    </script>
+  </body>
+</html>

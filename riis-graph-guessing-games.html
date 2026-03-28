@@ -1,0 +1,1713 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Graph Entropy ↔ Network Coding ↔ Guessing Games (Riis)</title>
+    <meta
+      name="description"
+      content="Interactive visualisation of the link between multiple-unicast network coding, gluing (source=target), and guessing games / graph entropy from Søren Riis (2007)."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #0b1220;
+        --paper: rgba(255, 255, 255, 0.92);
+        --paper-2: rgba(255, 255, 255, 0.86);
+        --ink: #0f172a;
+        --muted: #475569;
+        --brand: #2563eb;
+        --brand-2: #06b6d4;
+        --good: #16a34a;
+        --bad: #dc2626;
+        --line: rgba(15, 23, 42, 0.12);
+        --shadow: 0 18px 40px rgba(2, 6, 23, 0.28);
+        --radius: 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--ink);
+        line-height: 1.5;
+        background: radial-gradient(900px 400px at 8% 8%, rgba(37, 99, 235, 0.25), transparent 60%),
+          radial-gradient(700px 420px at 80% 20%, rgba(6, 182, 212, 0.22), transparent 55%),
+          radial-gradient(700px 420px at 45% 95%, rgba(2, 132, 199, 0.15), transparent 55%),
+          var(--bg);
+      }
+
+      a {
+        color: var(--brand);
+        text-underline-offset: 3px;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: -999px;
+        top: 12px;
+        background: var(--brand);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 999px;
+        z-index: 10;
+      }
+
+      .skip-link:focus {
+        left: 14px;
+      }
+
+      .container {
+        width: min(1180px, 92vw);
+        margin: 0 auto;
+        padding: 28px 0 56px;
+      }
+
+      header {
+        color: rgba(255, 255, 255, 0.92);
+        padding-bottom: 18px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: clamp(1.55rem, 1.1rem + 1.6vw, 2.4rem);
+        letter-spacing: -0.02em;
+        line-height: 1.12;
+      }
+
+      header p {
+        margin: 10px 0 0;
+        max-width: 70ch;
+        color: rgba(255, 255, 255, 0.74);
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .card__header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.82));
+      }
+
+      .card__header h2 {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: 0.01em;
+      }
+
+      .card__header .hint {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .card__body {
+        padding: 16px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      @media (max-width: 880px) {
+        .controls {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .controls .card__body {
+        padding: 14px 16px 18px;
+      }
+
+      .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      @media (max-width: 880px) {
+        .controls-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 520px) {
+        .controls-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
+
+      select,
+      input[type="number"] {
+        width: 100%;
+        border: 1px solid rgba(15, 23, 42, 0.2);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      .controls .explain {
+        margin: 0;
+        color: rgba(15, 23, 42, 0.82);
+        font-size: 0.98rem;
+      }
+
+      .controls .explain strong {
+        color: rgba(15, 23, 42, 0.98);
+      }
+
+      .panel-grid {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      @media (max-width: 1080px) {
+        .panel-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .viz {
+        width: 100%;
+        aspect-ratio: 16 / 11;
+        min-height: 260px;
+        height: 340px;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+      }
+
+      .legend {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+      }
+
+      .swatch {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+      }
+
+      .swatch--source {
+        background: var(--brand);
+      }
+
+      .swatch--target {
+        background: var(--brand-2);
+      }
+
+      .swatch--internal {
+        background: #111827;
+      }
+
+      .swatch--glued {
+        background: #7c3aed;
+      }
+
+      .results {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: 1.35fr 1fr;
+        gap: 14px;
+      }
+
+      @media (max-width: 980px) {
+        .results {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      @media (max-width: 520px) {
+        .kpi-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .kpi {
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        padding: 12px 12px 10px;
+      }
+
+      .kpi .label {
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      .kpi .value {
+        margin-top: 4px;
+        font-size: 1.22rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .kpi .sub {
+        margin-top: 2px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.88rem;
+        font-weight: 650;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .tag--good {
+        color: var(--good);
+      }
+
+      .tag--bad {
+        color: var(--bad);
+      }
+
+      .notes {
+        margin-top: 14px;
+      }
+
+      .notes p,
+      .notes li {
+        color: rgba(15, 23, 42, 0.86);
+      }
+
+      details {
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        padding: 10px 12px;
+      }
+
+      details + details {
+        margin-top: 10px;
+      }
+
+      summary {
+        cursor: pointer;
+        font-weight: 700;
+        color: rgba(15, 23, 42, 0.94);
+      }
+
+      /* SVG styling */
+      svg {
+        user-select: none;
+      }
+
+      .edge {
+        stroke: rgba(17, 24, 39, 0.42);
+        stroke-width: 1.6;
+        fill: none;
+      }
+
+      .edge.is-active {
+        stroke: rgba(37, 99, 235, 0.92);
+        stroke-width: 2.4;
+      }
+
+      .node circle {
+        stroke: rgba(15, 23, 42, 0.22);
+        stroke-width: 1.4;
+      }
+
+      .node text {
+        font-size: 12px;
+        font-weight: 700;
+        fill: rgba(15, 23, 42, 0.9);
+        dominant-baseline: middle;
+        text-anchor: middle;
+      }
+
+      .node .secondary {
+        font-weight: 650;
+        font-size: 10px;
+        fill: rgba(15, 23, 42, 0.72);
+      }
+
+      .node.is-active circle {
+        stroke: rgba(37, 99, 235, 0.92);
+        stroke-width: 2.4;
+      }
+
+      .node--source circle {
+        fill: rgba(37, 99, 235, 0.18);
+      }
+
+      .node--target circle {
+        fill: rgba(6, 182, 212, 0.16);
+      }
+
+      .node--internal circle {
+        fill: rgba(17, 24, 39, 0.08);
+      }
+
+      .node--glued circle {
+        fill: rgba(124, 58, 237, 0.12);
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="container">
+      <header>
+        <h1>Graph entropy ↔ network coding ↔ guessing games (Riis, 2007)</h1>
+        <p>
+          This page visualizes a key idea from Søren Riis’ 2007 preprint: a multiple-unicast network
+          coding instance can be “glued” into a directed graph, and solvability becomes a statement
+          about the graph’s guessing number / entropy.
+        </p>
+        <p style="margin-top: 6px; color: rgba(255, 255, 255, 0.74)">
+          <a href="research-demos.html" style="color: rgba(255, 255, 255, 0.9)">← Research demos</a>
+        </p>
+      </header>
+
+      <main id="main">
+        <noscript>
+          <article class="card" style="margin-bottom: 16px">
+            <div class="card__body">
+              <p class="explain" style="margin: 0">
+                This demo needs JavaScript enabled. If JavaScript is disabled, the diagrams and
+                computed values will not appear.
+              </p>
+            </div>
+          </article>
+        </noscript>
+
+        <section class="controls">
+          <article class="card">
+            <div class="card__header">
+              <h2>Controls</h2>
+              <p class="hint">Hover nodes/edges to highlight across panels.</p>
+            </div>
+            <div class="card__body">
+              <div class="controls-grid">
+                <label>
+                  Example
+                  <select id="example"></select>
+                </label>
+
+                <label>
+                  Alphabet size <strong>s</strong>
+                  <select id="alphabetSize"></select>
+                </label>
+
+                <label>
+                  Strategy
+                  <select id="strategy">
+                  </select>
+                </label>
+
+                <label>
+                  Parameter <strong>c</strong>
+                  <input id="sumConstant" type="number" min="0" step="1" value="0" />
+                </label>
+
+                <label>
+                  Split A
+                  <select id="splitA"></select>
+                </label>
+
+                <label>
+                  Split B
+                  <select id="splitB"></select>
+                </label>
+              </div>
+
+              <p class="explain" style="margin-top: 12px">
+                In the <strong>guessing game</strong> on a directed graph, each vertex must guess its
+                own value from its in-neighbours. The same local functions can also be used as
+                <strong>coding functions</strong> on any acyclic split of the glued graph (Theorem 8
+                / Corollary 9 in the preprint). Pick an example + split(s) below to see the
+                correspondence numerically.
+              </p>
+
+              <p id="runtimeStatus" class="explain" style="margin: 10px 0 0; color: var(--muted)">
+                Runtime: waiting for JavaScript…
+              </p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__header">
+              <h2>Strategy used here</h2>
+              <p class="hint">Local rule(s) used as guessing + coding functions.</p>
+            </div>
+            <div class="card__body">
+              <p class="explain" style="margin: 0">
+                Local rule (guessing / coding functions):
+                <br />
+                <span
+                  style="
+                    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                    white-space: pre-wrap;
+                    display: inline-block;
+                  "
+                  id="strategyFormula"
+                  >x̂_i = (c − Σ_{u∈Pred(i)} x_u) mod s</span
+                >
+              </p>
+
+              <div class="legend" aria-label="Legend">
+                <span class="chip"><span class="swatch swatch--source"></span>source (input)</span>
+                <span class="chip"><span class="swatch swatch--target"></span>target (output)</span>
+                <span class="chip"><span class="swatch swatch--internal"></span>internal node</span>
+                <span class="chip"><span class="swatch swatch--glued"></span>glued vertex</span>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel-grid" aria-label="Visualizations">
+          <article class="card">
+            <div class="card__header">
+              <h2>Multiple-unicast network (Split A)</h2>
+              <p id="hintNetworkA" class="hint">Split set B = —</p>
+            </div>
+            <div class="card__body">
+              <svg id="svgNetworkA" class="viz" viewBox="0 0 640 440" role="img">
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="rgba(15, 23, 42, 0.55)">
+                  Loading…
+                </text>
+              </svg>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__header">
+              <h2>Glue sources with targets → guessing graph</h2>
+              <p id="hintGuessing" class="hint">Glued directed graph (guessing game).</p>
+            </div>
+            <div class="card__body">
+              <svg id="svgGuessing" class="viz" viewBox="0 0 640 440" role="img">
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="rgba(15, 23, 42, 0.55)">
+                  Loading…
+                </text>
+              </svg>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__header">
+              <h2>Another split of the same glued graph (Split B)</h2>
+              <p id="hintNetworkB" class="hint">Split set B = —</p>
+            </div>
+            <div class="card__body">
+              <svg id="svgNetworkB" class="viz" viewBox="0 0 640 440" role="img">
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="rgba(15, 23, 42, 0.55)">
+                  Loading…
+                </text>
+              </svg>
+            </div>
+          </article>
+        </section>
+
+        <section class="results" aria-label="Computed results">
+          <article class="card">
+            <div class="card__header">
+              <h2>What the numbers show</h2>
+              <p class="hint">We recompute these by brute force for the chosen s.</p>
+            </div>
+            <div class="card__body">
+              <div class="kpi-grid">
+                <div class="kpi">
+                  <div class="label">Fixed points in glued graph</div>
+                  <div id="kpiFixedPoints" class="value">—</div>
+                  <div id="kpiFixedPointsSub" class="sub">—</div>
+                </div>
+
+                <div class="kpi">
+                  <div class="label">Guessing number g(G, s)</div>
+                  <div id="kpiGuessingNumber" class="value">—</div>
+                  <div class="sub">g(G, s) = logₛ(#fixed points)</div>
+                </div>
+
+                <div class="kpi">
+                  <div class="label">Split A: inputs decoded correctly</div>
+                  <div id="kpiNetA" class="value">—</div>
+                  <div id="kpiNetATag" class="sub">—</div>
+                </div>
+
+                <div class="kpi">
+                  <div class="label">Split B: inputs decoded correctly</div>
+                  <div id="kpiNetB" class="value">—</div>
+                  <div id="kpiNetBTag" class="sub">—</div>
+                </div>
+              </div>
+
+              <p class="explain" style="margin-top: 12px">
+                For a split with <strong>k</strong> input–output pairs, the network is solved (over
+                alphabet A with |A|=s) if and only if the glued graph has <strong>sᵏ</strong> fixed
+                points under some guessing strategy — i.e. guessing number / entropy <strong>k</strong>.
+                This page evaluates the <em>selected</em> local rule; it does not search over all
+                possible rules.
+              </p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__header">
+              <h2>How this matches the paper</h2>
+              <p class="hint">Local reference: NetworkCoding/RiisTRGraphEntro.tex</p>
+            </div>
+            <div class="card__body notes">
+              <details open>
+                <summary>Core statements (informal)</summary>
+                <ul>
+                  <li>
+                    “Glue” a multiple-unicast network by identifying each source with its
+                    corresponding target; this gives a directed graph Gₙ.
+                  </li>
+                  <li>
+                    The graph’s entropy equals its guessing number (Theorem&nbsp;1 in the preprint).
+                  </li>
+                  <li>
+                    Solvability of the network over an alphabet A is equivalent to the glued graph
+                    having entropy / guessing number k over A (Corollary 9 in the preprint).
+                  </li>
+                  <li>
+                    Different minimal “splits” of the same glued graph yield different acyclic
+                    multiple-unicast instances, but the same local functions solve all of them (Theorem
+                    8 and the discussion right after it).
+                  </li>
+                </ul>
+              </details>
+
+              <details>
+                <summary>What “split” means here</summary>
+                <p>
+                  Pick a vertex set B. Splitting duplicates each v∈B into a <em>source</em> vᵢₙ (keeps
+                  outgoing edges) and a <em>target</em> vₒᵤₜ (keeps incoming edges). This breaks all
+                  directed cycles that rely on passing “through” vertices in B.
+                </p>
+              </details>
+
+              <details>
+                <summary>Note: K5 vs C5</summary>
+                <p>
+                  A common non-integer example is the 5-cycle C5, whose guessing number is 2.5. The
+                  complete graph K5 (viewed as a complete digraph) has guessing number 4; the
+                  “sum strategy” achieves s⁴ fixed points.
+                </p>
+              </details>
+
+              <details>
+                <summary>References</summary>
+                <ul>
+                  <li>
+                    Søren Riis (2007). Preprint introducing the gluing/splitting viewpoint:
+                    <a href="NetworkCoding/RiisTRGraphEntro.tex">NetworkCoding/RiisTRGraphEntro.tex</a>
+                  </li>
+                  <li>
+                    Maximilien Gadouleau, Søren Riis (2012). “Graph-Theoretical Constructions for
+                    Graph Entropy and Network Coding Based Communications”, IEEE Transactions on
+                    Information Theory.
+                  </li>
+                </ul>
+              </details>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      "use strict";
+
+      const svgNetworkA = document.getElementById("svgNetworkA");
+      const svgGuessing = document.getElementById("svgGuessing");
+      const svgNetworkB = document.getElementById("svgNetworkB");
+
+      const exampleSelect = document.getElementById("example");
+      const alphabetSizeSelect = document.getElementById("alphabetSize");
+      const strategySelect = document.getElementById("strategy");
+      const sumConstantInput = document.getElementById("sumConstant");
+      const splitASelect = document.getElementById("splitA");
+      const splitBSelect = document.getElementById("splitB");
+      const strategyFormula = document.getElementById("strategyFormula");
+
+      const hintNetworkA = document.getElementById("hintNetworkA");
+      const hintGuessing = document.getElementById("hintGuessing");
+      const hintNetworkB = document.getElementById("hintNetworkB");
+
+      const kpiFixedPoints = document.getElementById("kpiFixedPoints");
+      const kpiFixedPointsSub = document.getElementById("kpiFixedPointsSub");
+      const kpiGuessingNumber = document.getElementById("kpiGuessingNumber");
+      const kpiNetA = document.getElementById("kpiNetA");
+      const kpiNetATag = document.getElementById("kpiNetATag");
+      const kpiNetB = document.getElementById("kpiNetB");
+      const kpiNetBTag = document.getElementById("kpiNetBTag");
+      const runtimeStatus = document.getElementById("runtimeStatus");
+
+      /** Small helpers */
+      function mod(n, m) {
+        const r = n % m;
+        return r < 0 ? r + m : r;
+      }
+
+      function powInt(base, exp) {
+        let out = 1;
+        for (let i = 0; i < exp; i += 1) out *= base;
+        return out;
+      }
+
+      function logBase(value, base) {
+        return Math.log(value) / Math.log(base);
+      }
+
+      function uniqBy(list, keyFn) {
+        const seen = new Set();
+        const out = [];
+        for (const item of list) {
+          const key = keyFn(item);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          out.push(item);
+        }
+        return out;
+      }
+
+      function isPowerOfTwo(n) {
+        return Number.isInteger(n) && n >= 1 && (n & (n - 1)) === 0;
+      }
+
+      function baseVertexId(id) {
+        if (id.endsWith("_in")) return id.slice(0, -3);
+        if (id.endsWith("_out")) return id.slice(0, -4);
+        return id;
+      }
+
+      /** Graph model (directed) */
+      function makeCompleteDigraph(n) {
+        const nodes = Array.from({ length: n }, (_, idx) => {
+          const vertex = idx + 1;
+          return { id: String(vertex), vertex, label: String(vertex) };
+        });
+
+        const edges = [];
+        for (let u = 1; u <= n; u += 1) {
+          for (let v = 1; v <= n; v += 1) {
+            if (u === v) continue;
+            edges.push({ u: String(u), v: String(v) });
+          }
+        }
+
+        return { kind: "graph", nodes, edges };
+      }
+
+      function makeRiisBottleneckGraph() {
+        // Riis (2007) Fig (i)-(iii) glued graph: vertices {1,2,3} ↔ {4,5} (both directions).
+        const nodes = Array.from({ length: 5 }, (_, idx) => {
+          const vertex = idx + 1;
+          return { id: String(vertex), vertex, label: String(vertex) };
+        });
+
+        const left = [1, 2, 3];
+        const right = [4, 5];
+        const edges = [];
+        for (const u of left) {
+          for (const v of right) {
+            edges.push({ u: String(u), v: String(v) });
+            edges.push({ u: String(v), v: String(u) });
+          }
+        }
+
+        return { kind: "graph", nodes, edges };
+      }
+
+      function makeTheorem8GraphA() {
+        // Graph (a) in the figures around Theorem 8, specified by the user as two directed 7-cycles.
+        const nodes = Array.from({ length: 7 }, (_, idx) => {
+          const vertex = idx + 1;
+          return { id: String(vertex), vertex, label: String(vertex) };
+        });
+
+        const forward = [
+          [1, 2],
+          [2, 3],
+          [3, 4],
+          [4, 5],
+          [5, 6],
+          [6, 7],
+          [7, 1]
+        ];
+
+        const backward = [
+          [3, 1],
+          [4, 2],
+          [5, 3],
+          [6, 4],
+          [7, 5],
+          [1, 6],
+          [2, 7]
+        ];
+
+        const edges = [];
+        for (const [u, v] of forward.concat(backward)) {
+          edges.push({ u: String(u), v: String(v) });
+        }
+
+        return { kind: "graph", nodes, edges };
+      }
+
+      const EXAMPLES = [
+        {
+          id: "riis-bottleneck",
+          name: "Riis bottleneck (paper Fig i–iii): entropy 2",
+          entropyK: 2,
+          buildGraph: makeRiisBottleneckGraph,
+          alphabetSizes: [2, 3, 4, 5, 7, 8, 9, 11],
+          defaultAlphabetSize: 5,
+          strategies: [
+            { id: "riis-bottleneck", label: "Riis bottleneck (projection)" },
+            { id: "sum", label: "Sum strategy" },
+            { id: "constant", label: "Constant guess" }
+          ],
+          defaultStrategy: "riis-bottleneck",
+          splitSets: [
+            { id: "split-123", label: "{1,2,3} (non-minimal split; unsolvable)", vertices: [1, 2, 3] },
+            { id: "split-45", label: "{4,5} (minimal split; solvable)", vertices: [4, 5] }
+          ],
+          defaultSplitA: "split-123",
+          defaultSplitB: "split-45"
+        },
+        {
+          id: "theorem8-a",
+          name: "Theorem 8 graph (a): 3 different splits (b/c/d), power-of-2 alphabets",
+          entropyK: 3,
+          buildGraph: makeTheorem8GraphA,
+          alphabetSizes: [2, 3, 4, 5, 7, 8],
+          defaultAlphabetSize: 4,
+          strategies: [
+            { id: "theorem8-xor", label: "XOR strategy (achieves k=3 for s=2^r)" },
+            { id: "theorem8-linear", label: "Linear (mod s): gives k=2 (s=3,5,7)" },
+            { id: "constant", label: "Constant guess" }
+          ],
+          defaultStrategy: "theorem8-xor",
+          splitSets: [
+            { id: "split-b", label: "{1,2,5} → network (b)", vertices: [1, 2, 5] },
+            { id: "split-c", label: "{2,3,6} → network (c)", vertices: [2, 3, 6] },
+            { id: "split-d", label: "{1,3,5} → network (d)", vertices: [1, 3, 5] }
+          ],
+          defaultSplitA: "split-b",
+          defaultSplitB: "split-d"
+        },
+        {
+          id: "butterfly-triangle",
+          name: "Butterfly-style: glued graph is a bidirected triangle (entropy 2)",
+          entropyK: 2,
+          buildGraph: function () {
+            // The glued graph for a butterfly-style (2-unicast) instance can be represented by K3 (bidirected triangle).
+            return makeCompleteDigraph(3);
+          },
+          alphabetSizes: [2, 3, 4, 5, 7, 8, 9, 11],
+          defaultAlphabetSize: 5,
+          strategies: [
+            { id: "sum", label: "Sum strategy (optimal)" },
+            { id: "constant", label: "Constant guess" }
+          ],
+          defaultStrategy: "sum",
+          splitSets: [
+            { id: "split-12", label: "{1,2} (internal 3)", vertices: [1, 2] },
+            { id: "split-13", label: "{1,3} (internal 2)", vertices: [1, 3] },
+            { id: "split-23", label: "{2,3} (internal 1)", vertices: [2, 3] }
+          ],
+          defaultSplitA: "split-12",
+          defaultSplitB: "split-23"
+        },
+        {
+          id: "complete-5",
+          name: "Complete graph K5 (digraph): entropy 4",
+          entropyK: 4,
+          buildGraph: function () {
+            return makeCompleteDigraph(5);
+          },
+          alphabetSizes: [2, 3, 4, 5, 7, 8, 9, 11],
+          defaultAlphabetSize: 5,
+          strategies: [
+            { id: "sum", label: "Sum strategy (optimal)" },
+            { id: "constant", label: "Constant guess" }
+          ],
+          defaultStrategy: "sum",
+          splitSets: [
+            { id: "split-except-1", label: "{2,3,4,5} (internal 1)", vertices: [2, 3, 4, 5] },
+            { id: "split-except-2", label: "{1,3,4,5} (internal 2)", vertices: [1, 3, 4, 5] },
+            { id: "split-except-3", label: "{1,2,4,5} (internal 3)", vertices: [1, 2, 4, 5] },
+            { id: "split-except-4", label: "{1,2,3,5} (internal 4)", vertices: [1, 2, 3, 5] },
+            { id: "split-except-5", label: "{1,2,3,4} (internal 5)", vertices: [1, 2, 3, 4] }
+          ],
+          defaultSplitA: "split-except-5",
+          defaultSplitB: "split-except-4"
+        }
+      ];
+
+      const EXAMPLE_BY_ID = new Map(EXAMPLES.map((ex) => [ex.id, ex]));
+
+      function predecessorsOf(graph) {
+        const pred = new Map();
+        for (const node of graph.nodes) pred.set(node.id, []);
+        for (const { u, v } of graph.edges) pred.get(v).push(u);
+        for (const [v, list] of pred) {
+          list.sort((a, b) => Number(a) - Number(b));
+          pred.set(v, list);
+        }
+        return pred;
+      }
+
+      /** Split operation: duplicate vertices in B into in/out nodes. */
+      function splitGraph(graph, splitSetVertices) {
+        const splitSet = new Set(splitSetVertices.map(String));
+        const networkNodes = [];
+
+        for (const node of graph.nodes) {
+          if (splitSet.has(node.id)) {
+            networkNodes.push({
+              id: node.id + "_in",
+              vertex: node.vertex,
+              role: "source",
+              label: node.label,
+              sublabel: "in"
+            });
+            networkNodes.push({
+              id: node.id + "_out",
+              vertex: node.vertex,
+              role: "target",
+              label: node.label,
+              sublabel: "out"
+            });
+          } else {
+            networkNodes.push({
+              id: node.id,
+              vertex: node.vertex,
+              role: "internal",
+              label: node.label,
+              sublabel: ""
+            });
+          }
+        }
+
+        const edges = [];
+        for (const { u, v } of graph.edges) {
+          const tail = splitSet.has(u) ? u + "_in" : u;
+          const head = splitSet.has(v) ? v + "_out" : v;
+          edges.push({ u: tail, v: head, uVertex: baseVertexId(tail), vVertex: baseVertexId(head) });
+        }
+
+        const sources = networkNodes.filter((n) => n.role === "source").map((n) => n.id);
+        const targets = networkNodes.filter((n) => n.role === "target").map((n) => n.id);
+
+        return { kind: "network", nodes: networkNodes, edges, sources, targets, splitSet };
+      }
+
+      /** Simple layered layout for split networks */
+      function layoutSplitNetwork(network, viewBox) {
+        const { width, height, padding } = viewBox;
+        const sources = network.nodes.filter((n) => n.role === "source").sort((a, b) => a.vertex - b.vertex);
+        const targets = network.nodes.filter((n) => n.role === "target").sort((a, b) => a.vertex - b.vertex);
+        const internals = network.nodes.filter((n) => n.role === "internal").sort((a, b) => a.vertex - b.vertex);
+
+        const topY = padding + 54;
+        const midY = height / 2;
+        const botY = height - padding - 54;
+
+        const leftX = padding + 60;
+        const rightX = width - padding - 60;
+        const span = Math.max(1, sources.length - 1);
+
+        const coords = new Map();
+        sources.forEach((node, idx) => {
+          const x = leftX + ((rightX - leftX) * idx) / span;
+          coords.set(node.id, { x, y: topY });
+        });
+
+        targets.forEach((node) => {
+          const sourceId = String(node.vertex) + "_in";
+          const sourcePos = coords.get(sourceId);
+          const x = sourcePos ? sourcePos.x : leftX;
+          coords.set(node.id, { x, y: botY });
+        });
+
+        internals.forEach((node, idx) => {
+          const x = width / 2 + (idx - (internals.length - 1) / 2) * 110;
+          coords.set(node.id, { x, y: midY });
+        });
+
+        return coords;
+      }
+
+      /** Circular layout for glued guessing graph */
+      function layoutCircle(graph, viewBox) {
+        const { width, height, padding } = viewBox;
+        const cx = width / 2;
+        const cy = height / 2 + 10;
+        const r = Math.min(width, height) / 2 - padding - 68;
+        const nodes = [...graph.nodes].sort((a, b) => a.vertex - b.vertex);
+        const coords = new Map();
+
+        nodes.forEach((node, idx) => {
+          const angle = (-Math.PI / 2) + (idx * 2 * Math.PI) / nodes.length;
+          coords.set(node.id, { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+        });
+
+        return coords;
+      }
+
+      function buildMarker(svgEl, id) {
+        const existing = svgEl.querySelector("marker#" + id);
+        if (existing) return;
+
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+        marker.setAttribute("id", id);
+        marker.setAttribute("viewBox", "0 0 10 10");
+        marker.setAttribute("refX", "9");
+        marker.setAttribute("refY", "5");
+        marker.setAttribute("markerWidth", "7");
+        marker.setAttribute("markerHeight", "7");
+        marker.setAttribute("orient", "auto-start-reverse");
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+        path.setAttribute("fill", "rgba(17, 24, 39, 0.55)");
+        marker.appendChild(path);
+
+        defs.appendChild(marker);
+        svgEl.appendChild(defs);
+      }
+
+      function edgePath(posU, posV, curvature) {
+        const x1 = posU.x;
+        const y1 = posU.y;
+        const x2 = posV.x;
+        const y2 = posV.y;
+
+        if (!curvature) {
+          return "M " + x1 + " " + y1 + " L " + x2 + " " + y2;
+        }
+
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.max(1, Math.hypot(dx, dy));
+        const nx = -dy / len;
+        const ny = dx / len;
+        const c = curvature * Math.min(110, len * 0.28);
+        const cx = mx + nx * c;
+        const cy = my + ny * c;
+        return "M " + x1 + " " + y1 + " Q " + cx + " " + cy + " " + x2 + " " + y2;
+      }
+
+      function clearSvg(svgEl) {
+        while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
+      }
+
+      function render(svgEl, model, coords, options) {
+        const { markerId, isGuessingGraph } = options;
+        clearSvg(svgEl);
+        buildMarker(svgEl, markerId);
+
+        const gEdges = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        const gNodes = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        svgEl.appendChild(gEdges);
+        svgEl.appendChild(gNodes);
+
+        const nodeById = new Map(model.nodes.map((n) => [n.id, n]));
+
+        for (const edge of model.edges) {
+          const posU = coords.get(edge.u);
+          const posV = coords.get(edge.v);
+          if (!posU || !posV) continue;
+
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.classList.add("edge");
+          path.setAttribute("marker-end", "url(#" + markerId + ")");
+
+          let curvature = 0;
+          if (isGuessingGraph) {
+            const uVertex = Number(edge.u);
+            const vVertex = Number(edge.v);
+            curvature = uVertex < vVertex ? 1 : -1;
+          }
+
+          path.setAttribute("d", edgePath(posU, posV, curvature));
+          path.dataset.u = edge.uVertex !== undefined && edge.uVertex !== null ? edge.uVertex : edge.u;
+          path.dataset.v = edge.vVertex !== undefined && edge.vVertex !== null ? edge.vVertex : edge.v;
+
+          path.addEventListener("mouseenter", () => setActiveEdge(path.dataset.u, path.dataset.v));
+          path.addEventListener("mouseleave", () => clearActive());
+
+          gEdges.appendChild(path);
+        }
+
+        for (const node of model.nodes) {
+          const pos = coords.get(node.id);
+          if (!pos) continue;
+
+          const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          group.classList.add("node");
+          group.dataset.vertex = String(node.vertex !== undefined && node.vertex !== null ? node.vertex : node.id);
+
+          const role = node.role !== undefined && node.role !== null ? node.role : (isGuessingGraph ? "glued" : "internal");
+          if (role === "source") group.classList.add("node--source");
+          if (role === "target") group.classList.add("node--target");
+          if (role === "internal") group.classList.add("node--internal");
+          if (role === "glued") group.classList.add("node--glued");
+
+          const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          circle.setAttribute("cx", String(pos.x));
+          circle.setAttribute("cy", String(pos.y));
+          circle.setAttribute("r", "20");
+          group.appendChild(circle);
+
+          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          text.setAttribute("x", String(pos.x));
+          text.setAttribute("y", String(pos.y - (node.sublabel ? 6 : 0)));
+          text.textContent = node.label !== undefined && node.label !== null ? node.label : node.id;
+          group.appendChild(text);
+
+          if (node.sublabel) {
+            const sub = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            sub.classList.add("secondary");
+            sub.setAttribute("x", String(pos.x));
+            sub.setAttribute("y", String(pos.y + 10));
+            sub.textContent = node.sublabel;
+            group.appendChild(sub);
+          }
+
+          group.addEventListener("mouseenter", () => setActiveVertex(group.dataset.vertex));
+          group.addEventListener("mouseleave", () => clearActive());
+
+          gNodes.appendChild(group);
+        }
+      }
+
+      /** Highlighting across the 3 svgs */
+      let activeVertex = null;
+      let activeEdge = null;
+
+      function setActiveVertex(vertex) {
+        activeVertex = String(vertex);
+        activeEdge = null;
+        applyHighlights();
+      }
+
+      function setActiveEdge(u, v) {
+        activeEdge = { u: String(u), v: String(v) };
+        activeVertex = null;
+        applyHighlights();
+      }
+
+      function clearActive() {
+        activeVertex = null;
+        activeEdge = null;
+        applyHighlights();
+      }
+
+      function applyHighlights() {
+        for (const svgEl of [svgNetworkA, svgGuessing, svgNetworkB]) {
+          for (const nodeEl of svgEl.querySelectorAll(".node")) {
+            const isActive = activeVertex && nodeEl.dataset.vertex === activeVertex;
+            nodeEl.classList.toggle("is-active", Boolean(isActive));
+          }
+          for (const edgeEl of svgEl.querySelectorAll(".edge")) {
+            const isActive =
+              activeEdge && edgeEl.dataset.u === activeEdge.u && edgeEl.dataset.v === activeEdge.v;
+            edgeEl.classList.toggle("is-active", Boolean(isActive));
+          }
+        }
+      }
+
+      /** Computation: guessing strategy and verification */
+      function buildStrategy({ id, s, c }) {
+        const cNorm = mod(c, s);
+
+        if (id === "constant") {
+          return {
+            id: "constant",
+            usesC: true,
+            requiresPowerOfTwo: false,
+            fallbackHint: "",
+            formula: "x̂ᵢ = c",
+            guess: function () {
+              return cNorm;
+            }
+          };
+        }
+
+        if (id === "riis-bottleneck") {
+          return {
+            id: "riis-bottleneck",
+            usesC: false,
+            requiresPowerOfTwo: false,
+            fallbackHint: "",
+            formula:
+              "g₁(x₄,x₅)=x₄\n" +
+              "g₂(x₄,x₅)=x₅\n" +
+              "g₃(x₄,x₅)=0\n" +
+              "g₄(x₁,x₂,x₃)=x₁\n" +
+              "g₅(x₁,x₂,x₃)=x₂",
+            guess: function (vertexId, predIds, predValues) {
+              function pick(predVertexId) {
+                const idx = predIds.indexOf(predVertexId);
+                return idx >= 0 ? predValues[idx] : 0;
+              }
+
+              if (vertexId === "1") return pick("4");
+              if (vertexId === "2") return pick("5");
+              if (vertexId === "3") return 0;
+              if (vertexId === "4") return pick("1");
+              if (vertexId === "5") return pick("2");
+              return 0;
+            }
+          };
+        }
+
+        if (id === "theorem8-xor") {
+          return {
+            id: "theorem8-xor",
+            usesC: false,
+            requiresPowerOfTwo: true,
+            fallbackHint: "For this s, the best-known linear (mod s) gives s^2 fixed points (guessing number 2).",
+            formula: "x̂ᵢ = x_{p} ⊕ x_{q}   (p,q are the two predecessors of i)",
+            guess: function (vertexId, predIds, predValues) {
+              let out = 0;
+              for (let i = 0; i < predValues.length; i += 1) out = out ^ predValues[i];
+              // Values are interpreted as r-bit vectors when s=2^r.
+              return out;
+            }
+          };
+        }
+
+        if (id === "theorem8-linear") {
+          // Coefficients chosen to achieve exactly s^2 fixed points / solved inputs for the Theorem 8 graph
+          // when s is odd (here: 3,5,7). Each node has exactly two predecessors.
+          const coeffsByS = {
+            3: {
+              "1": [2, 1],
+              "2": [2, 2],
+              "3": [1, 2],
+              "4": [0, 0],
+              "5": [2, 2],
+              "6": [1, 2],
+              "7": [1, 1]
+            },
+            5: {
+              "1": [2, 1],
+              "2": [0, 3],
+              "3": [1, 4],
+              "4": [3, 2],
+              "5": [3, 2],
+              "6": [3, 1],
+              "7": [3, 2]
+            },
+            7: {
+              "1": [6, 1],
+              "2": [5, 6],
+              "3": [4, 2],
+              "4": [0, 0],
+              "5": [0, 4],
+              "6": [3, 5],
+              "7": [2, 6]
+            }
+          };
+
+          const table = coeffsByS[s] || null;
+
+          return {
+            id: "theorem8-linear",
+            usesC: false,
+            requiresPowerOfTwo: false,
+            fallbackHint: table ? "" : "Not defined for this s (try s=3,5,7).",
+            formula: "x̂_i = a_i·x_p + b_i·x_q (mod s)   (a_i,b_i depend on s)",
+            guess: function (vertexId, predIds, predValues) {
+              if (!table) return 0;
+              const coeff = table[vertexId];
+              if (!coeff) return 0;
+              const a = coeff[0];
+              const b = coeff[1];
+              const x0 = predValues.length > 0 ? predValues[0] : 0;
+              const x1 = predValues.length > 1 ? predValues[1] : 0;
+              return mod(a * x0 + b * x1, s);
+            }
+          };
+        }
+
+        return {
+          id: "sum",
+          usesC: true,
+          requiresPowerOfTwo: false,
+          fallbackHint: "",
+          formula: "x̂_i = (c − Σ_{u∈Pred(i)} x_u) mod s",
+          guess: function (vertexId, predIds, predValues) {
+            let sum = 0;
+            for (let i = 0; i < predValues.length; i += 1) sum += predValues[i];
+            return mod(cNorm - sum, s);
+          }
+        };
+      }
+
+      function countFixedPoints(graph, strategy, s) {
+        const pred = predecessorsOf(graph);
+        const vertices = graph.nodes.map((n) => n.id).sort((a, b) => Number(a) - Number(b));
+        const n = vertices.length;
+
+        const values = Array.from({ length: n }, () => 0);
+        let count = 0;
+
+        const toValueMap = () => {
+          const map = new Map();
+          for (let i = 0; i < n; i += 1) map.set(vertices[i], values[i]);
+          return map;
+        };
+
+        const rec = (idx) => {
+          if (idx === n) {
+            const valueMap = toValueMap();
+            for (const v of vertices) {
+              const predVertices = pred.get(v);
+              const predValues = predVertices.map((u) => valueMap.get(u));
+              if (strategy.guess(v, predVertices, predValues) !== valueMap.get(v)) return;
+            }
+            count += 1;
+            return;
+          }
+          for (let x = 0; x < s; x += 1) {
+            values[idx] = x;
+            rec(idx + 1);
+          }
+        };
+
+        rec(0);
+        return count;
+      }
+
+      function topoSort(nodeIds, edges) {
+        const indegree = new Map();
+        const outgoing = new Map();
+
+        for (const id of nodeIds) {
+          indegree.set(id, 0);
+          outgoing.set(id, []);
+        }
+
+        for (const { u, v } of edges) {
+          if (!outgoing.has(u) || !indegree.has(v)) continue;
+          outgoing.get(u).push(v);
+          indegree.set(v, (indegree.get(v) || 0) + 1);
+        }
+
+        const queue = [];
+        for (const [id, deg] of indegree) {
+          if (deg === 0) queue.push(id);
+        }
+
+        queue.sort();
+
+        const order = [];
+        while (queue.length) {
+          const id = queue.shift();
+          order.push(id);
+
+          const outs = outgoing.get(id) || [];
+          for (const v of outs) {
+            const next = (indegree.get(v) || 0) - 1;
+            indegree.set(v, next);
+            if (next === 0) {
+              queue.push(v);
+              queue.sort();
+            }
+          }
+        }
+
+        if (order.length !== nodeIds.length) return null;
+        return order;
+      }
+
+      function countSolvedInputs(network, strategy, s) {
+        const nodesById = new Map(network.nodes.map((n) => [n.id, n]));
+        const sources = network.nodes
+          .filter((n) => n.role === "source")
+          .sort((a, b) => a.vertex - b.vertex);
+
+        const k = sources.length;
+        const total = powInt(s, k);
+
+        const topo = topoSort(
+          network.nodes.map((n) => n.id),
+          network.edges
+        );
+        if (!topo) return { solved: 0, total, k, acyclic: false };
+
+        // Predecessors in the network, expressed as original-vertex order.
+        const incoming = new Map();
+        for (const node of network.nodes) incoming.set(node.id, []);
+        for (const { u, v } of network.edges) incoming.get(v).push(u);
+        for (const [id, list] of incoming) {
+          const uniq = uniqBy(list, (x) => x);
+          uniq.sort((a, b) => Number(baseVertexId(a)) - Number(baseVertexId(b)));
+          incoming.set(id, uniq);
+        }
+
+        const sourceIds = sources.map((n) => n.id);
+        const input = Array.from({ length: k }, () => 0);
+        let solved = 0;
+
+        const rec = (idx) => {
+          if (idx === k) {
+            const valueAt = new Map();
+            for (let i = 0; i < k; i += 1) valueAt.set(sourceIds[i], input[i]);
+
+            for (const nodeId of topo) {
+              const node = nodesById.get(nodeId);
+              if (!node) continue;
+              if (node.role === "source") continue;
+
+              const preds = incoming.get(nodeId) || [];
+              const predValues = preds.map((pid) => valueAt.get(pid));
+              const predIds = preds.map(baseVertexId);
+              const vertexId = String(node.vertex);
+
+              const computed = strategy.guess(vertexId, predIds, predValues);
+              valueAt.set(nodeId, computed);
+            }
+
+            // Check demand: v_out equals v_in, for each split vertex v.
+            for (const src of sources) {
+              const v = String(src.vertex);
+              const srcVal = valueAt.get(v + "_in");
+              const outVal = valueAt.get(v + "_out");
+              if (srcVal !== outVal) return;
+            }
+
+            solved += 1;
+            return;
+          }
+
+          for (let x = 0; x < s; x += 1) {
+            input[idx] = x;
+            rec(idx + 1);
+          }
+        };
+
+        rec(0);
+        return { solved, total, k, acyclic: true };
+      }
+
+      /** Build the main example (glued) */
+      function formatInt(n) {
+        return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
+      }
+
+      function formatVertexSet(vertices) {
+        const list = vertices.map((x) => String(x)).join(", ");
+        return "{" + list + "}";
+      }
+
+      function populateNamedSelect(select, items, getValue, getLabel) {
+        select.innerHTML = "";
+        for (const item of items) {
+          const option = document.createElement("option");
+          option.value = String(getValue(item));
+          option.textContent = String(getLabel(item));
+          select.appendChild(option);
+        }
+      }
+
+      function getSelectedExample() {
+        const id = String(exampleSelect.value || "");
+        return EXAMPLE_BY_ID.get(id) || EXAMPLES[0];
+      }
+
+      function syncExampleDependentControls(example) {
+        const prevAlphabet = String(alphabetSizeSelect.value || "");
+        const prevStrategy = String(strategySelect.value || "");
+        const prevSplitA = String(splitASelect.value || "");
+        const prevSplitB = String(splitBSelect.value || "");
+
+        const sizes = example.alphabetSizes && example.alphabetSizes.length
+          ? example.alphabetSizes
+          : [2, 3, 4, 5, 7, 8, 9, 11];
+        populateSelect(alphabetSizeSelect, sizes, (v) => String(v));
+        if (sizes.includes(Number(prevAlphabet))) {
+          alphabetSizeSelect.value = prevAlphabet;
+        } else if (example.defaultAlphabetSize && sizes.includes(example.defaultAlphabetSize)) {
+          alphabetSizeSelect.value = String(example.defaultAlphabetSize);
+        } else {
+          alphabetSizeSelect.value = String(sizes[0]);
+        }
+
+        populateNamedSelect(strategySelect, example.strategies, (s) => s.id, (s) => s.label);
+        const strategyIds = new Set(example.strategies.map((s) => s.id));
+        strategySelect.value = strategyIds.has(prevStrategy) ? prevStrategy : example.defaultStrategy;
+
+        populateNamedSelect(splitASelect, example.splitSets, (s) => s.id, (s) => s.label);
+        populateNamedSelect(splitBSelect, example.splitSets, (s) => s.id, (s) => s.label);
+        const splitIds = new Set(example.splitSets.map((s) => s.id));
+        splitASelect.value = splitIds.has(prevSplitA) ? prevSplitA : example.defaultSplitA;
+        splitBSelect.value = splitIds.has(prevSplitB) ? prevSplitB : example.defaultSplitB;
+      }
+
+      function update() {
+        const t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+        try {
+          const example = getSelectedExample();
+
+          const s = Number(alphabetSizeSelect.value);
+          const strategyType = String(strategySelect.value || example.defaultStrategy || "sum");
+          let c = Number(sumConstantInput.value);
+          c = Number.isFinite(c) ? c : 0;
+          c = mod(Math.trunc(c), s);
+          sumConstantInput.value = String(c);
+
+          const gluedGraph = example.buildGraph();
+
+          const splitAId = String(splitASelect.value || example.defaultSplitA);
+          const splitBId = String(splitBSelect.value || example.defaultSplitB);
+          const splitA = example.splitSets.find((s) => s.id === splitAId) || example.splitSets[0];
+          const splitB = example.splitSets.find((s) => s.id === splitBId) || example.splitSets[0];
+
+          const networkA = splitGraph(gluedGraph, splitA.vertices);
+          const networkB = splitGraph(gluedGraph, splitB.vertices);
+
+          const viewBox = { width: 640, height: 440, padding: 26 };
+          const coordsGuess = layoutCircle(gluedGraph, viewBox);
+          const coordsA = layoutSplitNetwork(networkA, viewBox);
+          const coordsB = layoutSplitNetwork(networkB, viewBox);
+
+          // Annotate glued nodes with role for rendering.
+          const gluedNodes = gluedGraph.nodes.map((n) =>
+            Object.assign({}, n, { role: "glued", sublabel: "" })
+          );
+          const gluedModel = Object.assign({}, gluedGraph, { nodes: gluedNodes });
+
+          render(svgGuessing, gluedModel, coordsGuess, { markerId: "arrowGuess", isGuessingGraph: true });
+          render(svgNetworkA, networkA, coordsA, { markerId: "arrowNetA", isGuessingGraph: false });
+          render(svgNetworkB, networkB, coordsB, { markerId: "arrowNetB", isGuessingGraph: false });
+
+          // Strategy + computations
+          const vertexStrategy = buildStrategy({ id: strategyType, s, c });
+          sumConstantInput.disabled = !vertexStrategy.usesC;
+
+          const requiresPow2 = Boolean(vertexStrategy.requiresPowerOfTwo);
+          const pow2Ok = !requiresPow2 || isPowerOfTwo(s);
+
+          let fixedPoints = null;
+          let guessNum = null;
+          let netA = null;
+          let netB = null;
+          let fixedPointsNote = "";
+
+          let effectiveStrategy = vertexStrategy;
+          if (!pow2Ok && requiresPow2 && example.id === "theorem8-a") {
+            const linearFallback = buildStrategy({ id: "theorem8-linear", s, c: 0 });
+            if (!linearFallback.fallbackHint) {
+              effectiveStrategy = linearFallback;
+              fixedPointsNote =
+                (vertexStrategy.fallbackHint || "Showing best-known linear (mod s) result.") +
+                " Full s^3 (guessing number 3) is achieved when s=2^r.";
+            } else {
+              fixedPointsNote = "Requires s=2^r (characteristic 2).";
+            }
+          }
+
+          if (!pow2Ok && requiresPow2 && effectiveStrategy === vertexStrategy) {
+            netA = {
+              solved: 0,
+              total: powInt(s, splitA.vertices.length),
+              k: splitA.vertices.length,
+              acyclic: true,
+              note: fixedPointsNote || "Requires s=2^r"
+            };
+            netB = {
+              solved: 0,
+              total: powInt(s, splitB.vertices.length),
+              k: splitB.vertices.length,
+              acyclic: true,
+              note: fixedPointsNote || "Requires s=2^r"
+            };
+          } else {
+            fixedPoints = countFixedPoints(gluedGraph, effectiveStrategy, s);
+            guessNum = logBase(fixedPoints, s);
+            netA = countSolvedInputs(networkA, effectiveStrategy, s);
+            netB = countSolvedInputs(networkB, effectiveStrategy, s);
+          }
+
+          kpiFixedPoints.textContent = fixedPoints === null ? "—" : formatInt(fixedPoints);
+          if (fixedPoints === null && requiresPow2 && !pow2Ok) {
+            kpiFixedPointsSub.textContent = fixedPointsNote || "This strategy is defined for alphabets of size s=2^r (characteristic 2).";
+          } else if (fixedPointsNote) {
+            kpiFixedPointsSub.textContent = fixedPointsNote;
+          } else {
+            kpiFixedPointsSub.textContent =
+              "Target for entropy k=" + String(example.entropyK) + ": s^k = " + formatInt(powInt(s, example.entropyK));
+          }
+
+          kpiGuessingNumber.textContent = Number.isFinite(guessNum)
+            ? guessNum.toFixed(6).replace(/0+$/, "").replace(/\.$/, "")
+            : "—";
+
+          const fmtSolved = (res) => formatInt(res.solved) + " / " + formatInt(res.total);
+          kpiNetA.textContent = fmtSolved(netA);
+          kpiNetB.textContent = fmtSolved(netB);
+
+          const tagFor = (res) => {
+            if (res.note) {
+              return '<span class="tag tag--bad">' + res.note + "</span>";
+            }
+            if (!res.acyclic) {
+              return '<span class="tag tag--bad">Not a split</span>';
+            }
+            const ok = res.solved === res.total;
+            const cls = ok ? "tag tag--good" : "tag tag--bad";
+            const text = ok ? "Solved" : "Not solved";
+            return (
+              '<span class="' +
+              cls +
+              '">' +
+              text +
+              '</span> <span style="color: var(--muted)">k=' +
+              res.k +
+              "</span>"
+            );
+          };
+
+          kpiNetATag.innerHTML = tagFor(netA);
+          kpiNetBTag.innerHTML = tagFor(netB);
+
+          if (fixedPointsNote && effectiveStrategy !== vertexStrategy) {
+            strategyFormula.textContent =
+              vertexStrategy.formula + "\n\n" + "(" + fixedPointsNote + ")\n\n" + effectiveStrategy.formula;
+          } else {
+            strategyFormula.textContent = vertexStrategy.formula;
+          }
+          if (hintGuessing) {
+            hintGuessing.textContent =
+              "Vertices: " + String(gluedGraph.nodes.length) + " • Edges: " + String(gluedGraph.edges.length);
+          }
+          if (hintNetworkA) {
+            hintNetworkA.textContent =
+              "Split set B = " + formatVertexSet(splitA.vertices) + " • k = " + String(splitA.vertices.length);
+          }
+          if (hintNetworkB) {
+            hintNetworkB.textContent =
+              "Split set B = " + formatVertexSet(splitB.vertices) + " • k = " + String(splitB.vertices.length);
+          }
+
+          clearActive();
+
+          const t1 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+          const ms = Math.max(0, t1 - t0);
+          if (runtimeStatus) runtimeStatus.textContent = "Runtime: OK (last compute " + ms.toFixed(1) + " ms)";
+        } catch (err) {
+          if (runtimeStatus) runtimeStatus.textContent =
+            "Runtime error: " + (err && err.message ? err.message : String(err));
+          throw err;
+        }
+      }
+
+      function populateSelect(select, values, format) {
+        select.innerHTML = "";
+        for (const value of values) {
+          const option = document.createElement("option");
+          option.value = String(value);
+          option.textContent = format ? format(value) : String(value);
+          select.appendChild(option);
+        }
+      }
+
+      // Init controls
+      populateNamedSelect(exampleSelect, EXAMPLES, (ex) => ex.id, (ex) => ex.name);
+      if (!exampleSelect.value) exampleSelect.value = EXAMPLES[0].id;
+      syncExampleDependentControls(getSelectedExample());
+
+      const scheduleUpdate = (() => {
+        let raf = null;
+        return () => {
+          if (raf) cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(() => {
+            raf = null;
+            update();
+          });
+        };
+      })();
+
+      alphabetSizeSelect.addEventListener("change", scheduleUpdate);
+      exampleSelect.addEventListener("change", () => {
+        syncExampleDependentControls(getSelectedExample());
+        scheduleUpdate();
+      });
+      strategySelect.addEventListener("change", scheduleUpdate);
+      sumConstantInput.addEventListener("input", scheduleUpdate);
+      splitASelect.addEventListener("change", scheduleUpdate);
+      splitBSelect.addEventListener("change", scheduleUpdate);
+
+      window.addEventListener("error", function (event) {
+        if (!runtimeStatus) return;
+        const msg = event && event.message ? event.message : "Unknown error";
+        runtimeStatus.textContent = "Runtime error: " + msg;
+      });
+
+      window.addEventListener("unhandledrejection", function (event) {
+        if (!runtimeStatus) return;
+        const reason = event && event.reason ? event.reason : null;
+        const msg = reason && reason.message ? reason.message : String(reason);
+        runtimeStatus.textContent = "Runtime error: " + msg;
+      });
+
+      update();
+    </script>
+  </body>
+</html>

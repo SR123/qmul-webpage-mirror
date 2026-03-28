@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Søren Riis — Curriculum Vitae</title>
+    <meta name="description" content="Academic CV for Søren Riis." />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #0f172a;
+        --muted: #475569;
+        --line: rgba(15, 23, 42, 0.14);
+        --paper: #ffffff;
+        --soft: #f8fafc;
+        --brand: #2563eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        color: var(--ink);
+        background: var(--soft);
+        line-height: 1.45;
+      }
+
+      a {
+        color: var(--brand);
+        text-underline-offset: 3px;
+      }
+
+      .container {
+        width: min(920px, 92vw);
+        margin: 0 auto;
+        padding: 28px 0 54px;
+      }
+
+      .sheet {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: 0 18px 40px rgba(2, 6, 23, 0.08);
+        padding: 26px 26px;
+      }
+
+      header {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 16px;
+        align-items: start;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 16px;
+        margin-bottom: 18px;
+      }
+
+      @media (max-width: 760px) {
+        header {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 2rem;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+
+      .subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-weight: 650;
+      }
+
+      .meta {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 6px;
+        justify-items: start;
+      }
+
+      .meta li {
+        color: var(--muted);
+      }
+
+      .meta strong {
+        color: var(--ink);
+        font-weight: 750;
+      }
+
+      .actions {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.96);
+        font-weight: 650;
+        font-size: 0.95rem;
+      }
+
+      h2 {
+        margin: 18px 0 8px;
+        font-size: 1.1rem;
+        letter-spacing: 0.01em;
+      }
+
+      p {
+        margin: 8px 0 0;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      @media (max-width: 760px) {
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+
+      li {
+        margin: 4px 0;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      .item {
+        margin-top: 10px;
+      }
+
+      .item-title {
+        font-weight: 800;
+      }
+
+      .item-meta {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-top: 2px;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+        .container {
+          width: auto;
+          padding: 0;
+        }
+        .sheet {
+          border: none;
+          box-shadow: none;
+          padding: 0;
+        }
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+        .actions {
+          display: none;
+        }
+        .pill.print-only {
+          display: none;
+        }
+        #pubControls,
+        #pubStatus {
+          display: none !important;
+        }
+      }
+
+      .pub-controls {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+        margin-top: 10px;
+      }
+
+      @media (max-width: 760px) {
+        .pub-controls {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .pub-controls input,
+      .pub-controls select {
+        width: 100%;
+        font: inherit;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.98);
+      }
+
+      .pub-status {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+
+      .pub-list {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .pub-item {
+        padding: 12px 12px 10px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.96);
+      }
+
+      .pub-title {
+        display: inline-block;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+
+      .pub-meta {
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      .pub-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      .pub-links a {
+        font-weight: 650;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="sheet">
+        <header>
+          <div>
+            <h1>Søren Riis</h1>
+            <p class="subtitle">Reader in Computer Science · Queen Mary University of London</p>
+            <div class="actions">
+              <a class="pill" href="Soren_Riis_CV.pdf">Download PDF</a>
+              <button class="pill print-only" type="button" id="printBtn" style="cursor: pointer">Print / Save as PDF</button>
+              <a class="pill" href="index.html">Website</a>
+              <a class="pill" href="https://dblp.org/pid/19/2253.html" target="_blank" rel="noopener">DBLP</a>
+              <a class="pill" href="https://scholar.google.com/citations?user=nwnDFYsAAAAJ&amp;hl=en" target="_blank" rel="noopener"
+                >Google Scholar</a
+              >
+            </div>
+          </div>
+          <ul class="meta">
+            <li><strong>Affiliation:</strong> School of EECS, QMUL (Centre for Fundamentals of AI and Computational Theory)</li>
+            <li><strong>Email:</strong> <a href="mailto:s.riis@qmul.ac.uk">s.riis@qmul.ac.uk</a></li>
+            <li><strong>Address:</strong> Mile End Road, London E1 4NS, United Kingdom</li>
+            <li><strong>Web:</strong> <a href="index.html">Personal webpage</a></li>
+          </ul>
+        </header>
+
+        <section>
+          <h2>Research</h2>
+          <p>
+            My research spans logic and proof complexity, information theory and network coding, and algorithmic/combinatorial
+            methods. In recent work I also study reinforcement learning and representation/learnability barriers in games.
+          </p>
+        </section>
+
+        <section class="grid-2">
+          <div>
+            <h2>Employment</h2>
+            <div class="item">
+              <div class="item-title">Queen Mary University of London</div>
+              <div class="item-meta">Reader in Computer Science (2000–present)</div>
+            </div>
+            <div class="item">
+              <div class="item-title">Fetch.AI (Cambridge)</div>
+              <div class="item-meta">Industry consultancy (part-time, 2018–2019)</div>
+            </div>
+            <p class="muted" style="margin-top: 10px">
+              Earlier academic positions and research visits include (selected): LBRICS (Aarhus), University of Leeds, Hebrew University of Jerusalem,
+              University of Lund, and Ohio State University.
+            </p>
+          </div>
+          <div>
+            <h2>Education</h2>
+            <div class="item">
+              <div class="item-title">University of Oxford</div>
+              <div class="item-meta">DPhil in Mathematics (Mathematical Logic), 1994</div>
+            </div>
+            <div class="item">
+              <div class="item-title">University of Copenhagen</div>
+              <div class="item-meta">MSc in Mathematics and Physics, 1989</div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Fellowships, service &amp; academic activity</h2>
+          <div class="grid-2">
+            <div>
+              <h2 style="margin-top: 0">Fellowships &amp; leadership</h2>
+              <ul>
+                <li>Research fellowships: The Fields Institute (Toronto), Isaac Newton Institute (Cambridge), Institut Henri Poincaré (Paris).</li>
+                <li>Former research fellow / visitor at institutes and universities including the Isaac Newton Institute, the Fields Institute, and others.</li>
+                <li>Director and co-founder, Centre for Discrete Mathematics (QMUL).</li>
+              </ul>
+            </div>
+            <div>
+              <h2 style="margin-top: 0">Reviewing &amp; community service</h2>
+              <ul>
+                <li>EPSRC College of Peer Reviewers (member since 2010); served on grant-review panels (UK and international).</li>
+                <li>Refereeing for journals and conferences in logic, complexity, information theory, combinatorics, and theoretical computer science (50+ reports).</li>
+                <li>External examining and assessment roles (PhD and project examination).</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 10px">
+            <div>
+              <h2 style="margin-top: 0">Teaching &amp; supervision</h2>
+              <ul>
+                <li>15+ years teaching experience across undergraduate and postgraduate levels (3,000+ students taught in total).</li>
+                <li>Module organisation for large cohorts; supervision and mentoring of student projects over many years.</li>
+                <li>Research staff / supervision in the EPSRC CDT in Intelligent Games and Game Intelligence (IGGI).</li>
+              </ul>
+            </div>
+            <div>
+              <h2 style="margin-top: 0">Industry &amp; applied work</h2>
+              <ul>
+                <li>Consultancy: Fetch.AI (Cambridge), work on governance / hard-fork models and distributed-ledger mechanisms.</li>
+                <li>Applied machine-learning projects (e.g. game AI / reinforcement learning) alongside theoretical work.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 10px">
+            <div>
+              <h2 style="margin-top: 0">Funding (selected)</h2>
+              <ul>
+                <li>EPSRC grant EP/H016015/1 (flows and bottlenecks) — £414,367.</li>
+                <li>Project leadership on funded research totalling £400k+ (research assistants and PhD students).</li>
+              </ul>
+            </div>
+            <div>
+              <h2 style="margin-top: 0">PhD supervision (selected)</h2>
+              <ul>
+                <li>Stefan Dantchev (now academic; Durham).</li>
+                <li>Sun Yun (now in industry; Deutsche Bank).</li>
+                <li>Bei Zhou (reinforcement learning and game AI).</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Publications</h2>
+          <p class="muted">
+            The list below is loaded from
+            <a href="https://dblp.org/pid/19/2253.html" target="_blank" rel="noopener">DBLP</a>
+            (with light de-duplication of preprint/journal variants).
+          </p>
+
+          <div id="pubControls" class="pub-controls" aria-label="Publication filters">
+            <label>
+              Search
+              <input id="pubFilter" type="search" placeholder="title, venue, coauthor…" />
+            </label>
+            <label>
+              Year
+              <select id="pubYear">
+                <option value="">All years</option>
+              </select>
+            </label>
+            <button class="pill" type="button" id="pubReset" style="height: 42px; justify-content: center; cursor: pointer">
+              Reset
+            </button>
+          </div>
+
+          <div id="pubStatus" class="pub-status">Loading publications…</div>
+          <ul id="pubList" class="pub-list" aria-label="Publications list"></ul>
+          <p class="muted" style="margin-top: 10px">
+            Tip: to produce a complete PDF (including the DBLP list), wait until the status says the publications are loaded, then use
+            <span class="mono">Print / Save as PDF</span>.
+          </p>
+        </section>
+
+        <section>
+          <h2>Talks (recent)</h2>
+          <ul>
+            <li>
+              <span class="item-title">Coin racing and waiting-time paradoxes: why fair coins are exceptional</span>
+              <span class="muted">(DIMAP Seminar, University of Warwick, 26 Jan 2026)</span>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Awards (selected)</h2>
+          <ul>
+            <li>Prize winner (USD 5,000), <em>Humanity’s Last Exam</em> (Outlier), 2025.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+
+      const printBtn = document.getElementById("printBtn");
+      if (printBtn) printBtn.addEventListener("click", () => window.print());
+
+      const listEl = document.getElementById("pubList");
+      const statusEl = document.getElementById("pubStatus");
+      const filterEl = document.getElementById("pubFilter");
+      const yearEl = document.getElementById("pubYear");
+      const resetEl = document.getElementById("pubReset");
+
+      function setStatus(msg) {
+        if (statusEl) statusEl.textContent = msg;
+      }
+
+      function decodeHtmlText(x) {
+        if (x === null || x === undefined) return "";
+        try {
+          const doc = new DOMParser().parseFromString(String(x), "text/html");
+          return (doc && doc.documentElement && doc.documentElement.textContent) ? doc.documentElement.textContent : String(x);
+        } catch (e) {
+          return String(x);
+        }
+      }
+
+      function safeText(x) {
+        if (x === null || x === undefined) return "";
+        return decodeHtmlText(x).replace(/\s+/g, " ").trim();
+      }
+
+      function uniq(arr) {
+        const seen = new Set();
+        const out = [];
+        for (const x of arr) {
+          if (!x) continue;
+          if (seen.has(x)) continue;
+          seen.add(x);
+          out.push(x);
+        }
+        return out;
+      }
+
+      async function fetchJson(url) {
+        const res = await fetch(url, { mode: "cors" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return await res.json();
+      }
+
+      function normalizeTitleKey(title) {
+        return safeText(title)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim();
+      }
+
+      function parseAuthors(author) {
+        if (!author) return [];
+        const arr = Array.isArray(author) ? author : [author];
+        return arr.map((a) => safeText(a.text || a)).filter(Boolean);
+      }
+
+      function formatAuthors(authors) {
+        if (!authors || !authors.length) return "";
+        if (authors.length <= 3) return authors.join(", ");
+        return authors.slice(0, 3).join(", ") + ", …";
+      }
+
+      function labelForUrl(u) {
+        try {
+          const url = new URL(u);
+          if (url.hostname.includes("arxiv.org")) return "arXiv";
+          if (url.hostname.includes("nature.com")) return "Nature";
+          if (url.hostname.includes("sciencedirect.com")) return "ScienceDirect";
+          if (url.hostname.includes("epubs.siam.org")) return "SIAM";
+          return url.hostname.replace(/^www\./, "");
+        } catch (e) {
+          return "Link";
+        }
+      }
+
+      function pickYear(info) {
+        const y = safeText(info.year);
+        if (y && /^\d{4}$/.test(y)) return parseInt(y, 10);
+        const venue = safeText(info.venue);
+        const m = venue.match(/\b(19|20)\d{2}\b/);
+        if (m) return parseInt(m[0], 10);
+        return null;
+      }
+
+      function isCorrDblp(dblpUrl) {
+        return dblpUrl && String(dblpUrl).includes("/corr/");
+      }
+
+      function scorePub(p) {
+        let s = 0;
+        if (p.primaryLink) s += 3;
+        if (p.venue) s += 2;
+        if (p.year) s += 2;
+        if (p.dblp) s += 1;
+        if (p.links && p.links.length) s += 1;
+        if (isCorrDblp(p.dblp)) s -= 2;
+        return s;
+      }
+
+      function dedupe(pubs) {
+        const map = new Map();
+        for (const p of pubs) {
+          const key = p.titleKey;
+          if (!map.has(key)) {
+            map.set(key, p);
+            continue;
+          }
+          const cur = map.get(key);
+          const best = scorePub(p) > scorePub(cur) ? p : cur;
+          const other = best === p ? cur : p;
+          // merge links
+          best.links = uniq([...(best.links || []), ...(other.links || [])]);
+          if (!best.primaryLink && other.primaryLink) best.primaryLink = other.primaryLink;
+          if (!best.venue && other.venue) best.venue = other.venue;
+          if (!best.year && other.year) best.year = other.year;
+          if (!best.dblp && other.dblp) best.dblp = other.dblp;
+          map.set(key, best);
+        }
+        return Array.from(map.values());
+      }
+
+      async function loadPubs() {
+        const queries = ['author:Søren_Riis:', 'author:"Søren Riis"', 'author:Soren_Riis:', 'author:"Soren Riis"'];
+        let data = null;
+        let usedQuery = null;
+
+        for (const q of queries) {
+          const url = "https://dblp.org/search/publ/api?format=json&h=1000&q=" + encodeURIComponent(q);
+          try {
+            const json = await fetchJson(url);
+            const total = parseInt((json && json.result && json.result.hits && json.result.hits["@total"]) || "0", 10);
+            if (total > 0) {
+              data = json;
+              usedQuery = q;
+              break;
+            }
+          } catch (e) {
+            // try next query
+          }
+        }
+
+        if (!data) throw new Error("Could not load publications from DBLP.");
+
+        const hits = data.result && data.result.hits && data.result.hits.hit;
+        const hitArr = hits ? (Array.isArray(hits) ? hits : [hits]) : [];
+
+        const pubsRaw = [];
+        for (const hit of hitArr) {
+          const info = hit && hit.info ? hit.info : null;
+          if (!info) continue;
+          const title = safeText(info.title).replace(/\.$/, "");
+          if (!title) continue;
+
+          const venue = safeText(info.venue || info.journal || info.booktitle || "");
+          const year = pickYear(info);
+          const dblp = safeText(info.url);
+          const links = [];
+
+          if (info.ee) {
+            const eeArr = Array.isArray(info.ee) ? info.ee : [info.ee];
+            eeArr.forEach((u) => links.push(safeText(u)));
+          }
+
+          pubsRaw.push({
+            title,
+            titleKey: normalizeTitleKey(title),
+            authors: parseAuthors(info.authors && info.authors.author),
+            venue,
+            year,
+            dblp,
+            links: uniq(links),
+            primaryLink: ""
+          });
+        }
+
+        const pubs = dedupe(pubsRaw).sort((a, b) => {
+          const ay = a.year || 0;
+          const by = b.year || 0;
+          if (ay !== by) return by - ay;
+          return a.title.localeCompare(b.title);
+        });
+
+        // Populate year select
+        if (yearEl) {
+          const years = uniq(
+            pubs
+              .map((p) => p.year)
+              .filter((y) => !!y)
+              .sort((a, b) => b - a)
+          );
+          years.forEach((y) => {
+            const opt = document.createElement("option");
+            opt.value = String(y);
+            opt.textContent = String(y);
+            yearEl.appendChild(opt);
+          });
+        }
+
+        if (listEl) listEl.innerHTML = "";
+        const frag = document.createDocumentFragment();
+
+        pubs.forEach((p) => {
+          const li = document.createElement("li");
+          li.className = "pub-item";
+          li.dataset.search = (p.title + " " + (p.authors || []).join(" ") + " " + p.venue).toLowerCase();
+          li.dataset.year = p.year ? String(p.year) : "";
+
+          const titleLink = document.createElement("a");
+          titleLink.className = "pub-title";
+          titleLink.textContent = p.title;
+          titleLink.href = p.links[0] || p.dblp || "#";
+          titleLink.target = "_blank";
+          titleLink.rel = "noopener";
+
+          const meta = document.createElement("div");
+          meta.className = "pub-meta";
+          meta.textContent =
+            (p.authors ? formatAuthors(p.authors) : "") +
+            (p.venue ? (" — " + p.venue) : "") +
+            (p.year ? (" (" + p.year + ")") : "");
+
+          const linksDiv = document.createElement("div");
+          linksDiv.className = "pub-links";
+          let shown = 0;
+          (p.links || []).forEach((u) => {
+            if (shown >= 3) return;
+            if (!u) return;
+            const a = document.createElement("a");
+            a.href = u;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.textContent = labelForUrl(u);
+            linksDiv.appendChild(a);
+            shown += 1;
+          });
+          if (p.dblp) {
+            const d = document.createElement("a");
+            d.href = p.dblp;
+            d.target = "_blank";
+            d.rel = "noopener";
+            d.textContent = "DBLP";
+            linksDiv.appendChild(d);
+          }
+
+          li.appendChild(titleLink);
+          li.appendChild(meta);
+          li.appendChild(linksDiv);
+          frag.appendChild(li);
+        });
+
+        if (listEl) listEl.appendChild(frag);
+        setStatus("Loaded " + pubs.length + " publications from DBLP (" + usedQuery + ").");
+
+        function applyFilters() {
+          const term = filterEl ? filterEl.value.trim().toLowerCase() : "";
+          const year = yearEl ? yearEl.value : "";
+          let visible = 0;
+          const items = listEl ? listEl.querySelectorAll(".pub-item") : [];
+          items.forEach((item) => {
+            let ok = true;
+            if (term && !item.dataset.search.includes(term)) ok = false;
+            if (year && item.dataset.year !== year) ok = false;
+            item.style.display = ok ? "" : "none";
+            if (ok) visible += 1;
+          });
+          setStatus("Showing " + visible + " / " + pubs.length + " publications.");
+        }
+
+        if (filterEl) filterEl.addEventListener("input", applyFilters);
+        if (yearEl) yearEl.addEventListener("change", applyFilters);
+        if (resetEl)
+          resetEl.addEventListener("click", () => {
+            if (filterEl) filterEl.value = "";
+            if (yearEl) yearEl.value = "";
+            applyFilters();
+          });
+      }
+
+      (async () => {
+        try {
+          await loadPubs();
+        } catch (e) {
+          setStatus("Could not load publications automatically. Please use DBLP: dblp.org/pid/19/2253");
+          if (listEl) {
+            listEl.innerHTML = "";
+            const li = document.createElement("li");
+            li.className = "pub-item";
+            li.innerHTML =
+              'Please use <a href="https://dblp.org/pid/19/2253.html" target="_blank" rel="noopener">DBLP</a> for the full list.';
+            listEl.appendChild(li);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

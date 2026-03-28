@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Impartial 4x4 Nimber Explorer</title>
+    <meta
+      name="description"
+      content="Explore Grundy (nimber) values for all 4x4 positions in an impartial game with single-square and adjacent-pair removals."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #08131e;
+        --paper: rgba(255, 255, 255, 0.94);
+        --ink: #0f172a;
+        --muted: #475569;
+        --brand: #0f766e;
+        --brand-dark: #115e59;
+        --line: rgba(15, 23, 42, 0.14);
+        --shadow: 0 20px 44px rgba(2, 6, 23, 0.3);
+        --radius: 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+        color: var(--ink);
+        line-height: 1.55;
+        background: radial-gradient(850px 420px at 8% 8%, rgba(15, 118, 110, 0.3), transparent 58%),
+          radial-gradient(820px 420px at 78% 20%, rgba(14, 116, 144, 0.28), transparent 56%),
+          radial-gradient(720px 360px at 48% 100%, rgba(21, 94, 117, 0.2), transparent 56%),
+          var(--bg);
+      }
+
+      a {
+        color: var(--brand-dark);
+        text-underline-offset: 3px;
+      }
+
+      .container {
+        width: min(1120px, 94vw);
+        margin: 0 auto;
+        padding: 26px 0 54px;
+      }
+
+      header {
+        color: rgba(255, 255, 255, 0.94);
+        margin-bottom: 14px;
+      }
+
+      h1 {
+        margin: 0;
+        letter-spacing: -0.02em;
+        line-height: 1.13;
+        font-size: clamp(1.65rem, 1.2rem + 1.7vw, 2.35rem);
+      }
+
+      .sub {
+        margin: 10px 0 0;
+        color: rgba(255, 255, 255, 0.78);
+        max-width: 76ch;
+      }
+
+      .top-links {
+        margin-top: 8px;
+      }
+
+      .top-links a {
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .card + .card {
+        margin-top: 14px;
+      }
+
+      .card__header {
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.86));
+      }
+
+      .card__header h2 {
+        margin: 0;
+        font-size: 1.06rem;
+      }
+
+      .card__body {
+        padding: 16px;
+      }
+
+      .facts {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      @media (max-width: 980px) {
+        .facts {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .fact {
+        border: 1px solid #d9e2ec;
+        border-radius: 12px;
+        padding: 12px;
+        background: #f8fbfc;
+      }
+
+      .fact h3 {
+        margin: 0 0 6px;
+        font-size: 1.01rem;
+      }
+
+      .fact p,
+      .fact ul {
+        margin: 0;
+        color: rgba(15, 23, 42, 0.88);
+      }
+
+      .fact ul {
+        padding-left: 18px;
+      }
+
+      .explorer {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 290px 1fr;
+      }
+
+      @media (max-width: 920px) {
+        .explorer {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+
+      .cell {
+        aspect-ratio: 1 / 1;
+        border: 1px solid #94a3b8;
+        border-radius: 9px;
+        background: #ffffff;
+        color: #334155;
+        font-size: 11px;
+        cursor: pointer;
+        transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+      }
+
+      .cell:hover {
+        transform: translateY(-1px);
+      }
+
+      .cell.filled {
+        background: #0f766e;
+        color: #ffffff;
+        border-color: #0f5d57;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .controls input,
+      button.action {
+        border: 1px solid #c6d2df;
+        border-radius: 9px;
+        padding: 8px 10px;
+        font: inherit;
+      }
+
+      .controls input,
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      }
+
+      button.action {
+        background: #ffffff;
+        cursor: pointer;
+      }
+
+      button.action:hover {
+        border-color: #95a9be;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .status {
+        margin: 8px 0 0;
+        font-size: 0.96rem;
+        color: var(--muted);
+      }
+
+      .nimber {
+        margin: 9px 0 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--brand-dark);
+      }
+
+      .hint {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      th,
+      td {
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 8px;
+        vertical-align: top;
+      }
+
+      th {
+        font-size: 0.95rem;
+        color: #334155;
+      }
+
+      td {
+        font-size: 0.93rem;
+      }
+
+      .max-grid {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+        gap: 10px;
+      }
+
+      .max-card {
+        border: 1px solid #d2dce7;
+        border-radius: 9px;
+        padding: 8px;
+        background: #fbfdff;
+        cursor: pointer;
+      }
+
+      .max-card:hover {
+        border-color: #9cb1c6;
+      }
+
+      .max-title {
+        font-size: 0.78rem;
+        margin-bottom: 5px;
+        color: #334155;
+      }
+
+      .mini-board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 3px;
+      }
+
+      .mini-cell {
+        aspect-ratio: 1 / 1;
+        border: 1px solid #c7d3df;
+        border-radius: 3px;
+        background: #ffffff;
+      }
+
+      .mini-cell.filled {
+        background: #0f766e;
+        border-color: #0f5d57;
+      }
+
+      footer {
+        margin-top: 18px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Impartial 4x4 Nimber Explorer</h1>
+        <p class="sub">
+          This demo computes and explores Grundy values for all 65,536 positions of a finite impartial game on a
+          4x4 board.
+        </p>
+        <p class="top-links">
+          <a href="research-demos.html">&larr; Research demos</a>
+          &nbsp;|&nbsp;
+          <a href="index.html">Home</a>
+        </p>
+      </header>
+
+      <section class="card" aria-label="Game description">
+        <div class="card__header">
+          <h2>Rules, impartiality, and nimbers</h2>
+        </div>
+        <div class="card__body">
+          <div class="facts">
+            <article class="fact">
+              <h3>Rules (normal play)</h3>
+              <ul>
+                <li>A position is a 4x4 board of filled/empty squares.</li>
+                <li>On each move, remove one filled square, or two filled orthogonal neighbours.</li>
+                <li>The player who makes the last move wins.</li>
+              </ul>
+            </article>
+            <article class="fact">
+              <h3>Why this is impartial</h3>
+              <p>
+                Both players have exactly the same legal moves from every position. There is no hidden information and
+                no chance moves. So this is an impartial combinatorial game under normal play.
+              </p>
+            </article>
+            <article class="fact">
+              <h3>Grundy (nimber) value</h3>
+              <p>
+                The nimber of a position is the mex of the nimbers of all legal options. Nimber 0 means a losing
+                position for the player to move; non-zero means winning with correct play.
+              </p>
+            </article>
+          </div>
+          <p class="status" style="margin-top: 12px">
+            Historical context: this is a 2D finite variant of the classic Kayles move pattern (remove one or two
+            adjacent tokens). The Sprague-Grundy framework (Sprague and Grundy, 1930s) gives a complete
+            value-theoretic classification for finite impartial normal-play games, though computing nimbers can still
+            be difficult in practice.
+          </p>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Nimber explorer">
+        <div class="card__header">
+          <h2>Interactive explorer</h2>
+        </div>
+        <div class="card__body">
+          <p id="computeStatus" class="status">Computing Grundy table for all 2^16 positions...</p>
+
+          <div class="explorer">
+            <div>
+              <div id="board" class="board"></div>
+            </div>
+
+            <div>
+              <div class="controls">
+                <input id="stateInput" type="number" min="0" max="65535" value="0" />
+                <button id="loadStateBtn" class="action">Load state</button>
+                <input id="bitsInput" type="text" value="0000000000000000" />
+                <button id="loadBitsBtn" class="action">Load bits</button>
+              </div>
+
+              <div class="button-row">
+                <button id="clearBtn" class="action">Clear board</button>
+                <button id="fillBtn" class="action">Fill board</button>
+              </div>
+
+              <p class="nimber">Nimber: <span id="nimberValue">0</span></p>
+              <p class="hint">Bit string order is row-major from top-left to bottom-right.</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Move</th>
+                    <th>Result state</th>
+                    <th>Result bits</th>
+                    <th>Nimber(result)</th>
+                  </tr>
+                </thead>
+                <tbody id="movesBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Maximal nimber positions">
+        <div class="card__header">
+          <h2>Positions with maximal nimber</h2>
+        </div>
+        <div class="card__body">
+          <p id="maxInfo" class="status"></p>
+          <button id="showMaxBtn" class="action">Show max-nimber positions</button>
+          <p class="hint">Click any listed position to load it into the main board.</p>
+          <div id="maxPositions" class="max-grid"></div>
+        </div>
+      </section>
+
+      <footer>
+        Standalone client-side demo. No server calls are required.
+      </footer>
+    </div>
+
+    <script>
+      const ROWS = 4;
+      const COLS = 4;
+      const N = ROWS * COLS;
+      const NUM_STATES = 1 << N;
+      const MAX_STATE = NUM_STATES - 1;
+
+      function indexOfCell(r, c) {
+        return r * COLS + c;
+      }
+
+      const SINGLE_MOVES = [];
+      for (let r = 0; r < ROWS; r += 1) {
+        for (let c = 0; c < COLS; c += 1) {
+          const idx = indexOfCell(r, c);
+          SINGLE_MOVES.push({ label: `S(${r},${c})`, mask: 1 << idx });
+        }
+      }
+
+      const PAIR_MOVES = [];
+      for (let r = 0; r < ROWS; r += 1) {
+        for (let c = 0; c < COLS - 1; c += 1) {
+          const i = indexOfCell(r, c);
+          const j = indexOfCell(r, c + 1);
+          PAIR_MOVES.push({ label: `H(${r},${c})-(${r},${c + 1})`, mask: (1 << i) | (1 << j) });
+        }
+      }
+      for (let r = 0; r < ROWS - 1; r += 1) {
+        for (let c = 0; c < COLS; c += 1) {
+          const i = indexOfCell(r, c);
+          const j = indexOfCell(r + 1, c);
+          PAIR_MOVES.push({ label: `V(${r},${c})-(${r + 1},${c})`, mask: (1 << i) | (1 << j) });
+        }
+      }
+
+      const ALL_MOVES = SINGLE_MOVES.concat(PAIR_MOVES);
+
+      function bitMask(index) {
+        return 1 << index;
+      }
+
+      function indexToCoord(index) {
+        return [Math.floor(index / COLS), index % COLS];
+      }
+
+      function formatStateBits(state) {
+        let out = "";
+        for (let i = 0; i < N; i += 1) {
+          out += (state & bitMask(i)) !== 0 ? "1" : "0";
+        }
+        return out;
+      }
+
+      function parseStateBits(text) {
+        const cleaned = text.replace(/[^01]/g, "");
+        if (cleaned.length !== N) {
+          return null;
+        }
+        let state = 0;
+        for (let i = 0; i < N; i += 1) {
+          if (cleaned[i] === "1") {
+            state |= bitMask(i);
+          }
+        }
+        return state;
+      }
+
+      function computeGrundyTable() {
+        const grundy = new Uint8Array(NUM_STATES);
+        let maxNimber = 0;
+        const maxStates = [0];
+
+        for (let state = 1; state < NUM_STATES; state += 1) {
+          const seen = new Uint8Array(32);
+
+          for (let k = 0; k < ALL_MOVES.length; k += 1) {
+            const mask = ALL_MOVES[k].mask;
+            if ((state & mask) === mask) {
+              const nextState = state ^ mask;
+              seen[grundy[nextState]] = 1;
+            }
+          }
+
+          let g = 0;
+          while (seen[g] === 1) {
+            g += 1;
+          }
+          grundy[state] = g;
+
+          if (g > maxNimber) {
+            maxNimber = g;
+            maxStates.length = 0;
+            maxStates.push(state);
+          } else if (g === maxNimber) {
+            maxStates.push(state);
+          }
+        }
+
+        return { grundy, maxNimber, maxStates };
+      }
+
+      const computeStatusEl = document.getElementById("computeStatus");
+      const boardEl = document.getElementById("board");
+      const stateInput = document.getElementById("stateInput");
+      const bitsInput = document.getElementById("bitsInput");
+      const nimberValueEl = document.getElementById("nimberValue");
+      const movesBodyEl = document.getElementById("movesBody");
+      const maxInfoEl = document.getElementById("maxInfo");
+      const maxPositionsEl = document.getElementById("maxPositions");
+      const showMaxBtn = document.getElementById("showMaxBtn");
+
+      let state = 0;
+      let maxShown = false;
+
+      const t0 = performance.now();
+      const DB = computeGrundyTable();
+      const t1 = performance.now();
+      computeStatusEl.textContent = `Computed ${NUM_STATES.toLocaleString()} nimbers in ${(t1 - t0).toFixed(1)} ms.`;
+
+      function buildBoard() {
+        boardEl.innerHTML = "";
+        for (let i = 0; i < N; i += 1) {
+          const button = document.createElement("button");
+          button.className = "cell";
+          button.dataset.index = String(i);
+          button.addEventListener("click", () => {
+            state ^= bitMask(i);
+            render();
+          });
+          boardEl.appendChild(button);
+        }
+      }
+
+      function renderBoard() {
+        const cells = boardEl.querySelectorAll(".cell");
+        cells.forEach((cell) => {
+          const i = Number(cell.dataset.index);
+          const filled = (state & bitMask(i)) !== 0;
+          const [r, c] = indexToCoord(i);
+          cell.classList.toggle("filled", filled);
+          cell.textContent = `${r},${c}`;
+          cell.title = `(${r},${c}) ${filled ? "filled" : "empty"}`;
+        });
+      }
+
+      function legalMoves(currentState) {
+        const result = [];
+        for (let k = 0; k < ALL_MOVES.length; k += 1) {
+          const move = ALL_MOVES[k];
+          if ((currentState & move.mask) === move.mask) {
+            const nextState = currentState ^ move.mask;
+            result.push({
+              label: move.label,
+              nextState,
+              nimber: DB.grundy[nextState],
+            });
+          }
+        }
+        return result;
+      }
+
+      function renderMoves() {
+        const moves = legalMoves(state);
+        movesBodyEl.innerHTML = "";
+
+        if (moves.length === 0) {
+          const row = document.createElement("tr");
+          row.innerHTML = '<td colspan="4">No legal moves. This is a losing position (nimber 0).</td>';
+          movesBodyEl.appendChild(row);
+          return;
+        }
+
+        for (let i = 0; i < moves.length; i += 1) {
+          const move = moves[i];
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="mono">${move.label}</td>
+            <td class="mono">${move.nextState}</td>
+            <td class="mono">${formatStateBits(move.nextState)}</td>
+            <td class="mono">${move.nimber}</td>
+          `;
+          movesBodyEl.appendChild(row);
+        }
+      }
+
+      function makeMiniBoard(stateValue) {
+        const board = document.createElement("div");
+        board.className = "mini-board";
+        for (let i = 0; i < N; i += 1) {
+          const cell = document.createElement("div");
+          cell.className = "mini-cell";
+          if ((stateValue & bitMask(i)) !== 0) {
+            cell.classList.add("filled");
+          }
+          board.appendChild(cell);
+        }
+        return board;
+      }
+
+      function toggleMaxPositions() {
+        if (maxShown) {
+          maxPositionsEl.innerHTML = "";
+          showMaxBtn.textContent = "Show max-nimber positions";
+          maxShown = false;
+          return;
+        }
+
+        maxPositionsEl.innerHTML = "";
+        for (let i = 0; i < DB.maxStates.length; i += 1) {
+          const s = DB.maxStates[i];
+          const card = document.createElement("div");
+          card.className = "max-card";
+
+          const title = document.createElement("div");
+          title.className = "max-title mono";
+          title.textContent = `state ${s}`;
+
+          card.appendChild(title);
+          card.appendChild(makeMiniBoard(s));
+
+          card.addEventListener("click", () => {
+            state = s;
+            render();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+
+          maxPositionsEl.appendChild(card);
+        }
+
+        showMaxBtn.textContent = "Hide max-nimber positions";
+        maxShown = true;
+      }
+
+      function updateInputs() {
+        stateInput.value = String(state);
+        bitsInput.value = formatStateBits(state);
+      }
+
+      function render() {
+        renderBoard();
+        updateInputs();
+        nimberValueEl.textContent = String(DB.grundy[state]);
+        renderMoves();
+      }
+
+      document.getElementById("loadStateBtn").addEventListener("click", () => {
+        const value = Number(stateInput.value);
+        if (!Number.isInteger(value) || value < 0 || value > MAX_STATE) {
+          alert(`State must be an integer from 0 to ${MAX_STATE}.`);
+          return;
+        }
+        state = value;
+        render();
+      });
+
+      document.getElementById("loadBitsBtn").addEventListener("click", () => {
+        const parsed = parseStateBits(bitsInput.value);
+        if (parsed === null) {
+          alert(`Provide exactly ${N} bits (0/1).`);
+          return;
+        }
+        state = parsed;
+        render();
+      });
+
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        state = 0;
+        render();
+      });
+
+      document.getElementById("fillBtn").addEventListener("click", () => {
+        state = MAX_STATE;
+        render();
+      });
+
+      showMaxBtn.addEventListener("click", toggleMaxPositions);
+
+      maxInfoEl.textContent = `Max nimber = ${DB.maxNimber}. Number of max-nimber positions: ${DB.maxStates.length}.`;
+      buildBoard();
+      render();
+    </script>
+  </body>
+</html>

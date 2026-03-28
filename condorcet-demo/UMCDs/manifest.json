@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "generated_on": "2026-02-24",
+  "base_path": "UMCDs",
+  "files": [
+    {"file":"mucds-n=4-FINAL06_004","k":4,"domains":1,"permutations":4},
+    {"file":"mucds-n=4-FINAL06_007","k":4,"domains":4,"permutations":28},
+    {"file":"mucds-n=4-FINAL06_008","k":4,"domains":25,"permutations":200},
+    {"file":"mucds-n=4-FINAL06_009","k":4,"domains":1,"permutations":9},
+    {"file":"mucds-n=5-FINAL06_004","k":6,"domains":2,"permutations":8},
+    {"file":"mucds-n=5-FINAL06_008","k":6,"domains":12,"permutations":96},
+    {"file":"mucds-n=5-FINAL06_011","k":6,"domains":28,"permutations":308},
+    {"file":"mucds-n=5-FINAL06_012","k":6,"domains":41,"permutations":492},
+    {"file":"mucds-n=5-FINAL06_013","k":6,"domains":52,"permutations":676},
+    {"file":"mucds-n=5-FINAL06_014","k":6,"domains":279,"permutations":3906},
+    {"file":"mucds-n=5-FINAL06_015","k":6,"domains":212,"permutations":3180},
+    {"file":"mucds-n=5-FINAL06_016","k":6,"domains":573,"permutations":9168},
+    {"file":"mucds-n=5-FINAL06_017","k":6,"domains":106,"permutations":1802},
+    {"file":"mucds-n=5-FINAL06_018","k":6,"domains":43,"permutations":774},
+    {"file":"mucds-n=5-FINAL06_019","k":6,"domains":12,"permutations":228},
+    {"file":"mucds-n=5-FINAL06_020","k":6,"domains":2,"permutations":40}
+  ]
+}
