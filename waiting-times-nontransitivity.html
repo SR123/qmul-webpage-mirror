@@ -282,11 +282,11 @@
         font-size: 0.92rem;
       }
     </style>
-  </head>
-  <body>
+  <link rel="stylesheet" href="assets/demo-shell.css"><link rel="canonical" href="https://webspace.eecs.qmul.ac.uk/s.riis/waiting-times-nontransitivity.html"></head>
+  <body><a class="demo-skip" href="#guide-title">Skip to the quick start</a><nav class="research-bar" aria-label="Research navigation"><a href="index.html">Søren Riis · Home</a><a href="research-demos.html">Try it: all tools</a><a href="publications.html">All papers and PDFs</a><a href="research.html#current">Research context</a><a href="publications.html#coin-races">Related paper</a></nav><noscript><p class="resource-note">This interactive tool needs JavaScript. The related paper and research explanation remain available through the links above.</p></noscript>
     <div class="container">
       <header>
-        <h1>Waiting times & non-transitivity (Riis–Paterson)</h1>
+        <h1 id="main">Waiting times & non-transitivity (Riis–Paterson)</h1>
         <p>
           Choose three length-3 patterns A, B, C over {H,T}, and give each its own biased coin:
           pA=P(H on coin A), pB=P(H on coin B), pC=P(H on coin C). In each run we flip the three coins
@@ -296,16 +296,76 @@
         <p style="margin-top: 6px; color: rgba(255, 255, 255, 0.74)">
           <a href="research-demos.html" style="color: rgba(255, 255, 255, 0.9)">← Research demos</a>
         </p>
-      </header>
+      </header><section class="demo-guide" aria-labelledby="guide-title"><div class="guide-heading"><h2 id="guide-title">Can A beat B, B beat C, and C beat A?</h2><a href="watch.html#coins">Watch the coin-race overview →</a></div><details open><summary>First visit · three things to try</summary><ol><li><strong>Read one comparison.</strong> Each pattern has its own independent coin. P(A beats B) above 0.5 means A usually finishes first; simultaneous finishes count half each.</li><li><strong>Keep the opening example.</strong> HHH / HTH / HHT with biases 0.61 / 0.71 / 0.51 gives a small cycle. Check all three numerical probabilities, not just the mean waiting times.</li><li><strong>Compare calculation with simulation.</strong> The effect is close to 0.5, so sampling noise can reverse it. Look at the confidence intervals; changing settings clears old simulation results.</li></ol></details><details><summary>How to read the results</summary><p>Bias means probability of Heads. The sliders cover 0.01–0.99 so every pattern eventually occurs. Numerical probabilities solve a finite joint waiting-time model without truncating the tail. Simulations are capped at one million runs and an estimated workload limit. The optional 3D picture always describes the fixed opening pattern triple.</p></details></section>
 
       <section class="grid">
+
+
         <article class="card">
           <div class="card__header">
-            <h2>Non-transitive region (3D viewer)</h2>
-            <p class="hint">McDonald-shaped region: drag to rotate, scroll to zoom, click to select (pA,pB,pC).</p>
+            <h2>Controls & simulation</h2>
+            <p class="hint">Run N Monte Carlo games with the selected independent coin biases pA, pB, and pC.</p>
           </div>
           <div class="card__body">
-            <canvas id="region3dCanvas" class="viz" width="820" height="520"></canvas>
+            <div class="controls-grid">
+              <label>
+                Pattern A
+                <select id="patternA"></select>
+              </label>
+              <label>
+                Pattern B
+                <select id="patternB"></select>
+              </label>
+              <label>
+                Pattern C
+                <select id="patternC"></select>
+              </label>
+            </div>
+
+            <div style="margin-top: 12px">
+              <label>
+                pA = P(H on coin A) <span class="mono" id="pALabel"></span>
+                <input id="pASlider" type="range" min="1" max="99" step="1" value="61" />
+              </label>
+              <label style="margin-top: 10px">
+                pB = P(H on coin B) <span class="mono" id="pBLabel"></span>
+                <input id="pBSlider" type="range" min="1" max="99" step="1" value="71" />
+              </label>
+              <label style="margin-top: 10px">
+                pC = P(H on coin C) <span class="mono" id="pCLabel"></span>
+                <input id="pCSlider" type="range" min="1" max="99" step="1" value="51" />
+              </label>
+            </div>
+
+            <div class="row" style="margin-top: 12px">
+              <label style="margin: 0">
+                Games N
+                <input id="gamesN" type="number" min="10000" step="10000" value="100000" max="1000000" />
+              </label>
+              <button id="runBtn" class="btn btn--primary" type="button">Run simulation</button>
+            </div>
+
+            <p id="runtimeStatus" role="status" aria-live="polite" class="hint" style="margin: 10px 2px 0; color: var(--muted)">
+              Runtime: ready.
+            </p>
+
+            <div class="row" style="margin-top: 12px">
+              <label style="margin: 0">
+                Pairwise N (for confidence intervals)
+                <input id="pairwiseN" type="number" min="10000" step="10000" value="20000" max="1000000" />
+              </label>
+              <button id="pairwiseBtn" class="btn" type="button">Estimate pairwise matrix</button>
+            </div>
+          </div>
+        </article>
+      </section>
+<details id="regionWorkshop" class="region-workshop"><summary>Optional 3D workshop · explore the fixed pattern triple</summary>        <article class="card">
+          <div class="card__header">
+            <h2>Optional: the region for HHH / HTH / HHT</h2>
+            <p class="hint">Drag to rotate, scroll to zoom, or click a point to set the three biases. The probability table also works without this picture.</p>
+          </div>
+          <div class="card__body">
+            <p class="hint">This picture always uses A = HHH, B = HTH, C = HHT. Changing the pattern controls affects the probability table, not this region. The sliders provide a keyboard-accessible way to explore probabilities.</p><canvas aria-label="Optional three-dimensional region for the fixed HHH, HTH, HHT patterns" id="region3dCanvas" class="viz" width="820" height="520"></canvas>
             <div class="toolbar">
               <label>
                 Grid step (coarser = faster)
@@ -332,79 +392,20 @@
                 <button id="resetViewBtn" class="btn" type="button">Reset view</button>
               </div>
             </div>
-            <p id="regionStatus" class="statusline">Sampling: ready.</p>
+            <p id="regionStatus" aria-live="polite" class="statusline">Sampling: ready.</p>
             <p class="hint" style="margin: 10px 2px 0">
               Region definition: 0&lt;pA,pB,pC&lt;1 and <span class="mono">G_AB(pA,pB)&gt;0</span>,
               <span class="mono">G_BC(pB,pC)&gt;0</span>, <span class="mono">G_CA(pC,pA)&gt;0</span>.
               (These polynomials correspond to the classic length-3 example A=HHH, B=HTH, C=HHT.)
             </p>
           </div>
-        </article>
-
-        <article class="card">
-          <div class="card__header">
-            <h2>Controls & simulation</h2>
-            <p class="hint">Run N Monte Carlo games at the selected (p,q).</p>
-          </div>
-          <div class="card__body">
-            <div class="controls-grid">
-              <label>
-                Pattern A
-                <select id="patternA"></select>
-              </label>
-              <label>
-                Pattern B
-                <select id="patternB"></select>
-              </label>
-              <label>
-                Pattern C
-                <select id="patternC"></select>
-              </label>
-            </div>
-
-            <div style="margin-top: 12px">
-              <label>
-                pA = P(H on coin A) <span class="mono" id="pALabel"></span>
-                <input id="pASlider" type="range" min="0" max="100" step="1" value="61" />
-              </label>
-              <label style="margin-top: 10px">
-                pB = P(H on coin B) <span class="mono" id="pBLabel"></span>
-                <input id="pBSlider" type="range" min="0" max="100" step="1" value="71" />
-              </label>
-              <label style="margin-top: 10px">
-                pC = P(H on coin C) <span class="mono" id="pCLabel"></span>
-                <input id="pCSlider" type="range" min="0" max="100" step="1" value="51" />
-              </label>
-            </div>
-
-            <div class="row" style="margin-top: 12px">
-              <label style="margin: 0">
-                Games N
-                <input id="gamesN" type="number" min="10000" step="10000" value="100000" />
-              </label>
-              <button id="runBtn" class="btn btn--primary" type="button">Run simulation</button>
-            </div>
-
-            <p id="runtimeStatus" class="hint" style="margin: 10px 2px 0; color: var(--muted)">
-              Runtime: ready.
-            </p>
-
-            <div class="row" style="margin-top: 12px">
-              <label style="margin: 0">
-                Pairwise N (for confidence intervals)
-                <input id="pairwiseN" type="number" min="10000" step="10000" value="20000" />
-              </label>
-              <button id="pairwiseBtn" class="btn" type="button">Compute pairwise matrix</button>
-            </div>
-          </div>
-        </article>
-      </section>
+        </article></details>
 
       <section style="margin-top: 14px" class="grid">
         <article class="card">
           <div class="card__header">
             <h2>At current (pA,pB,pC)</h2>
-            <p class="hint">Means are exact; pairwise win probabilities are simulation estimates.</p>
+            <p class="hint">Means and initial pairwise probabilities are calculated numerically. “Estimate pairwise matrix” replaces the pairwise values with Monte Carlo estimates and approximate 95% confidence intervals.</p>
           </div>
           <div class="card__body">
             <div class="kpi-grid">
@@ -480,16 +481,11 @@
                   <td id="simCA">—</td>
                   <td id="simCAp">—</td>
                 </tr>
-                <tr>
-                  <td>Cycle frequency</td>
-                  <td id="simCycle">—</td>
-                  <td id="simCyclep">—</td>
-                </tr>
               </tbody>
             </table>
             <p class="hint" style="margin: 10px 2px 0">
               Each run flips 3 independent coins (A/B/C) until all three patterns have appeared, then records the
-              three pairwise outcomes (with random tie-breaks).
+              three pairwise outcomes. A tie in each comparison is resolved with an independent fair tie-break. A cycle of tie-break outcomes within one trial is not evidence of non-transitivity between the waiting-time distributions. At the default biases the probabilities are very close to 1/2, so simulation noise can hide or reverse the effect.
             </p>
           </div>
         </article>
@@ -533,8 +529,6 @@
       const simBCpEl = document.getElementById("simBCp");
       const simCAEl = document.getElementById("simCA");
       const simCApEl = document.getElementById("simCAp");
-      const simCycleEl = document.getElementById("simCycle");
-      const simCyclepEl = document.getElementById("simCyclep");
 
       const regionCanvas = document.getElementById("region3dCanvas");
       const regionStatusEl = document.getElementById("regionStatus");
@@ -545,7 +539,7 @@
       const resetViewBtn = document.getElementById("resetViewBtn");
 
       function clamp01(x) {
-        return Math.max(0, Math.min(1, x));
+        return Math.max(0.01, Math.min(0.99, x));
       }
 
       function fmtProb(x) {
@@ -760,28 +754,21 @@
         return { pmf, tail };
       }
 
-      // Probability that pattern A finishes before B, with random tie-breaks.
+      // Solve the joint transient chain; ties contribute one half.
+      // No waiting-time truncation. The UI excludes nonterminating deterministic coins.
       function probAbeatsBExactLen3(A, B, pA, pB) {
-        const distA = waitingTimePmfLen3(A, pA, 1e-13);
-        const distB = waitingTimePmfLen3(B, pB, 1e-13);
-        const pmfA = distA.pmf;
-        const pmfB = distB.pmf;
-        const T = Math.max(pmfA.length, pmfB.length) - 1;
-
-        let cdfB = 0.0;
-        let pStrict = 0.0;
-        let pTie = 0.0;
-
-        for (let t = 1; t <= T; t += 1) {
-          const a = t < pmfA.length ? pmfA[t] : 0.0;
-          const b = t < pmfB.length ? pmfB[t] : 0.0;
-          cdfB += b;
-          pStrict += a * (1 - cdfB);
-          pTie += a * b;
+        if (!(pA > 0 && pA < 1 && pB > 0 && pB < 1)) return NaN;
+        const n=SUFFIX_STATES.length, matrix=Array.from({length:n*n},()=>Array(n*n).fill(0)), rhs=Array(n*n).fill(0);
+        for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+          const row=i*n+j;matrix[row][row]=1;
+          for(const a of ['H','T'])for(const b of ['H','T']){
+            const probability=(a==='H'?pA:1-pA)*(b==='H'?pB:1-pB);
+            const aw=(SUFFIX_STATES[i]+a).endsWith(A), bw=(SUFFIX_STATES[j]+b).endsWith(B);
+            if(aw)rhs[row]+=probability*(bw?.5:1);
+            else if(!bw)matrix[row][SUFFIX_INDEX.get(nextSuffix(SUFFIX_STATES[i],a))*n+SUFFIX_INDEX.get(nextSuffix(SUFFIX_STATES[j],b))]-=probability;
+          }
         }
-
-        // Remaining tails are tiny (eps), ignore them; result is accurate to ~eps.
-        return pStrict + 0.5 * pTie;
+        return Math.max(0,Math.min(1,solveLinear(matrix,rhs)[0]));
       }
 
       function isNonTransitive(pAB, pBC, pCA) {
@@ -1190,7 +1177,7 @@
                 const ab = pairwiseWins(N, A, B, pA, pB);
                 const bc = pairwiseWins(N, B, C, pB, pC);
                 const ca = pairwiseWins(N, C, A, pC, pA);
-                postMessage({ type: "pairwise", N, ab, bc, ca });
+                postMessage({ type: "pairwise", revision:msg.revision, N, ab, bc, ca });
               } catch (err) {
                 postMessage({ type: "error", message: err && err.message ? err.message : String(err) });
               }
@@ -1533,6 +1520,10 @@
       })();
 
       const regionWorker = createRegionWorker();
+      let settingsRevision=0;
+      function simulationAllowed(N,A,B,C,pA,pB,pC) {
+        if(N*(expectedTimeIID(A,pA)+expectedTimeIID(B,pB)+expectedTimeIID(C,pC))>20000000){runtimeStatus.textContent="This simulation would require too many flips. Reduce N or move the biases closer to 0.5; the numerical probabilities above remain available.";return false;}return true;
+      }
 
       function renderExact() {
         const { pA, pB, pC } = getParams();
@@ -1549,9 +1540,9 @@
         pABEl.textContent = fmtProb(pAB);
         pBCEl.textContent = fmtProb(pBC);
         pCAEl.textContent = fmtProb(pCA);
-        pABciEl.textContent = "numerical exact (length-3)";
-        pBCciEl.textContent = "numerical exact (length-3)";
-        pCAciEl.textContent = "numerical exact (length-3)";
+        pABciEl.textContent = "numerical joint-chain calculation";
+        pBCciEl.textContent = "numerical joint-chain calculation";
+        pCAciEl.textContent = "numerical joint-chain calculation";
 
         const nonT = isNonTransitive(pAB, pBC, pCA);
         nonTransitiveTagEl.innerHTML = nonT
@@ -1632,14 +1623,17 @@
           const C = String(patternCEl.value);
           const { pA, pB, pC } = getParams();
           let N = Number(gamesNEl.value);
-          N = Number.isFinite(N) ? Math.max(10000, Math.floor(N / 10000) * 10000) : 100000;
+          N = Number.isFinite(N) ? Math.min(1000000, Math.max(10000, Math.floor(N / 10000) * 10000)) : 100000;
           gamesNEl.value = String(N);
+          if(!simulationAllowed(N,A,B,C,pA,pB,pC))return;
+          const revision=settingsRevision;
 
           runtimeStatus.textContent = "Runtime: running simulation…";
           const res = await simulateRunsBiased(N, A, B, C, pA, pB, pC, (done, total) => {
             runtimeStatus.textContent = "Runtime: simulation " + done + " / " + total;
           });
 
+          if(revision !== settingsRevision){runtimeStatus.textContent="Settings changed: old simulation discarded. Run again for these settings.";return;}
           const fmt = (x) => x + " / " + res.N;
           const fp = (x) => (x / res.N).toFixed(4);
 
@@ -1649,8 +1643,6 @@
           simBCpEl.textContent = fp(res.bc);
           simCAEl.textContent = fmt(res.ca);
           simCApEl.textContent = fp(res.ca);
-          simCycleEl.textContent = fmt(res.cycles);
-          simCyclepEl.textContent = fp(res.cycles);
 
           const t1 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
           runtimeStatus.textContent = "Runtime: OK (simulation " + (t1 - t0).toFixed(1) + " ms)";
@@ -1667,7 +1659,6 @@
         let ab = 0;
         let bc = 0;
         let ca = 0;
-        let cycles = 0;
 
         function oneRun() {
           const tA = singleWaitingTime(A, pA);
@@ -1687,7 +1678,6 @@
           if (A_lt_B) ab += 1;
           if (B_lt_C) bc += 1;
           if (C_lt_A) ca += 1;
-          if (A_lt_B && B_lt_C && C_lt_A) cycles += 1;
         }
 
         return new Promise((resolve) => {
@@ -1697,7 +1687,7 @@
             for (; done < target; done += 1) oneRun();
             if (onProgress) onProgress(done, N);
             if (done < N) requestAnimationFrame(step);
-            else resolve({ ab, bc, ca, cycles, N });
+            else resolve({ ab, bc, ca, N });
           }
           step();
         });
@@ -1725,11 +1715,12 @@
         const B = String(patternBEl.value);
         const C = String(patternCEl.value);
         let N = Number(pairwiseNEl.value);
-        N = Number.isFinite(N) ? Math.max(10000, Math.floor(N / 10000) * 10000) : 20000;
+        N = Number.isFinite(N) ? Math.min(1000000, Math.max(10000, Math.floor(N / 10000) * 10000)) : 20000;
         pairwiseNEl.value = String(N);
+        if(!simulationAllowed(N,A,B,C,pA,pB,pC))return;
         pairwiseBtn.disabled = true;
         if (autoFromClick) runtimeStatus.textContent = "Runtime: computing pairwise matrix…";
-        regionWorker.postMessage({ type: "pairwise", N, A, B, C, pA, pB, pC });
+        regionWorker.postMessage({ type: "pairwise", revision:settingsRevision, N, A, B, C, pA, pB, pC });
       }
 
       regionWorker.onmessage = (ev) => {
@@ -1749,6 +1740,8 @@
           regionStatusEl.textContent = "Sampling: done (" + count + " points, " + mode + ").";
           resampleBtn.disabled = false;
         } else if (msg.type === "pairwise") {
+          pairwiseBtn.disabled=false;
+          if(msg.revision !== settingsRevision){runtimeStatus.textContent="Settings changed: old estimate discarded.";return;}
           const N = Number(msg.N) || 1;
           const pAB = (Number(msg.ab) || 0) / N;
           const pBC = (Number(msg.bc) || 0) / N;
@@ -1763,8 +1756,8 @@
 
           const nonT = isNonTransitive(pAB, pBC, pCA);
           nonTransitiveTagEl.innerHTML = nonT
-            ? '<span class="tag tag--good">Yes</span>'
-            : '<span class="tag tag--bad">No</span>';
+            ? '<span class="tag">Cycle suggested by point estimates only</span>'
+            : '<span class="tag">No cycle in point estimates</span>';
 
           pairwiseBtn.disabled = false;
           runtimeStatus.textContent = "Runtime: OK (pairwise matrix, N=" + N + ")";
@@ -1778,6 +1771,9 @@
       };
 
       function scheduleAll() {
+        settingsRevision++;
+        [simABEl,simABpEl,simBCEl,simBCpEl,simCAEl,simCApEl].forEach(el=>el.textContent="—");
+        runtimeStatus.textContent="Settings changed. Numerical results updated; run a fresh simulation if needed.";
         if (scheduleAll._raf) cancelAnimationFrame(scheduleAll._raf);
         scheduleAll._raf = requestAnimationFrame(() => {
           scheduleAll._raf = null;
@@ -1797,7 +1793,8 @@
 
       syncLabels();
       renderExact();
-      requestResample();
+      let regionLoaded=false;
+      document.getElementById("regionWorkshop").addEventListener("toggle",event=>{if(event.target.open && !regionLoaded){regionLoaded=true;requestResample();}});
 
       patternAEl.addEventListener("change", scheduleAll);
       patternBEl.addEventListener("change", scheduleAll);

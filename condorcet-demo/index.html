@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Maximal Condorcet Domain Explorer</title>
+  <title>Condorcet Domain Archive</title>
   <style>
     :root {
       --bg: #080b12;
@@ -365,22 +365,22 @@
       color: #bef5d0;
     }
   </style>
-</head>
-<body>
+<link rel="stylesheet" href="../assets/demo-shell.css"><link rel="canonical" href="https://webspace.eecs.qmul.ac.uk/s.riis/condorcet-demo/index.html"></head>
+<body><a class="demo-skip" href="#guide-title">Skip to the quick start</a><nav class="research-bar" aria-label="Research navigation"><a href="../index.html">Søren Riis · Home</a><a href="../research-demos.html">Try it: all tools</a><a href="../publications.html">All papers and PDFs</a><a href="../research.html#choice">Research context</a><a href="../publications.html#condorcet-eight">Related paper</a></nav><noscript><p class="resource-note">This interactive tool needs JavaScript. The related paper and research explanation remain available through the links above.</p></noscript>
   <header>
-    <h1>Maximal Condorcet Domain Explorer</h1>
+    <h1 id="main">Condorcet Domain Archive</h1>
     <p>
-      Explore maximal Condorcet domains as adjacent-swap graphs. Each node is one permutation; edges connect permutations that differ by
-      a single adjacent transposition.
+      Explore the stored preference domains as adjacent-swap graphs. Each node is one permutation; edges connect permutations that differ by
+      a single adjacent transposition. Start with the connected four-alternative example, and select a node to inspect its neighbours.
     </p>
-  </header>
+  <p class="resource-note">Archive note: filenames marked n=5 contain permutations of six symbols, including a leading 0. The original naming convention has not been verified. All stored symbols are displayed; these files are not presented as a verified five- or six-alternative census.</p></header><section class="demo-guide" aria-labelledby="guide-title"><div class="guide-heading"><h2 id="guide-title">Read a preference domain as a graph</h2><a href="../research-playground/assembly/">Start with The Assembly →</a></div><details open><summary>First visit · three things to try</summary><ol><li><strong>Keep the four-alternative example.</strong> It opens with nine rankings. Each node is one whole preference order, read from most to least preferred.</li><li><strong>Select a ranking.</strong> An edge means swapping two adjacent entries. For example, 0123 and 1023 differ by one adjacent swap.</li><li><strong>Compare another domain.</strong> Change the domain number or dataset. The graph describes relationships between rankings, not a majority vote. Table rows can be selected with Enter or Space.</li></ol></details><details><summary>How to read the results</summary><p>A Condorcet domain prevents majority cycles for every odd electorate using its allowed rankings. Maximal means no extra ranking can be added; largest means greatest possible size. This archive viewer does not prove maximality or certify uploaded data. Filename n=5 files store six symbols; their naming convention remains unresolved.</p></details></section>
 
   <div class="app">
     <aside class="stack">
       <section class="panel">
         <div class="hd">Data Source</div>
         <div class="bd stack">
-          <button id="loadBundledBtn" class="primary" disabled>Load bundled UMCD files</button>
+          <button id="loadBundledBtn" class="primary" disabled>Load bundled MUCD files</button>
           <div>
             <label for="fileInput">Load local file(s) or folder</label>
             <input id="fileInput" type="file" multiple webkitdirectory directory />
@@ -394,7 +394,7 @@
         <div class="hd">Domain Selection</div>
         <div class="bd stack">
           <div>
-            <label for="kFilter">Filter by dataset n</label>
+            <label for="kFilter">Filter by filename n label</label>
             <select id="kFilter" disabled>
               <option value="all">All</option>
             </select>
@@ -448,7 +448,7 @@
           <div class="graph-toolbar">
             <span class="inline">
               layout
-              <select id="layoutSelect">
+              <select id="layoutSelect" aria-label="Graph layout">
                 <option value="layers">Inversion layers</option>
                 <option value="force">Force-directed</option>
               </select>
@@ -456,15 +456,15 @@
 
             <span class="inline">
               labels
-              <select id="labelModeSelect">
+              <select id="labelModeSelect" aria-label="Graph labels">
                 <option value="index">Index</option>
-                <option value="perm">Permutation</option>
+                <option value="perm" selected>Permutation</option>
               </select>
             </span>
 
             <span class="inline">
               colors
-              <select id="colorModeSelect">
+              <select id="colorModeSelect" aria-label="Colour nodes by">
                 <option value="component">component</option>
                 <option value="degree">degree</option>
                 <option value="distance">distance from selected</option>
@@ -480,7 +480,7 @@
 
             <span class="inline">
               size
-              <select id="sizeModeSelect">
+              <select id="sizeModeSelect" aria-label="Size nodes by">
                 <option value="fixed">fixed</option>
                 <option value="degree">degree</option>
                 <option value="kcore">k-core index</option>
@@ -491,7 +491,7 @@
 
             <span class="inline">
               edges
-              <select id="edgeModeSelect">
+              <select id="edgeModeSelect" aria-label="Style edges by">
                 <option value="uniform">uniform</option>
                 <option value="swap">swap position</option>
                 <option value="layers">BFS layers from selected</option>
@@ -608,7 +608,7 @@
       }
 
       function hideLeadingZeroColumn(domain) {
-        return domain.length > 0 && domain.every((p) => p.length > 0 && p[0] === 0);
+        return false; // Display every stored symbol; the archive convention is unresolved.
       }
 
       function permutationText(p, dropLeadingZero = false) {
@@ -1284,12 +1284,12 @@
         for (const ds of visible) {
           const opt = document.createElement("option");
           opt.value = String(ds.id);
-          opt.textContent = `${ds.name}  (n=${ds.nLabel}, perm-len=${ds.permLength}, domains=${ds.domains.length})`;
+          opt.textContent = `${ds.name}  (file n=${ds.nLabel}, stored length=${ds.permLength}, domains=${ds.domains.length})`;
           datasetSelect.appendChild(opt);
         }
 
         if (!visible.some((d) => d.id === state.currentDatasetId)) {
-          state.currentDatasetId = visible[0].id;
+          state.currentDatasetId = (visible.find(d => d.name === "mucds-n=4-FINAL06_009") || visible[0]).id;
           state.currentDomainIndex = 0;
           state.selectedPermIndex = null;
         }
@@ -1356,7 +1356,7 @@
         datasetBadges.innerHTML = "";
         const parts = [
           { text: `${dataset.source}`, cls: "" },
-          { text: `n=${dataset.nLabel}`, cls: "" },
+          { text: `file label n=${dataset.nLabel}`, cls: "" },
           { text: `perm-len=${dataset.permLength}`, cls: "" },
           { text: `domains: ${dataset.domains.length}`, cls: "" },
           { text: `|D|=${domain.length}`, cls: "" },
@@ -1387,7 +1387,7 @@
         statsGrid.innerHTML = "";
         statsGrid.appendChild(statCard("Dataset", dataset.name));
         statsGrid.appendChild(statCard("Domain", `${state.currentDomainIndex + 1} / ${dataset.domains.length}`));
-        statsGrid.appendChild(statCard("n (from file)", String(dataset.nLabel)));
+        statsGrid.appendChild(statCard("Filename n label", String(dataset.nLabel)));
         statsGrid.appendChild(statCard("Permutation length", String(dataset.permLength)));
         statsGrid.appendChild(statCard("Permutations", String(domain.length)));
         statsGrid.appendChild(statCard("Edges", String(model.edges.length)));
@@ -1448,6 +1448,9 @@
             <td class="mono">${model.componentOf[i] + 1}</td>
           `;
 
+          tr.tabIndex=0;
+          tr.setAttribute("aria-label","Inspect ranking: " + tr.cells[1].textContent);
+          tr.addEventListener("keydown", event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();tr.click();}});
           tr.addEventListener("click", () => {
             state.selectedPermIndex = state.selectedPermIndex === i ? null : i;
             renderAll();
@@ -1494,6 +1497,9 @@
             <td class="mono">${model.inversions[j]}</td>
             <td class="mono">${model.degree[j]}</td>
           `;
+          tr.tabIndex=0;
+          tr.setAttribute("aria-label","Inspect ranking: " + tr.cells[1].textContent);
+          tr.addEventListener("keydown", event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();tr.click();}});
           tr.addEventListener("click", () => {
             state.selectedPermIndex = j;
             renderAll();
@@ -1808,7 +1814,7 @@
             return;
           }
 
-          setStatus("Loading embedded bundled UMCD files...", "normal");
+          setStatus("Loading embedded bundled MUCD files...", "normal");
           const added = addBundledPayloads(inline);
           state.bundledLoaded = true;
           loadBundledBtn.disabled = false;
@@ -1827,7 +1833,7 @@
         }
 
         loadBundledBtn.disabled = true;
-        setStatus("Loading bundled UMCD files...", "normal");
+        setStatus("Loading bundled MUCD files...", "normal");
 
         try {
           const base = state.manifest.base_path || "UMCDs";

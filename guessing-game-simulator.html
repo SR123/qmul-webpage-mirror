@@ -274,11 +274,11 @@
         fill: rgba(15, 23, 42, 0.72);
       }
     </style>
-  </head>
-  <body>
+  <link rel="stylesheet" href="assets/demo-shell.css"><link rel="canonical" href="https://webspace.eecs.qmul.ac.uk/s.riis/guessing-game-simulator.html"></head>
+  <body><a class="demo-skip" href="#guide-title">Skip to the quick start</a><nav class="research-bar" aria-label="Research navigation"><a href="index.html">Søren Riis · Home</a><a href="research-demos.html">Try it: all tools</a><a href="publications.html">All papers and PDFs</a><a href="research.html#information">Research context</a><a href="publications.html#information-flows">Related paper</a></nav><noscript><p class="resource-note">This interactive tool needs JavaScript. The related paper and research explanation remain available through the links above.</p></noscript>
     <div class="container">
       <header>
-        <h1>Guessing game simulator</h1>
+        <h1 id="main">Guessing game simulator</h1>
         <p>
           Each vertex i is assigned a hat value xᵢ ∈ {0,…,s−1}. On K5 each player sees all other hats.
           The (standard) sum strategy is: guess x̂ᵢ = −∑ⱼ≠ᵢ xⱼ (mod s). This succeeds iff ∑ᵢ xᵢ ≡ 0 (mod s),
@@ -287,7 +287,7 @@
         <p style="margin-top: 6px; color: rgba(255, 255, 255, 0.74)">
           <a href="research-demos.html" style="color: rgba(255, 255, 255, 0.9)">← Research demos</a>
         </p>
-      </header>
+      </header><section class="demo-guide" aria-labelledby="guide-title"><div class="guide-heading"><h2 id="guide-title">Compare local guessing strategies</h2><a href="research-playground/signal/">Start with Signal Club →</a></div><details open><summary>First visit · three things to try</summary><ol><li><strong>Choose K₅ and s = 2.</strong> Five players each see everyone else’s symbol. The team wins only when all five guesses are correct.</li><li><strong>Deal, then simulate.</strong> “New single run” shows one outcome. Run simulations to compare the observed win rate with the theoretical 1/2.</li><li><strong>Try C₅ with s = 4.</strong> Each symbol is now a pair of bits. Players see their two neighbours. The pairing rule wins 32 of 1,024 deals, or 1/32.</li></ol></details><details><summary>How to read the results</summary><p>s is the number of possible symbols. K₅ connects every pair; C₅ is a ring. The diagram reveals all symbols to you as an observer; each player’s rule still uses only its neighbours. A guessing number measures coordinated success, not how many players guess correctly.</p></details></section>
 
       <section class="grid">
         <article class="card">
@@ -323,7 +323,7 @@
 
               <label>
                 Simulations N
-                <input id="simN" type="number" min="10000" step="10000" value="100000" />
+                <input id="simN" max="1000000" type="number" min="10000" step="10000" value="100000" />
               </label>
 
               <div class="kpi" aria-label="Theoretical">
@@ -772,11 +772,12 @@
         try {
           btnSimulate.disabled = true;
           btnOneRun.disabled = true;
+          graphSelect.disabled=true; alphabetSizeEl.disabled=true;
 
           const s = Number(alphabetSizeEl.value);
           const graphId = String(graphSelect.value || "k5");
           let N = Number(simNEl.value);
-          N = Number.isFinite(N) ? Math.max(10000, Math.floor(N / 10000) * 10000) : 100000;
+          N = Number.isFinite(N) ? Math.min(1000000, Math.max(10000, Math.floor(N / 10000) * 10000)) : 100000;
           simNEl.value = String(N);
 
           if (graphId === "c5" && !sqrtInt(s)) {
@@ -816,6 +817,7 @@
         } finally {
           btnSimulate.disabled = false;
           btnOneRun.disabled = false;
+          graphSelect.disabled=false; alphabetSizeEl.disabled=false;
         }
       }
 
@@ -828,10 +830,12 @@
           opt.textContent = String(s);
           alphabetSizeEl.appendChild(opt);
         }
-        alphabetSizeEl.value = "5";
+        alphabetSizeEl.value = "2";
       }
 
       function updateTheory() {
+        for(const option of alphabetSizeEl.options) option.disabled=graphSelect.value === "c5" && !sqrtInt(Number(option.value));
+        [simSuccess,simSuccessP,simFail,simFailP].forEach(el=>el.textContent="—");
         const s = Number(alphabetSizeEl.value);
         const graphId = String(graphSelect.value || "k5");
         if (graphId === "k5") {
@@ -863,6 +867,7 @@
         runOne();
       });
       graphSelect.addEventListener("change", () => {
+        if(graphSelect.value === "c5" && !sqrtInt(Number(alphabetSizeEl.value))) alphabetSizeEl.value="4";
         updateTheory();
         runOne();
       });
@@ -880,473 +885,3 @@
     </script>
 </body>
 </html>
-<!-- Duplicate content below was accidentally appended and is ignored.
-              <summary><strong>C5 (bidirected): guessing number 2.5 (for square s)</strong></summary>
-              <p style="margin: 10px 0 0">
-                <span class="mono">Upper bound (Shannon):</span>
-                For bidirected C5 the entropy constraints are
-                <span class="mono">H(Xᵢ | X_{i−1},X_{i+1})=0</span> (indices mod 5).
-                Using Shannon submodularity, one derives
-                <span class="mono">2·H(X₁,…,X₅) ≤ H(X₁)+…+H(X₅) ≤ 5·log s</span>,
-                hence <span class="mono">g ≤ 2.5</span>.
-              </p>
-              <p style="margin: 10px 0 0">
-                <span class="mono">Lower bound (pairing strategy for s=t²):</span>
-                Write each symbol as a pair <span class="mono">(L,R)∈{0,…,t−1}²</span>.
-                Each player guesses <span class="mono">Lᵢ = R_{left(i)}</span> and
-                <span class="mono">Rᵢ = L_{right(i)}</span>. This partitions the 10 coordinates into
-                5 matched pairs; all guesses are correct iff all 5 matches agree, which occurs with
-                probability <span class="mono">1/t⁵ = 1/s^{2.5}</span>. Thus
-                <span class="mono">g = 2.5</span> for square <span class="mono">s=t²</span>.
-              </p>
-            </details>
-          </div>
-        </article>
-      </section>
-    </div>
-
-    <script>
-      "use strict";
-
-      const svgK5 = document.getElementById("svgK5");
-      const oneRunTag = document.getElementById("oneRunTag");
-      const oneRunHint = document.getElementById("oneRunHint");
-
-      const graphSelect = document.getElementById("graphSelect");
-      const alphabetSizeEl = document.getElementById("alphabetSize");
-      const simNEl = document.getElementById("simN");
-      const btnOneRun = document.getElementById("btnOneRun");
-      const btnSimulate = document.getElementById("btnSimulate");
-      const runtimeStatus = document.getElementById("runtimeStatus");
-      const strategyNote = document.getElementById("strategyNote");
-
-      const theoryProb = document.getElementById("theoryProb");
-      const simSuccess = document.getElementById("simSuccess");
-      const simSuccessP = document.getElementById("simSuccessP");
-      const simFail = document.getElementById("simFail");
-      const simFailP = document.getElementById("simFailP");
-
-      function mod(n, m) {
-        const r = n % m;
-        return r < 0 ? r + m : r;
-      }
-
-      function fmtProb(x) {
-        if (!Number.isFinite(x)) return "—";
-        return x.toFixed(6).replace(/0+$/, "").replace(/\.$/, "");
-      }
-
-      function formatInt(n) {
-        return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
-      }
-
-      function clearSvg(svgEl) {
-        while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
-      }
-
-      function buildMarker(svgEl, id) {
-        const existing = svgEl.querySelector("marker#" + id);
-        if (existing) return;
-
-        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-        const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-        marker.setAttribute("id", id);
-        marker.setAttribute("viewBox", "0 0 10 10");
-        marker.setAttribute("refX", "9");
-        marker.setAttribute("refY", "5");
-        marker.setAttribute("markerWidth", "7");
-        marker.setAttribute("markerHeight", "7");
-        marker.setAttribute("orient", "auto-start-reverse");
-
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
-        path.setAttribute("fill", "rgba(17, 24, 39, 0.24)");
-        marker.appendChild(path);
-
-        defs.appendChild(marker);
-        svgEl.appendChild(defs);
-      }
-
-      function makeCompleteDigraph(n) {
-        const nodes = [];
-        for (let i = 1; i <= n; i += 1) nodes.push({ id: String(i), label: String(i), vertex: i });
-        const edges = [];
-        for (let u = 1; u <= n; u += 1) {
-          for (let v = 1; v <= n; v += 1) {
-            if (u === v) continue;
-            edges.push({ u: String(u), v: String(v) });
-          }
-        }
-        return { nodes, edges };
-      }
-
-      function makeBidirectedCycle(n) {
-        const nodes = [];
-        for (let i = 1; i <= n; i += 1) nodes.push({ id: String(i), label: String(i), vertex: i });
-        const edges = [];
-        for (let i = 1; i <= n; i += 1) {
-          const j = i === n ? 1 : (i + 1);
-          edges.push({ u: String(i), v: String(j) });
-          edges.push({ u: String(j), v: String(i) });
-        }
-        return { nodes, edges };
-      }
-
-      function layoutCircle(nodes, width, height) {
-        const cx = width / 2;
-        const cy = height / 2 + 6;
-        const r = Math.min(width, height) / 2 - 86;
-        const coords = new Map();
-        const sorted = nodes.slice().sort((a, b) => a.vertex - b.vertex);
-        for (let i = 0; i < sorted.length; i += 1) {
-          const angle = (-Math.PI / 2) + (i * 2 * Math.PI) / sorted.length;
-          coords.set(sorted[i].id, { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
-        }
-        return coords;
-      }
-
-      function renderGraph(svgEl, graphId, graph, hats, guesses, s, overlayTitle) {
-        clearSvg(svgEl);
-        buildMarker(svgEl, "arrow");
-
-        const width = 820;
-        const height = 520;
-        const coords = layoutCircle(graph.nodes, width, height);
-
-        const gEdges = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        const gNodes = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        svgEl.appendChild(gEdges);
-        svgEl.appendChild(gNodes);
-
-        // Draw edges once for a clean look.
-        if (graphId === "k5") {
-          for (const e of graph.edges) {
-            const u = Number(e.u);
-            const v = Number(e.v);
-            if (u >= v) continue;
-            const pu = coords.get(e.u);
-            const pv = coords.get(e.v);
-            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.classList.add("edge");
-            path.setAttribute("d", "M " + pu.x + " " + pu.y + " L " + pv.x + " " + pv.y);
-            gEdges.appendChild(path);
-          }
-        } else {
-          // cycle: draw (i, i+1) once
-          for (let i = 1; i <= graph.nodes.length; i += 1) {
-            const j = i === graph.nodes.length ? 1 : (i + 1);
-            const pu = coords.get(String(i));
-            const pv = coords.get(String(j));
-            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.classList.add("edge");
-            path.setAttribute("d", "M " + pu.x + " " + pu.y + " L " + pv.x + " " + pv.y);
-            gEdges.appendChild(path);
-          }
-        }
-
-        for (const node of graph.nodes) {
-          const pos = coords.get(node.id);
-          const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-          group.classList.add("node");
-
-          const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-          circle.setAttribute("cx", String(pos.x));
-          circle.setAttribute("cy", String(pos.y));
-          circle.setAttribute("r", "24");
-          const ok = hats[node.id] === guesses[node.id];
-          circle.setAttribute("stroke", ok ? "rgba(22, 163, 74, 0.75)" : "rgba(220, 38, 38, 0.75)");
-          circle.setAttribute("stroke-width", "2.4");
-          group.appendChild(circle);
-
-          const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          title.setAttribute("x", String(pos.x));
-          title.setAttribute("y", String(pos.y));
-          title.textContent = "v" + node.label;
-          group.appendChild(title);
-
-          gNodes.appendChild(group);
-        }
-
-        // Overlay: list hats + guesses (keeps the graph visually clean).
-        const overlay = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        svgEl.appendChild(overlay);
-
-        const boxX = 18;
-        const boxY = 18;
-        const boxW = 270;
-        const boxH = 150;
-
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", String(boxX));
-        rect.setAttribute("y", String(boxY));
-        rect.setAttribute("width", String(boxW));
-        rect.setAttribute("height", String(boxH));
-        rect.setAttribute("rx", "12");
-        rect.setAttribute("fill", "rgba(255,255,255,0.82)");
-        rect.setAttribute("stroke", "rgba(15, 23, 42, 0.14)");
-        overlay.appendChild(rect);
-
-        const header = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        header.setAttribute("x", String(boxX + 12));
-        header.setAttribute("y", String(boxY + 20));
-        header.setAttribute("fill", "rgba(15,23,42,0.86)");
-        header.setAttribute(
-          "style",
-          "font: 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 800;"
-        );
-        header.textContent = (overlayTitle || "Hats & guesses") + " (mod " + s + ")";
-        overlay.appendChild(header);
-
-        for (let i = 1; i <= graph.nodes.length; i += 1) {
-          const id = String(i);
-          const ok = hats[id] === guesses[id];
-          const line = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          line.setAttribute("x", String(boxX + 12));
-          line.setAttribute("y", String(boxY + 20 + 20 * i));
-          line.setAttribute("fill", ok ? "rgba(22, 163, 74, 0.92)" : "rgba(220, 38, 38, 0.92)");
-          line.setAttribute(
-            "style",
-            "font: 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"
-          );
-          line.textContent =
-            "v" +
-            i +
-            ": x=" +
-            hats[id] +
-            "  x̂=" +
-            guesses[id] +
-            (ok ? "  ✓" : "  ✗");
-          overlay.appendChild(line);
-        }
-
-        // footer
-        const footer = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        footer.setAttribute("x", "18");
-        footer.setAttribute("y", String(height - 18));
-        footer.setAttribute("fill", "rgba(15, 23, 42, 0.65)");
-        footer.setAttribute(
-          "style",
-          "font: 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"
-        );
-        footer.textContent =
-          graphId === "k5"
-            ? "Strategy: x̂ᵢ = (−∑ⱼ≠ᵢ xⱼ) mod " + s
-            : "Strategy: x=(L,R), guess L = (left-neighbor).R and R = (right-neighbor).L";
-        svgEl.appendChild(footer);
-      }
-
-      function randomHats(n, s) {
-        const hats = {};
-        for (let i = 1; i <= n; i += 1) hats[String(i)] = Math.floor(Math.random() * s);
-        return hats;
-      }
-
-      function k5SumStrategy(hats, s) {
-        const guesses = {};
-        for (let i = 1; i <= 5; i += 1) {
-          let sum = 0;
-          for (let j = 1; j <= 5; j += 1) {
-            if (i === j) continue;
-            sum += hats[String(j)];
-          }
-          guesses[String(i)] = mod(-sum, s);
-        }
-        return guesses;
-      }
-
-      function sqrtInt(n) {
-        const r = Math.round(Math.sqrt(n));
-        return r * r === n ? r : null;
-      }
-
-      function decodePair(x, t) {
-        const L = Math.floor(x / t);
-        const R = x % t;
-        return { L, R };
-      }
-
-      function encodePair(L, R, t) {
-        return L * t + R;
-      }
-
-      function c5PairStrategy(hats, s) {
-        const t = sqrtInt(s);
-        if (!t) return null;
-        const guesses = {};
-        for (let i = 1; i <= 5; i += 1) {
-          const left = i === 1 ? 5 : (i - 1);
-          const right = i === 5 ? 1 : (i + 1);
-          const leftPair = decodePair(hats[String(left)], t);
-          const rightPair = decodePair(hats[String(right)], t);
-          const guessL = leftPair.R;
-          const guessR = rightPair.L;
-          guesses[String(i)] = encodePair(guessL, guessR, t);
-        }
-        return guesses;
-      }
-
-      function allCorrect(hats, guesses) {
-        for (const k in hats) {
-          if (Object.prototype.hasOwnProperty.call(hats, k)) {
-            if (hats[k] !== guesses[k]) return false;
-          }
-        }
-        return true;
-      }
-
-      function runOne() {
-        const s = Number(alphabetSizeEl.value);
-        const graphId = String(graphSelect.value || "k5");
-        const graph = graphId === "c5" ? makeBidirectedCycle(5) : makeCompleteDigraph(5);
-        const hats = randomHats(5, s);
-
-        let guesses = null;
-        let overlayTitle = "Hats & guesses";
-        if (graphId === "k5") {
-          guesses = k5SumStrategy(hats, s);
-          overlayTitle = "Hats & guesses";
-        } else {
-          guesses = c5PairStrategy(hats, s);
-          overlayTitle = "Hats (pairs) & guesses";
-        }
-
-        if (!guesses) {
-          clearSvg(svgK5);
-          oneRunTag.innerHTML = '<span class="tag tag--bad">Strategy not implemented for this s</span>';
-          if (oneRunHint) oneRunHint.textContent = "C5 pairing strategy is implemented for square s (e.g. 4, 9).";
-          return;
-        }
-
-        const ok = allCorrect(hats, guesses);
-
-        renderGraph(svgK5, graphId, graph, hats, guesses, s, overlayTitle);
-
-        let congrText = "";
-        if (graphId === "k5") {
-          let total = 0;
-          for (let i = 1; i <= 5; i += 1) total += hats[String(i)];
-          congrText = "Σ xᵢ ≡ " + mod(total, s) + " (mod " + s + ")";
-        } else {
-          const t = sqrtInt(s);
-          congrText = t ? ("s=" + s + " = " + t + "²; success prob = 1/" + (t * t * t * t * t)) : "";
-        }
-
-        const tag = ok
-          ? '<span class="tag tag--good">Success</span>'
-          : '<span class="tag tag--bad">Failure</span>';
-        oneRunTag.innerHTML = tag + (congrText ? (' <span style="color: var(--muted)">' + congrText + "</span>") : "");
-        if (oneRunHint) oneRunHint.textContent = graphId === "k5" ? "K5 with sum strategy." : "C5 with square-alphabet pairing strategy (for s=t²).";
-      }
-
-      async function runSimulations() {
-        const t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
-        try {
-          btnSimulate.disabled = true;
-          btnOneRun.disabled = true;
-
-          const s = Number(alphabetSizeEl.value);
-          const graphId = String(graphSelect.value || "k5");
-          let N = Number(simNEl.value);
-          N = Number.isFinite(N) ? Math.max(10000, Math.floor(N / 10000) * 10000) : 100000;
-          simNEl.value = String(N);
-
-          if (graphId === "c5" && !sqrtInt(s)) {
-            runtimeStatus.textContent = "Runtime: C5 strategy is currently implemented only for square s (e.g. 4, 9).";
-            return;
-          }
-
-          runtimeStatus.textContent = "Runtime: running " + formatInt(N) + " simulations…";
-
-          let success = 0;
-          const chunk = 40000;
-          let done = 0;
-
-          while (done < N) {
-            const target = Math.min(N, done + chunk);
-            for (; done < target; done += 1) {
-              const hats = randomHats(5, s);
-              const guesses = graphId === "k5" ? k5SumStrategy(hats, s) : c5PairStrategy(hats, s);
-              if (guesses && allCorrect(hats, guesses)) success += 1;
-            }
-            runtimeStatus.textContent =
-              "Runtime: running… " + formatInt(done) + " / " + formatInt(N);
-            await new Promise((r) => requestAnimationFrame(r));
-          }
-
-          const fail = N - success;
-          simSuccess.textContent = formatInt(success) + " / " + formatInt(N);
-          simSuccessP.textContent = fmtProb(success / N);
-          simFail.textContent = formatInt(fail) + " / " + formatInt(N);
-          simFailP.textContent = fmtProb(fail / N);
-
-          const t1 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
-          runtimeStatus.textContent = "Runtime: OK (" + (t1 - t0).toFixed(1) + " ms)";
-        } catch (err) {
-          runtimeStatus.textContent = "Runtime error: " + (err && err.message ? err.message : String(err));
-          throw err;
-        } finally {
-          btnSimulate.disabled = false;
-          btnOneRun.disabled = false;
-        }
-      }
-
-      function populateAlphabetSizes() {
-        alphabetSizeEl.innerHTML = "";
-        const sizes = [2, 3, 4, 5, 6, 7, 8, 9, 11, 16];
-        for (const s of sizes) {
-          const opt = document.createElement("option");
-          opt.value = String(s);
-          opt.textContent = String(s);
-          alphabetSizeEl.appendChild(opt);
-        }
-        alphabetSizeEl.value = "5";
-      }
-
-      function updateTheory() {
-        const s = Number(alphabetSizeEl.value);
-        const graphId = String(graphSelect.value || "k5");
-        if (graphId === "k5") {
-          theoryProb.textContent = "P(success) = 1/s = " + fmtProb(1 / s);
-          if (strategyNote) strategyNote.textContent = "Sum strategy is optimal on K5 (guessing number 4).";
-        } else {
-          const t = sqrtInt(s);
-          if (!t) {
-            theoryProb.textContent = "—";
-            if (strategyNote) strategyNote.textContent = "Square-alphabet strategy needs s=t² (implemented for s=4 and s=9).";
-          } else {
-            const prob = 1 / Math.pow(t, 5);
-            theoryProb.textContent = "P(success) = 1/t^5 = 1/s^{2.5} = " + fmtProb(prob);
-            if (strategyNote) strategyNote.textContent = "Pairing strategy achieves guessing number 2.5 for square s=t².";
-          }
-        }
-      }
-
-      populateAlphabetSizes();
-      updateTheory();
-      runOne();
-
-      btnOneRun.addEventListener("click", runOne);
-      btnSimulate.addEventListener("click", runSimulations);
-      alphabetSizeEl.addEventListener("change", () => {
-        updateTheory();
-        runOne();
-      });
-      graphSelect.addEventListener("change", () => {
-        updateTheory();
-        runOne();
-      });
-
-      window.addEventListener("error", function (event) {
-        const msg = event && event.message ? event.message : "Unknown error";
-        if (runtimeStatus) runtimeStatus.textContent = "Runtime error: " + msg;
-      });
-
-      window.addEventListener("unhandledrejection", function (event) {
-        const reason = event && event.reason ? event.reason : null;
-        const msg = reason && reason.message ? reason.message : String(reason);
-        if (runtimeStatus) runtimeStatus.textContent = "Runtime error: " + msg;
-      });
-    </script>
-  </body>
-</html>
--->

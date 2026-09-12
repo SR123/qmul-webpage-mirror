@@ -397,8 +397,8 @@
         fill: rgba(124, 58, 237, 0.12);
       }
     </style>
-  </head>
-  <body>
+  <link rel="stylesheet" href="assets/demo-shell.css"><link rel="canonical" href="https://webspace.eecs.qmul.ac.uk/s.riis/riis-graph-guessing-games.html"></head>
+  <body><a class="demo-skip" href="#guide-title">Skip to the quick start</a><nav class="research-bar" aria-label="Research navigation"><a href="index.html">Søren Riis · Home</a><a href="research-demos.html">Try it: all tools</a><a href="publications.html">All papers and PDFs</a><a href="research.html#information">Research context</a><a href="publications.html#graph-constructions">Related paper</a></nav><noscript><p class="resource-note">This interactive tool needs JavaScript. The related paper and research explanation remain available through the links above.</p></noscript>
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="container">
@@ -412,7 +412,7 @@
         <p style="margin-top: 6px; color: rgba(255, 255, 255, 0.74)">
           <a href="research-demos.html" style="color: rgba(255, 255, 255, 0.9)">← Research demos</a>
         </p>
-      </header>
+      </header><section class="demo-guide" aria-labelledby="guide-title"><div class="guide-heading"><h2 id="guide-title">From a shared guessing rule to a communication network</h2><a href="research-playground/signal/">Start with Signal Club →</a></div><details open><summary>First visit · three things to try</summary><ol><li><strong>Start with the triangle.</strong> Choose “Butterfly-style”, alphabet 2 and the sum strategy. Four of the eight assignments are fixed points: every guess matches its symbol.</li><li><strong>Change to constant guessing.</strong> Only one assignment survives. The achieved value falls from 2 to 0, although the graph itself has not changed.</li><li><strong>Compare Split A and Split B.</strong> A split separates selected vertices into message sources and destinations. Follow the corresponding labels across the three diagrams.</li></ol></details><details><summary>How to read the results</summary><p>A fixed point is a complete assignment on which all local rules are correct. The displayed value belongs to the selected strategy; the guessing number maximises this value over every legal strategy. The theorem examples and entropy language are optional deeper material.</p></details></section>
 
       <main id="main">
         <noscript>
@@ -434,33 +434,33 @@
             </div>
             <div class="card__body">
               <div class="controls-grid">
-                <label>
+                <label for="example">
                   Example
                   <select id="example"></select>
                 </label>
 
-                <label>
+                <label for="alphabetSize">
                   Alphabet size <strong>s</strong>
                   <select id="alphabetSize"></select>
                 </label>
 
-                <label>
+                <label for="strategy">
                   Strategy
                   <select id="strategy">
                   </select>
                 </label>
 
-                <label>
+                <label for="sumConstant">
                   Parameter <strong>c</strong>
                   <input id="sumConstant" type="number" min="0" step="1" value="0" />
                 </label>
 
-                <label>
+                <label for="splitA">
                   Split A
                   <select id="splitA"></select>
                 </label>
 
-                <label>
+                <label for="splitB">
                   Split B
                   <select id="splitB"></select>
                 </label>
@@ -558,7 +558,7 @@
           <article class="card">
             <div class="card__header">
               <h2>What the numbers show</h2>
-              <p class="hint">We recompute these by brute force for the chosen s.</p>
+              <p class="hint">We enumerate the fixed points for the chosen strategy and alphabet. The graph’s guessing number is the maximum over all admissible strategies.</p>
             </div>
             <div class="card__body">
               <div class="kpi-grid">
@@ -569,9 +569,9 @@
                 </div>
 
                 <div class="kpi">
-                  <div class="label">Guessing number g(G, s)</div>
+                  <div class="label">Value achieved by this strategy</div>
                   <div id="kpiGuessingNumber" class="value">—</div>
-                  <div class="sub">g(G, s) = logₛ(#fixed points)</div>
+                  <div class="sub">logₛ(#fixed points for the selected strategy)</div>
                 </div>
 
                 <div class="kpi">
@@ -600,7 +600,7 @@
           <article class="card">
             <div class="card__header">
               <h2>How this matches the paper</h2>
-              <p class="hint">Local reference: NetworkCoding/RiisTRGraphEntro.tex</p>
+              <p class="hint">The references below give the precise network-coding statements.</p>
             </div>
             <div class="card__body notes">
               <details open>
@@ -637,7 +637,7 @@
               <details>
                 <summary>Note: K5 vs C5</summary>
                 <p>
-                  A common non-integer example is the 5-cycle C5, whose guessing number is 2.5. The
+                  A common non-integer example is the bidirected 5-cycle C5, whose guessing number is 2.5 for square alphabet sizes (and asymptotically). The
                   complete graph K5 (viewed as a complete digraph) has guessing number 4; the
                   “sum strategy” achieves s⁴ fixed points.
                 </p>
@@ -651,9 +651,9 @@
                     <a href="NetworkCoding/RiisTRGraphEntro.tex">NetworkCoding/RiisTRGraphEntro.tex</a>
                   </li>
                   <li>
-                    Maximilien Gadouleau, Søren Riis (2012). “Graph-Theoretical Constructions for
+                    Maximilien Gadouleau, Søren Riis (2011). “Graph-Theoretical Constructions for
                     Graph Entropy and Network Coding Based Communications”, IEEE Transactions on
-                    Information Theory.
+                    Information Theory. <a href="Graph-Theoretical_Constructions_for_Graph_Entropy_and_Network_Coding_Based_Communications.pdf">Hosted PDF</a>
                   </li>
                 </ul>
               </details>
@@ -1670,8 +1670,9 @@
 
       // Init controls
       populateNamedSelect(exampleSelect, EXAMPLES, (ex) => ex.id, (ex) => ex.name);
-      if (!exampleSelect.value) exampleSelect.value = EXAMPLES[0].id;
+      exampleSelect.value = "butterfly-triangle";
       syncExampleDependentControls(getSelectedExample());
+      alphabetSizeSelect.value="2";
 
       const scheduleUpdate = (() => {
         let raf = null;

@@ -301,11 +301,11 @@
         font-size: 0.95rem;
       }
     </style>
-  </head>
-  <body>
+  <link rel="stylesheet" href="assets/demo-shell.css"><link rel="canonical" href="https://webspace.eecs.qmul.ac.uk/s.riis/impartial-game-nimber-demo.html"></head>
+  <body><a class="demo-skip" href="#guide-title">Skip to the quick start</a><nav class="research-bar" aria-label="Research navigation"><a href="index.html">Søren Riis · Home</a><a href="research-demos.html">Try it: all tools</a><a href="publications.html">All papers and PDFs</a><a href="research.html#learning">Research context</a><a href="publications.html#mastering-nim">Related paper</a></nav><noscript><p class="resource-note">This interactive tool needs JavaScript. The related paper and research explanation remain available through the links above.</p></noscript>
     <div class="container">
       <header>
-        <h1>Impartial 4x4 Nimber Explorer</h1>
+        <h1 id="main">Impartial 4x4 Nimber Explorer</h1>
         <p class="sub">
           This demo computes and explores Grundy values for all 65,536 positions of a finite impartial game on a
           4x4 board.
@@ -315,7 +315,7 @@
           &nbsp;|&nbsp;
           <a href="index.html">Home</a>
         </p>
-      </header>
+      </header><section class="demo-guide" aria-labelledby="guide-title"><div class="guide-heading"><h2 id="guide-title">See how legal moves determine a position’s value</h2><a href="research-playground/invariant/">Start with Counterplay →</a></div><details open><summary>First visit · three things to try</summary><ol><li><strong>Inspect the starting L shape.</strong> Its three filled squares have nimber 3. The table lists every legal move and the value it leaves.</li><li><strong>Play a move from the table.</strong> Remove one square, or two filled squares sharing an edge. Try a move whose next nimber is 0.</li><li><strong>Build another position.</strong> Clicking the board edits it freely; these edits are not game moves. “Restore starting example” returns to the L shape.</li></ol></details><details><summary>How to read the results</summary><p>mex means the smallest nonnegative integer missing from the next-position values: mex{0,1,2} = 3. A nimber is not a score or a count of winning moves. Zero is losing for the next player under perfect play. Coordinates start at row 0, column 0.</p></details></section>
 
       <section class="card" aria-label="Game description">
         <div class="card__header">
@@ -357,7 +357,7 @@
 
       <section class="card" aria-label="Nimber explorer">
         <div class="card__header">
-          <h2>Interactive explorer</h2>
+          <h2>Edit a position, then follow a legal move</h2>
         </div>
         <div class="card__body">
           <p id="computeStatus" class="status">Computing Grundy table for all 2^16 positions...</p>
@@ -369,14 +369,14 @@
 
             <div>
               <div class="controls">
-                <input id="stateInput" type="number" min="0" max="65535" value="0" />
+                <input id="stateInput" aria-label="Board state as an integer" type="number" min="0" max="65535" value="0" />
                 <button id="loadStateBtn" class="action">Load state</button>
-                <input id="bitsInput" type="text" value="0000000000000000" />
+                <input id="bitsInput" aria-label="Board state as 16 binary digits" type="text" value="0000000000000000" />
                 <button id="loadBitsBtn" class="action">Load bits</button>
               </div>
 
               <div class="button-row">
-                <button id="clearBtn" class="action">Clear board</button>
+                <button id="exampleBtn" class="action">Restore starting example</button><button id="clearBtn" class="action">Clear board</button>
                 <button id="fillBtn" class="action">Fill board</button>
               </div>
 
@@ -470,7 +470,8 @@
       }
 
       function parseStateBits(text) {
-        const cleaned = text.replace(/[^01]/g, "");
+        const cleaned = text.replace(/\s/g, "");
+        if (/[^01]/.test(cleaned)) return null;
         if (cleaned.length !== N) {
           return null;
         }
@@ -527,7 +528,7 @@
       const maxPositionsEl = document.getElementById("maxPositions");
       const showMaxBtn = document.getElementById("showMaxBtn");
 
-      let state = 0;
+      let state = 19; // A nonempty example with legal moves.
       let maxShown = false;
 
       const t0 = performance.now();
@@ -556,6 +557,8 @@
           const filled = (state & bitMask(i)) !== 0;
           const [r, c] = indexToCoord(i);
           cell.classList.toggle("filled", filled);
+          cell.setAttribute("aria-pressed", String(filled));
+          cell.setAttribute("aria-label", `Row ${r}, column ${c}: ${filled ? "filled" : "empty"}`);
           cell.textContent = `${r},${c}`;
           cell.title = `(${r},${c}) ${filled ? "filled" : "empty"}`;
         });
@@ -592,11 +595,12 @@
           const move = moves[i];
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td class="mono">${move.label}</td>
+            <td><button class="action" data-move-state="${move.nextState}" aria-label="Play ${move.label}; next nimber ${move.nimber}">${move.label} →</button></td>
             <td class="mono">${move.nextState}</td>
             <td class="mono">${formatStateBits(move.nextState)}</td>
             <td class="mono">${move.nimber}</td>
           `;
+          row.querySelector("button").onclick = () => { state=move.nextState; render(); document.getElementById("exampleBtn").focus({preventScroll:true}); };
           movesBodyEl.appendChild(row);
         }
       }
@@ -654,10 +658,14 @@
         bitsInput.value = formatStateBits(state);
       }
 
+      const mexNote=document.createElement("p");mexNote.id="mexExplanation";mexNote.className="resource-note";mexNote.setAttribute("role","status");boardEl.after(mexNote);
+      document.getElementById("exampleBtn").onclick=()=>{state=19;render();};
       function render() {
         renderBoard();
         updateInputs();
         nimberValueEl.textContent = String(DB.grundy[state]);
+        const options = [...new Set(legalMoves(state).map(m=>m.nimber))].sort((a,b)=>a-b);
+        document.getElementById("mexExplanation").textContent = `Next-position nimbers: ${options.length ? options.join(", ") : "none"}. The smallest missing nonnegative integer (mex) is ${DB.grundy[state]}. ${DB.grundy[state] ? "A move to 0 leaves the opponent a losing position." : "The player to move loses against perfect play."}`;
         renderMoves();
       }
 

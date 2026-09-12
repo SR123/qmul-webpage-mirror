@@ -376,11 +376,11 @@
         font-weight: 820;
       }
     </style>
-  </head>
-  <body>
+  <link rel="stylesheet" href="assets/demo-shell.css"><link rel="canonical" href="https://webspace.eecs.qmul.ac.uk/s.riis/nim-teaching-demo.html"></head>
+  <body><a class="demo-skip" href="#guide-title">Skip to the quick start</a><nav class="research-bar" aria-label="Research navigation"><a href="index.html">Søren Riis · Home</a><a href="research-demos.html">Try it: all tools</a><a href="publications.html">All papers and PDFs</a><a href="research.html#learning">Research context</a><a href="publications.html#impartial-games">Related paper</a></nav><noscript><p class="resource-note">This interactive tool needs JavaScript. The related paper and research explanation remain available through the links above.</p></noscript>
     <div class="container">
       <header>
-        <h1>NIM: abstraction beats “raw board recognition”</h1>
+        <h1 id="main">Nim · play and inspect the strategy</h1><p class="resource-note">This teaching opponent uses the mathematical Nim strategy, with adjustable mistakes. It is not a trained reinforcement-learning model.</p>
         <p>
           NIM is solved by a simple invariant: the <span class="mono">nim-sum</span> (bitwise xor) of the pile sizes.
           This page lets you play against a near-perfect “teacher” (perfect play, except with probability
@@ -389,13 +389,13 @@
         <p style="margin-top: 6px; color: rgba(255, 255, 255, 0.74)">
           <a href="research-demos.html" style="color: rgba(255, 255, 255, 0.9)">← Research demos</a>
         </p>
-      </header>
+      </header><section class="demo-guide" aria-labelledby="guide-title"><div class="guide-heading"><h2 id="guide-title">Play a move and inspect the reply</h2><a href="research-playground/invariant/">Start with Counterplay →</a></div><details open><summary>First visit · three things to try</summary><ol><li><strong>Select a pile and an amount.</strong> Remove a positive whole number from exactly one pile. Taking the last counter wins.</li><li><strong>Make your move.</strong> Your move is shown first. Then choose “Show opponent’s reply” to see the second turn separately.</li><li><strong>Ask for a hint.</strong> A nim-sum of zero loses against perfect play. From a nonzero nim-sum, try leaving zero for the opponent.</li></ol></details><details><summary>How to read the results</summary><p>The nim-sum is bitwise XOR: in each binary column, an even number of 1s cancels. The mistake setting ε is the chance of a random legal reply; that reply can still happen to be optimal. Use ε = 0 for perfect opposition. Custom positions allow at most 12 piles, each 0–1,000,000; press New game or Enter to apply them.</p></details></section>
 
       <section class="grid">
         <article class="card">
           <div class="card__header">
             <h2>Play NIM</h2>
-            <p id="statusLine" class="hint">—</p>
+            <p id="statusLine" role="status" aria-live="polite" class="hint">—</p>
           </div>
           <div class="card__body">
             <div id="gameOverBanner" class="banner" style="display: none" aria-live="polite"></div>
@@ -457,7 +457,7 @@
                 Teacher randomness ε
                 <div style="display: grid; grid-template-columns: 1fr 92px; gap: 10px; align-items: center">
                   <input id="epsilonRange" type="range" min="0" max="1" step="0.01" value="0.05" />
-                  <input id="epsilonNum" type="number" min="0" max="1" step="0.01" value="0.05" />
+                  <input id="epsilonNum" aria-label="Opponent random-move probability" type="number" min="0" max="1" step="0.01" value="0.05" />
                 </div>
               </label>
             </div>
@@ -476,10 +476,10 @@
 
             <div class="row" style="margin-top: 10px">
               <button id="btnNewGame" class="btn" type="button">New game</button>
-              <button id="btnHint" class="btn" type="button">Show perfect move hint</button>
+              <button id="btnTeacher" class="btn" type="button" hidden>Show opponent’s reply</button><button id="btnHint" class="btn" type="button">Show strategy hint</button>
             </div>
 
-            <p id="hintLine" class="hint" style="margin: 10px 2px 0; color: var(--muted)">—</p>
+            <p id="hintLine" role="status" aria-live="polite" class="hint" style="margin: 10px 2px 0; color: var(--muted)">—</p>
           </div>
         </article>
       </section>
@@ -491,7 +491,7 @@
             <p class="hint">Winning/losing is decided by nim-sum.</p>
           </div>
           <div class="card__body">
-            <table aria-label="Move log">
+            <div class="research-table-scroll" tabindex="0" aria-label="Move history, scroll horizontally if needed"><table aria-label="Move log">
               <thead>
                 <tr>
                   <th>#</th>
@@ -502,7 +502,7 @@
                 </tr>
               </thead>
               <tbody id="logBody"></tbody>
-            </table>
+            </table></div>
           </div>
         </article>
       </section>
@@ -566,6 +566,7 @@
       const removeCount = document.getElementById("removeCount");
       const btnMove = document.getElementById("btnMove");
       const btnNewGame = document.getElementById("btnNewGame");
+      const btnTeacher = document.getElementById("btnTeacher");
       const btnHint = document.getElementById("btnHint");
       const hintLine = document.getElementById("hintLine");
 
@@ -628,12 +629,13 @@
             return { ok: false, error: "Custom piles must be non-negative integers (e.g. 1,2,3,4,5).", piles: null };
           }
           const n = Number(p);
-          if (!Number.isFinite(n) || n < 0) {
-            return { ok: false, error: "Custom piles must be non-negative integers.", piles: null };
+          if (!Number.isSafeInteger(n) || n < 0 || n > 1000000) {
+            return { ok: false, error: "Use whole pile sizes from 0 to 1,000,000.", piles: null };
           }
           nums.push(n);
         }
 
+        if (nums.length > 12) return {ok:false,error:"Use at most 12 piles.",piles:null};
         if (nums.length === 0) return { ok: false, error: "No pile sizes found.", piles: null };
         return { ok: true, error: null, piles: nums };
       }
@@ -675,6 +677,9 @@
       }
 
       function setStatus() {
+        btnTeacher.hidden = gameOver || turn !== "teacher";
+        btnMove.disabled = gameOver || turn !== "human";
+        btnHint.disabled = gameOver || turn !== "human";
         const x = nimSum(piles);
         const losing = x === 0;
         const who = gameOver
@@ -727,6 +732,8 @@
           pick.type = "button";
           pick.className = "pile__pick";
           pick.textContent = i === selectedPile ? "Selected" : "Select";
+          pick.setAttribute("aria-label",`Select pile ${i+1}, ${piles[i]} counters`);
+          pick.setAttribute("aria-pressed",String(i === selectedPile));
           pick.addEventListener("click", () => {
             if (gameOver) return;
             selectedPile = i;
@@ -822,7 +829,7 @@
         const i = move.pile;
         const k = move.remove;
         if (i < 0 || i >= piles.length) return false;
-        if (k <= 0 || k > piles[i]) return false;
+        if (!Number.isInteger(k) || k <= 0 || k > piles[i]) return false;
         piles[i] -= k;
         appendLogRow(playerLabel, move, piles.slice());
         updatePileSelect();
@@ -862,7 +869,7 @@
 
         const i = Number(pileSelect.value);
         const k = Number(removeCount.value);
-        if (!Number.isFinite(i) || !Number.isFinite(k)) return;
+        if (!Number.isInteger(i) || !Number.isInteger(k)) { hintLine.textContent = "Remove a whole number of counters."; return; }
         if (piles[i] <= 0) {
           hintLine.textContent = "That pile is empty.";
           return;
@@ -878,7 +885,7 @@
           turn = "teacher";
           setStatus();
           // Give UI a moment to paint before teacher moves.
-          setTimeout(maybeTeacherTurn, 70);
+          btnTeacher.hidden = false;
         }
       }
 
@@ -892,7 +899,7 @@
         const after = piles.slice();
         after[move.pile] -= move.remove;
         hintLine.textContent =
-          "Perfect move: remove " +
+          (nimSum(piles) === 0 ? "No forced win against perfect play. One legal move: remove " : "Winning move: remove ") +
           move.remove +
           " from pile " +
           (move.pile + 1) +
@@ -916,7 +923,7 @@
         }
         const preset = PRESETS.find((p) => p.id === String(startPreset.value));
         piles = (custom || (preset ? preset.piles : [1, 2, 3, 4, 5])).slice();
-        if (piles.every((x) => x === 0)) piles = [1, 2, 3, 4, 5];
+        // Empty boards remain empty: the player to move has already lost.
 
         selectedPile = 0;
         moveIndex = 0;
@@ -935,7 +942,7 @@
         renderBoard();
         setStatus();
 
-        if (turn === "teacher") setTimeout(maybeTeacherTurn, 70);
+        if (allZero(piles)) setGameOver(turn === "human" ? "teacher" : "human");
       }
 
       function populatePresets() {
@@ -978,6 +985,7 @@
         removeCount.value = String(clamp(Number(removeCount.value) || 1, 1, max));
       });
 
+      btnTeacher.addEventListener("click", maybeTeacherTurn);
       btnMove.addEventListener("click", doHumanMove);
       btnNewGame.addEventListener("click", newGame);
       btnHint.addEventListener("click", showHint);
