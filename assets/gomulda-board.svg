@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc"><title id="title">Gomulda on a five-by-five board</title><desc id="desc">Twelve paired countries and one single-square country. Matching numbers belong to the same country. Neighbouring countries have different colours.</desc><rect width="240" height="240" rx="8" fill="#f4f3ed"/>
+<rect x="5" y="5" width="44" height="44" rx="4" fill="#f5edbb" stroke="#bac6bc"/><text x="27" y="34" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">5</text>
+<rect x="51" y="5" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="73" y="34" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">10</text>
+<rect x="97" y="5" width="44" height="44" rx="4" fill="#efd3c9" stroke="#bac6bc"/><text x="119" y="34" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">6</text>
+<rect x="143" y="5" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="165" y="34" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">7</text>
+<rect x="189" y="5" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="211" y="34" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">7</text>
+<rect x="5" y="51" width="44" height="44" rx="4" fill="#dce9f3" stroke="#bac6bc"/><text x="27" y="80" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">4</text>
+<rect x="51" y="51" width="44" height="44" rx="4" fill="#f5edbb" stroke="#bac6bc"/><text x="73" y="80" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">5</text>
+<rect x="97" y="51" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="119" y="80" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">2</text>
+<rect x="143" y="51" width="44" height="44" rx="4" fill="#dce9f3" stroke="#bac6bc"/><text x="165" y="80" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">4</text>
+<rect x="189" y="51" width="44" height="44" rx="4" fill="#efd3c9" stroke="#bac6bc"/><text x="211" y="80" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">6</text>
+<rect x="5" y="97" width="44" height="44" rx="4" fill="#f5edbb" stroke="#bac6bc"/><text x="27" y="126" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">8</text>
+<rect x="51" y="97" width="44" height="44" rx="4" fill="#dce9f3" stroke="#bac6bc"/><text x="73" y="126" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">0</text>
+<rect x="97" y="97" width="44" height="44" rx="4" fill="#f5edbb" stroke="#bac6bc"/><text x="119" y="126" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">1</text>
+<rect x="143" y="97" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="165" y="126" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">3</text>
+<rect x="189" y="97" width="44" height="44" rx="4" fill="#f5edbb" stroke="#bac6bc"/><text x="211" y="126" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">8</text>
+<rect x="5" y="143" width="44" height="44" rx="4" fill="#dce9f3" stroke="#bac6bc"/><text x="27" y="172" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">12</text>
+<rect x="51" y="143" width="44" height="44" rx="4" fill="#f5edbb" stroke="#bac6bc"/><text x="73" y="172" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">1</text>
+<rect x="97" y="143" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="119" y="172" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">3</text>
+<rect x="143" y="143" width="44" height="44" rx="4" fill="#dce9f3" stroke="#bac6bc"/><text x="165" y="172" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">0</text>
+<rect x="189" y="143" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="211" y="172" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">10</text>
+<rect x="5" y="189" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="27" y="218" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">11</text>
+<rect x="51" y="189" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="73" y="218" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">11</text>
+<rect x="97" y="189" width="44" height="44" rx="4" fill="#dce9f3" stroke="#bac6bc"/><text x="119" y="218" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">9</text>
+<rect x="143" y="189" width="44" height="44" rx="4" fill="#dfe9d3" stroke="#bac6bc"/><text x="165" y="218" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">2</text>
+<rect x="189" y="189" width="44" height="44" rx="4" fill="#dce9f3" stroke="#bac6bc"/><text x="211" y="218" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#263d34">9</text>
+</svg>

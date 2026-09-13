@@ -11,3 +11,6 @@
 
 /* Related data sits within the collective-choice research entry. */
 .research-resource{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}.research-resource>a{font-size:.88rem}.research-resource p{margin:5px 0 0;font-size:.85rem;line-height:1.6;color:var(--muted)}.research-resource p a{font-size:inherit}
+
+/* Gomulda: a small example board beside the invitation to play. */
+.gomulda-feature{display:grid;grid-template-columns:240px minmax(0,1fr);gap:32px;align-items:start}.gomulda-board{margin:0}.gomulda-board img{display:block;width:100%;height:auto}.gomulda-board figcaption{font-size:.88rem;color:var(--muted);line-height:1.6;margin-top:8px}.gomulda-feature h3{margin-top:0}.gomulda-feature .eyebrow{margin-top:0}.gomulda-feature .links{margin:20px 0 12px}#gomulda{scroll-margin-top:20px}@media(max-width:650px){.gomulda-feature{grid-template-columns:1fr;gap:20px}.gomulda-board{max-width:240px}}
