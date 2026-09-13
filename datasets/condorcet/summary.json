@@ -1,0 +1,719 @@
+{
+  "n": 7,
+  "retrieved": "2026-09-13",
+  "source": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/",
+  "summary_source": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/sizes.txt",
+  "summary_source_sha256": "e97baab88c7855941cef4c900061963284f57af3f3a75a34de3b6bf606d7c430",
+  "total_domains": 171870480,
+  "counts": [
+    {
+      "size": 4,
+      "count": 46
+    },
+    {
+      "size": 8,
+      "count": 44
+    },
+    {
+      "size": 9,
+      "count": 24
+    },
+    {
+      "size": 10,
+      "count": 270
+    },
+    {
+      "size": 11,
+      "count": 188
+    },
+    {
+      "size": 12,
+      "count": 147
+    },
+    {
+      "size": 13,
+      "count": 176
+    },
+    {
+      "size": 14,
+      "count": 284
+    },
+    {
+      "size": 15,
+      "count": 548
+    },
+    {
+      "size": 16,
+      "count": 1626
+    },
+    {
+      "size": 17,
+      "count": 2178
+    },
+    {
+      "size": 18,
+      "count": 4435
+    },
+    {
+      "size": 19,
+      "count": 9994
+    },
+    {
+      "size": 20,
+      "count": 11864
+    },
+    {
+      "size": 21,
+      "count": 7040
+    },
+    {
+      "size": 22,
+      "count": 12685
+    },
+    {
+      "size": 23,
+      "count": 18570
+    },
+    {
+      "size": 24,
+      "count": 25954
+    },
+    {
+      "size": 25,
+      "count": 44660
+    },
+    {
+      "size": 26,
+      "count": 81579
+    },
+    {
+      "size": 27,
+      "count": 94158
+    },
+    {
+      "size": 28,
+      "count": 132114
+    },
+    {
+      "size": 29,
+      "count": 159868
+    },
+    {
+      "size": 30,
+      "count": 194674
+    },
+    {
+      "size": 31,
+      "count": 247692
+    },
+    {
+      "size": 32,
+      "count": 404009
+    },
+    {
+      "size": 33,
+      "count": 356618
+    },
+    {
+      "size": 34,
+      "count": 480195
+    },
+    {
+      "size": 35,
+      "count": 461900
+    },
+    {
+      "size": 36,
+      "count": 609624
+    },
+    {
+      "size": 37,
+      "count": 678422
+    },
+    {
+      "size": 38,
+      "count": 928441
+    },
+    {
+      "size": 39,
+      "count": 930304
+    },
+    {
+      "size": 40,
+      "count": 1244522
+    },
+    {
+      "size": 41,
+      "count": 1273738
+    },
+    {
+      "size": 42,
+      "count": 1739772
+    },
+    {
+      "size": 43,
+      "count": 1849074
+    },
+    {
+      "size": 44,
+      "count": 2701280
+    },
+    {
+      "size": 45,
+      "count": 2644266
+    },
+    {
+      "size": 46,
+      "count": 3491780
+    },
+    {
+      "size": 47,
+      "count": 3686966
+    },
+    {
+      "size": 48,
+      "count": 4911214
+    },
+    {
+      "size": 49,
+      "count": 4790868
+    },
+    {
+      "size": 50,
+      "count": 6426642
+    },
+    {
+      "size": 51,
+      "count": 6253444
+    },
+    {
+      "size": 52,
+      "count": 8174653
+    },
+    {
+      "size": 53,
+      "count": 7497364
+    },
+    {
+      "size": 54,
+      "count": 9180598
+    },
+    {
+      "size": 55,
+      "count": 8270608
+    },
+    {
+      "size": 56,
+      "count": 11160909
+    },
+    {
+      "size": 57,
+      "count": 8540924
+    },
+    {
+      "size": 58,
+      "count": 10269782
+    },
+    {
+      "size": 59,
+      "count": 7723932
+    },
+    {
+      "size": 60,
+      "count": 9606176
+    },
+    {
+      "size": 61,
+      "count": 6518148
+    },
+    {
+      "size": 62,
+      "count": 7839946
+    },
+    {
+      "size": 63,
+      "count": 5191166
+    },
+    {
+      "size": 64,
+      "count": 7728718
+    },
+    {
+      "size": 65,
+      "count": 3436076
+    },
+    {
+      "size": 66,
+      "count": 3750621
+    },
+    {
+      "size": 67,
+      "count": 2034070
+    },
+    {
+      "size": 68,
+      "count": 2440206
+    },
+    {
+      "size": 69,
+      "count": 1152526
+    },
+    {
+      "size": 70,
+      "count": 1351871
+    },
+    {
+      "size": 71,
+      "count": 671796
+    },
+    {
+      "size": 72,
+      "count": 808375
+    },
+    {
+      "size": 73,
+      "count": 357970
+    },
+    {
+      "size": 74,
+      "count": 405334
+    },
+    {
+      "size": 75,
+      "count": 186106
+    },
+    {
+      "size": 76,
+      "count": 244369
+    },
+    {
+      "size": 77,
+      "count": 101268
+    },
+    {
+      "size": 78,
+      "count": 116958
+    },
+    {
+      "size": 79,
+      "count": 48120
+    },
+    {
+      "size": 80,
+      "count": 56464
+    },
+    {
+      "size": 81,
+      "count": 23402
+    },
+    {
+      "size": 82,
+      "count": 25154
+    },
+    {
+      "size": 83,
+      "count": 11344
+    },
+    {
+      "size": 84,
+      "count": 14503
+    },
+    {
+      "size": 85,
+      "count": 6108
+    },
+    {
+      "size": 86,
+      "count": 4273
+    },
+    {
+      "size": 87,
+      "count": 2066
+    },
+    {
+      "size": 88,
+      "count": 2038
+    },
+    {
+      "size": 89,
+      "count": 1248
+    },
+    {
+      "size": 90,
+      "count": 647
+    },
+    {
+      "size": 91,
+      "count": 214
+    },
+    {
+      "size": 92,
+      "count": 274
+    },
+    {
+      "size": 93,
+      "count": 106
+    },
+    {
+      "size": 94,
+      "count": 76
+    },
+    {
+      "size": 95,
+      "count": 18
+    },
+    {
+      "size": 96,
+      "count": 36
+    },
+    {
+      "size": 97,
+      "count": 16
+    },
+    {
+      "size": 98,
+      "count": 4
+    },
+    {
+      "size": 100,
+      "count": 2
+    }
+  ],
+  "included_rule": "size <= 16 or size >= 88",
+  "included_domains": 8032,
+  "files": [
+    {
+      "size": 4,
+      "count": 46,
+      "file": "n7/size-004.json",
+      "bytes": 1680,
+      "sha256": "ef8e8f3fc4e39cac982e8ed4103f859a79a29bca026c2106a002421cf8f9b5cc",
+      "source_file": "source/mucds-n=7-FINAL16_004.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_004.gz",
+      "source_bytes": 392,
+      "source_sha256": "98c2493ec13762da83532f1cc869568fad7652d5c5d846b3b51b764b472e4de9",
+      "uncompressed_source_sha256": "56e05abe3f22aebffeaa3e8cef0155d2c5c0c507f5c976628f54f02a4450290f",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 8,
+      "count": 44,
+      "file": "n7/size-008.json",
+      "bytes": 3020,
+      "sha256": "044877bf2fd310a2133dad498207ded48e02f2602c78cec1adcd7932aa3afaed",
+      "source_file": "source/mucds-n=7-FINAL16_008.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_008.gz",
+      "source_bytes": 773,
+      "source_sha256": "6794ba4e23aa4bbf5219fb1484176dd9f1afe51d68ff8c32d1f0075b0ea73931",
+      "uncompressed_source_sha256": "f90ba778f0ef14e86b1fc9d519f9f738dc26bab3465e8c5ee73523147ddb9f59",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 9,
+      "count": 24,
+      "file": "n7/size-009.json",
+      "bytes": 1892,
+      "sha256": "495c133deca0c8bd72a385ea1d9c215afcad840b9c1b5bf7e593e6d04abee0c2",
+      "source_file": "source/mucds-n=7-FINAL16_009.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_009.gz",
+      "source_bytes": 565,
+      "source_sha256": "d4ab0ec064efdbda2cf84d978c9da9c99f7cb9ba4cf97866f7a9ac6de92f7f9e",
+      "uncompressed_source_sha256": "6167d67eaf9447daba6e04771d8f208c8dfbb29cd42c2def7dbbe269be2060e7",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 10,
+      "count": 270,
+      "file": "n7/size-010.json",
+      "bytes": 22257,
+      "sha256": "ff38ad33d49fae65b46b6c3c5708957472a48a3a99e4ce3b01bea63c998d2259",
+      "source_file": "source/mucds-n=7-FINAL16_010.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_010.gz",
+      "source_bytes": 3582,
+      "source_sha256": "522d92edd5a710eacef9388b145f6dbbaaeeaa7e9aa0a37321725995a566af6c",
+      "uncompressed_source_sha256": "79698d9d46fdc1fe6381061c8a1fe1cbbe02b8430449d8c9c975125bf1376086",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 11,
+      "count": 188,
+      "file": "n7/size-011.json",
+      "bytes": 17037,
+      "sha256": "6cdfd1806ac2b92b849ff209eea1a7d68faadc69ace6f61c0361b88101814d4d",
+      "source_file": "source/mucds-n=7-FINAL16_011.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_011.gz",
+      "source_bytes": 2567,
+      "source_sha256": "2da85bbc264a8f5b4805bbbe572286c3f23ced815319ca38cc54e4a248c4c5f8",
+      "uncompressed_source_sha256": "77159abae9ff02fa5a8895cabfa5473582081a569dfd694827a43049e1f063bf",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 12,
+      "count": 147,
+      "file": "n7/size-012.json",
+      "bytes": 14523,
+      "sha256": "c5351b2d8a9c0ca98a178dca5229cc14f41b28ac589c55f6c17076cd88faaa1a",
+      "source_file": "source/mucds-n=7-FINAL16_012.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_012.gz",
+      "source_bytes": 2590,
+      "source_sha256": "92c5d9f8a3b7cb95bcb42467c37478b4994dece20f68aa0470162ce12ad6646f",
+      "uncompressed_source_sha256": "48124a26067b31e4f7544d662395194b22f5c67abb75c1fa2db6b9e6ff9eaa88",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 13,
+      "count": 176,
+      "file": "n7/size-013.json",
+      "bytes": 18773,
+      "sha256": "991dd3cc91cf2c685fd99fd33701e7e276eb9936ca0dbd65ec7c698458264f4b",
+      "source_file": "source/mucds-n=7-FINAL16_013.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_013.gz",
+      "source_bytes": 3543,
+      "source_sha256": "1a4c0db6ea7f4856eb4a92c49ffccdfb9321608dfa15f407c8f4016b4d8a7972",
+      "uncompressed_source_sha256": "809cf7c66415f7571812c44d1a10e93fc6c1e8789e05927003a68afe58ed8e53",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 14,
+      "count": 284,
+      "file": "n7/size-014.json",
+      "bytes": 32493,
+      "sha256": "0a4ed84446fc10da5000df4d2e449a6bad0188c4d96e8decc7498bab20d3e62c",
+      "source_file": "source/mucds-n=7-FINAL16_014.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_014.gz",
+      "source_bytes": 4770,
+      "source_sha256": "4090dcd41423d1cb07141a99b29126b1a07a898ca9f0aaad85b2663e3df71f95",
+      "uncompressed_source_sha256": "63027da5e1655caf127cc03fae7a381efa49096a36a4491b89b7b8ee348bf3b3",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 15,
+      "count": 548,
+      "file": "n7/size-015.json",
+      "bytes": 66973,
+      "sha256": "b066c37d3e9e04e0ef7d480842197226ccae4ebab7400c76a4a2160b930a7fd6",
+      "source_file": "source/mucds-n=7-FINAL16_015.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_015.gz",
+      "source_bytes": 8249,
+      "source_sha256": "0bd814c859ec4515f78d89ae38d8f7b3cc031aea89fc87deccd50458216c254b",
+      "uncompressed_source_sha256": "49fb645c6692f5ad2d71774baa546772876ad80c7cd0e764f93c8f85e73abf95",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 16,
+      "count": 1626,
+      "file": "n7/size-016.json",
+      "bytes": 211497,
+      "sha256": "164168e8bae988eab03435668f9e7fa9166bc7d5f6721ba012c094502c421386",
+      "source_file": "source/mucds-n=7-FINAL16_016.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_016.gz",
+      "source_bytes": 22189,
+      "source_sha256": "dc23e099ffe3d6cb651fd249bba901f25e0cd5b17254e413c05c23e71eed9578",
+      "uncompressed_source_sha256": "9e9b7b8463caf984e75ceb932d6de9b7cd08583f43224a412a7c1adc206c7f99",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 88,
+      "count": 2038,
+      "file": "n7/size-088.json",
+      "bytes": 1438945,
+      "sha256": "249cbce5065028abadfc5d8343fa4e354361ed67f15f436d4e6aa74e6845caba",
+      "source_file": "source/mucds-n=7-FINAL16_088.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_088.gz",
+      "source_bytes": 102043,
+      "source_sha256": "0f527f782ec67124b0f6878fc88b92fe3b9aaca7af8cb174601497919aef4850",
+      "uncompressed_source_sha256": "9ef8676147b9ae2dec99be145efe396966eb895c5e3e5b15ca046e53156d43a9",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 89,
+      "count": 1248,
+      "file": "n7/size-089.json",
+      "bytes": 891189,
+      "sha256": "e5458b605b7c73ad2472aa34a7d3d4316430166e2aef97b0c977c8f6eb82e72d",
+      "source_file": "source/mucds-n=7-FINAL16_089.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_089.gz",
+      "source_bytes": 66036,
+      "source_sha256": "14e81d9d079961dfb644b1f9b3dcea8f459550e2a05318f19d46fa6cfecf0004",
+      "uncompressed_source_sha256": "71507246ccc24982648ce094ebb1fa7109e1455b7ee57a111607cd188731fe73",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 90,
+      "count": 647,
+      "file": "n7/size-090.json",
+      "bytes": 467251,
+      "sha256": "cbe4e48480e343f1d4afba63ef193a9dc7ea15b1ca19591368f628ebd604f2f4",
+      "source_file": "source/mucds-n=7-FINAL16_090.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_090.gz",
+      "source_bytes": 38170,
+      "source_sha256": "8d333b5fe957752acf17893ce46816b297cd90bb005d7534d64aed318225dcb1",
+      "uncompressed_source_sha256": "cd36f6b36ad4da274c8c73fc711f588dae9b2e06a0f58d8c955de889b17a4f65",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 91,
+      "count": 214,
+      "file": "n7/size-091.json",
+      "bytes": 156337,
+      "sha256": "c680a73a063d634ad231257ae439d078f64a634bc85eab8b59d0aa12c809bcf0",
+      "source_file": "source/mucds-n=7-FINAL16_091.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_091.gz",
+      "source_bytes": 12938,
+      "source_sha256": "c7a979e661b8e96ca755f4ace25b1c76ae78710372248f40e02fdb1dbafc1668",
+      "uncompressed_source_sha256": "d7c0f4e368c8f8599bdd35d9128f2ddb09f6271a01552eb7207be2c882163c34",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 92,
+      "count": 274,
+      "file": "n7/size-092.json",
+      "bytes": 202329,
+      "sha256": "06f884109988bca11c8a302610ec1838bebbc0657cc502ecbd84c5225eb7fde1",
+      "source_file": "source/mucds-n=7-FINAL16_092.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_092.gz",
+      "source_bytes": 19772,
+      "source_sha256": "1483520c9c51e6b60cd8947e187062f4d31fb073dfa722538a14c2bf997e661c",
+      "uncompressed_source_sha256": "b881fe967be54d954b2c5255fd1b2cd7685f166745fe06b8a52dd837d92eec1c",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 93,
+      "count": 106,
+      "file": "n7/size-093.json",
+      "bytes": 79193,
+      "sha256": "30bae77d005aa627599f0598b5fc08bcf28ce133aa622afa9b57caa7668bfd16",
+      "source_file": "source/mucds-n=7-FINAL16_093.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_093.gz",
+      "source_bytes": 7783,
+      "source_sha256": "8b06050dbf68a6a22ba064c0940d6a255e2ceca1afde976a1c830b65bbe81094",
+      "uncompressed_source_sha256": "1d7da0bc4ef91953fd2cb87e98680aa6aef15d466f2bb16f8cd7d2fa17480002",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 94,
+      "count": 76,
+      "file": "n7/size-094.json",
+      "bytes": 57421,
+      "sha256": "16a0cd50834b2b767f2cb757d79a3329f9055cfae20a37df4acd13730f9e1cc3",
+      "source_file": "source/mucds-n=7-FINAL16_094.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_094.gz",
+      "source_bytes": 6960,
+      "source_sha256": "2fd25b231fb3122eb0daccad0f3b53f959276579c77fd13901200e3333e8c860",
+      "uncompressed_source_sha256": "e299e5a9c17dacb3ce60cf8064ea408e8e194c00df9275bad1f25d1e650f4865",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 95,
+      "count": 18,
+      "file": "n7/size-095.json",
+      "bytes": 13833,
+      "sha256": "3181284ccc8612129acc85a9a6eb973a27b61d1f77d55100537059e2ad239d9b",
+      "source_file": "source/mucds-n=7-FINAL16_095.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_095.gz",
+      "source_bytes": 2303,
+      "source_sha256": "e4729ecc3598916d58f46a3f5ad13e8ae73b400c3cd0f9e37237c801d0e503f9",
+      "uncompressed_source_sha256": "5fe66cfc0b7886996d2009ffd2aaa9a2818d605ac71ea6a4bfd64303941df03a",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 96,
+      "count": 36,
+      "file": "n7/size-096.json",
+      "bytes": 27837,
+      "sha256": "b3c25de76778de36db922e824bae6bdb950960cd8977df2259434a9ce208869d",
+      "source_file": "source/mucds-n=7-FINAL16_096.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_096.gz",
+      "source_bytes": 3535,
+      "source_sha256": "050dca33ef21a287d79d60fbd1773235847c1bfffd981b3917186f7c95343196",
+      "uncompressed_source_sha256": "12ee04c8e10fe4c15006b7ccd1f542f12729cfd20200b01476384e6cf517c718",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 97,
+      "count": 16,
+      "file": "n7/size-097.json",
+      "bytes": 12565,
+      "sha256": "c512b62784057e9c99853db57f8e7756fc819b1fc6b8b5215e292e822fb54b78",
+      "source_file": "source/mucds-n=7-FINAL16_097.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_097.gz",
+      "source_bytes": 1769,
+      "source_sha256": "5ba37623b07c70d8bf865a96d050c432032d790234a715fd6a45cb641c0df119",
+      "uncompressed_source_sha256": "b5fc305062aaa536ddd5ebab34a61b4f26f852f6779d572708e059e1601f9798",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 98,
+      "count": 4,
+      "file": "n7/size-098.json",
+      "bytes": 3261,
+      "sha256": "e6ac1b8b623316559affd79d610da4bf282b5802ffd50955023117392575e43b",
+      "source_file": "source/mucds-n=7-FINAL16_098.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_098.gz",
+      "source_bytes": 831,
+      "source_sha256": "74ede77bdf914db03f4b67001dae5a01a9d6ec31f8cfcfcafce804a9ca54cbd3",
+      "uncompressed_source_sha256": "4b1fd0148ac265c11aa648088223096995157bbbdec9caa897c932b7b623b7e9",
+      "source_row_widths": [
+        7
+      ]
+    },
+    {
+      "size": 100,
+      "count": 2,
+      "file": "n7/size-100.json",
+      "bytes": 1722,
+      "sha256": "2764436d0726101dad8b9100c93c6961e47478beee9994bcadacbb7ea0d7447e",
+      "source_file": "source/mucds-n=7-FINAL16_100.gz",
+      "source_url": "http://abel.math.umu.se/~klasm/Data/CONDORCET/MUCDS/mucds-n=7-FINAL16_100.gz",
+      "source_bytes": 577,
+      "source_sha256": "4cf07ede5a84e53d26549a5ac2efe1f8fc1cf02102b48769d4dffb09ee9a728b",
+      "uncompressed_source_sha256": "471002e092b3b62159ae7eb611913634c273f74d94d633f4521d58ad1511b982",
+      "source_row_widths": [
+        7
+      ]
+    }
+  ],
+  "source_compressed_bytes": 311937,
+  "normalization": "Source alternatives 0–6 relabelled 1–7. All seven alternatives retained; ranking and domain order preserved.",
+  "verification": "Every included domain checked for ranking validity, the Condorcet triple condition and maximality among all 7! rankings. Isomorphism classification and completeness are taken from the authors’ archive."
+}
