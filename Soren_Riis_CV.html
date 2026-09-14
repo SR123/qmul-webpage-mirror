@@ -1,736 +1,141 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Søren Riis — Curriculum Vitae</title>
-    <meta name="description" content="Academic CV for Søren Riis." />
-    <style>
-      :root {
-        color-scheme: light;
-        --ink: #0f172a;
-        --muted: #475569;
-        --line: rgba(15, 23, 42, 0.14);
-        --paper: #ffffff;
-        --soft: #f8fafc;
-        --brand: #2563eb;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        color: var(--ink);
-        background: var(--soft);
-        line-height: 1.45;
-      }
-
-      a {
-        color: var(--brand);
-        text-underline-offset: 3px;
-      }
-
-      .container {
-        width: min(920px, 92vw);
-        margin: 0 auto;
-        padding: 28px 0 54px;
-      }
-
-      .sheet {
-        background: var(--paper);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        box-shadow: 0 18px 40px rgba(2, 6, 23, 0.08);
-        padding: 26px 26px;
-      }
-
-      header {
-        display: grid;
-        grid-template-columns: 1.2fr 1fr;
-        gap: 16px;
-        align-items: start;
-        border-bottom: 1px solid var(--line);
-        padding-bottom: 16px;
-        margin-bottom: 18px;
-      }
-
-      @media (max-width: 760px) {
-        header {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 2rem;
-        letter-spacing: -0.02em;
-        line-height: 1.1;
-      }
-
-      .subtitle {
-        margin: 8px 0 0;
-        color: var(--muted);
-        font-weight: 650;
-      }
-
-      .meta {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: grid;
-        gap: 6px;
-        justify-items: start;
-      }
-
-      .meta li {
-        color: var(--muted);
-      }
-
-      .meta strong {
-        color: var(--ink);
-        font-weight: 750;
-      }
-
-      .actions {
-        margin-top: 8px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-
-      .pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 6px 12px;
-        border-radius: 999px;
-        border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.96);
-        font-weight: 650;
-        font-size: 0.95rem;
-      }
-
-      h2 {
-        margin: 18px 0 8px;
-        font-size: 1.1rem;
-        letter-spacing: 0.01em;
-      }
-
-      p {
-        margin: 8px 0 0;
-      }
-
-      .grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-      }
-
-      @media (max-width: 760px) {
-        .grid-2 {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      ul {
-        margin: 8px 0 0;
-        padding-left: 18px;
-      }
-
-      li {
-        margin: 4px 0;
-      }
-
-      .muted {
-        color: var(--muted);
-      }
-
-      .mono {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      }
-
-      .item {
-        margin-top: 10px;
-      }
-
-      .item-title {
-        font-weight: 800;
-      }
-
-      .item-meta {
-        color: var(--muted);
-        font-size: 0.95rem;
-        margin-top: 2px;
-      }
-
-      @media print {
-        body {
-          background: #fff;
-        }
-        .container {
-          width: auto;
-          padding: 0;
-        }
-        .sheet {
-          border: none;
-          box-shadow: none;
-          padding: 0;
-        }
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-        .actions {
-          display: none;
-        }
-        .pill.print-only {
-          display: none;
-        }
-        #pubControls,
-        #pubStatus {
-          display: none !important;
-        }
-      }
-
-      .pub-controls {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr auto;
-        gap: 10px;
-        align-items: end;
-        margin-top: 10px;
-      }
-
-      @media (max-width: 760px) {
-        .pub-controls {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .pub-controls input,
-      .pub-controls select {
-        width: 100%;
-        font: inherit;
-        padding: 10px 12px;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.98);
-      }
-
-      .pub-status {
-        margin-top: 8px;
-        color: var(--muted);
-      }
-
-      .pub-list {
-        list-style: none;
-        padding: 0;
-        margin: 12px 0 0;
-        display: grid;
-        gap: 12px;
-      }
-
-      .pub-item {
-        padding: 12px 12px 10px;
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.96);
-      }
-
-      .pub-title {
-        display: inline-block;
-        font-weight: 800;
-        line-height: 1.25;
-      }
-
-      .pub-meta {
-        color: var(--muted);
-        margin-top: 4px;
-      }
-
-      .pub-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 6px;
-      }
-
-      .pub-links a {
-        font-weight: 650;
-      }
-    </style>
-  <link rel="stylesheet" href="assets/demo-shell.css"><link rel="canonical" href="https://webspace.eecs.qmul.ac.uk/s.riis/Soren_Riis_CV.html"></head>
-  <body><nav class="research-bar" aria-label="Research navigation"><a href="index.html">Søren Riis · Home</a><a href="research-demos.html">Try it: all tools</a><a href="publications.html">All papers and PDFs</a></nav>
-    <div class="container">
-      <div class="sheet">
-        <header>
-          <div>
-            <h1 id="main">Søren Riis</h1>
-            <p class="subtitle">Reader in Computer Science · Queen Mary University of London</p>
-            <div class="actions">
-              <a class="pill" href="Soren_Riis_CV.pdf">Download PDF</a>
-              <button class="pill print-only" type="button" id="printBtn" style="cursor: pointer">Print / Save as PDF</button>
-              <a class="pill" href="index.html">Website</a>
-              <a class="pill" href="https://dblp.org/pid/19/2253.html" target="_blank" rel="noopener">DBLP</a>
-              <a class="pill" href="https://scholar.google.com/citations?user=nwnDFYsAAAAJ&amp;hl=en" target="_blank" rel="noopener"
-                >Google Scholar</a
-              >
-            </div>
-          </div>
-          <ul class="meta">
-            <li><strong>Affiliation:</strong> School of EECS, QMUL (Centre for Fundamentals of AI and Computational Theory)</li>
-            <li><strong>Email:</strong> <a href="mailto:s.riis@qmul.ac.uk">s.riis@qmul.ac.uk</a></li>
-            <li><strong>Address:</strong> Mile End Road, London E1 4NS, United Kingdom</li>
-            <li><strong>Web:</strong> <a href="index.html">Personal webpage</a></li>
-          </ul>
-        </header>
-
-        <section>
-          <h2>Research</h2>
-          <p>
-            My research spans logic and proof complexity, information theory and network coding, and algorithmic/combinatorial
-            methods. In recent work I also study reinforcement learning and representation/learnability barriers in games.
-          </p>
-        </section>
-
-        <section class="grid-2">
-          <div>
-            <h2>Employment</h2>
-            <div class="item">
-              <div class="item-title">Queen Mary University of London</div>
-              <div class="item-meta">Reader in Computer Science (2000–present)</div>
-            </div>
-            <div class="item">
-              <div class="item-title">Fetch.AI (Cambridge)</div>
-              <div class="item-meta">Industry consultancy (part-time, 2018–2019)</div>
-            </div>
-            <p class="muted" style="margin-top: 10px">
-              Earlier academic positions and research visits include (selected): LBRICS (Aarhus), University of Leeds, Hebrew University of Jerusalem,
-              University of Lund, and Ohio State University.
-            </p>
-          </div>
-          <div>
-            <h2>Education</h2>
-            <div class="item">
-              <div class="item-title">University of Oxford</div>
-              <div class="item-meta">DPhil in Mathematics (Mathematical Logic), 1994</div>
-            </div>
-            <div class="item">
-              <div class="item-title">University of Copenhagen</div>
-              <div class="item-meta">MSc in Mathematics and Physics, 1989</div>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2>Fellowships, service &amp; academic activity</h2>
-          <div class="grid-2">
-            <div>
-              <h2 style="margin-top: 0">Fellowships &amp; leadership</h2>
-              <ul>
-                <li>Research fellowships: The Fields Institute (Toronto), Isaac Newton Institute (Cambridge), Institut Henri Poincaré (Paris).</li>
-                <li>Former research fellow / visitor at institutes and universities including the Isaac Newton Institute, the Fields Institute, and others.</li>
-                <li>Director and co-founder, Centre for Discrete Mathematics (QMUL).</li>
-              </ul>
-            </div>
-            <div>
-              <h2 style="margin-top: 0">Reviewing &amp; community service</h2>
-              <ul>
-                <li>EPSRC College of Peer Reviewers (member since 2010); served on grant-review panels (UK and international).</li>
-                <li>Refereeing for journals and conferences in logic, complexity, information theory, combinatorics, and theoretical computer science (50+ reports).</li>
-                <li>External examining and assessment roles (PhD and project examination).</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="grid-2" style="margin-top: 10px">
-            <div>
-              <h2 style="margin-top: 0">Teaching &amp; supervision</h2>
-              <ul>
-                <li>15+ years teaching experience across undergraduate and postgraduate levels (3,000+ students taught in total).</li>
-                <li>Module organisation for large cohorts; supervision and mentoring of student projects over many years.</li>
-                <li>Research staff / supervision in the EPSRC CDT in Intelligent Games and Game Intelligence (IGGI).</li>
-              </ul>
-            </div>
-            <div>
-              <h2 style="margin-top: 0">Industry &amp; applied work</h2>
-              <ul>
-                <li>Consultancy: Fetch.AI (Cambridge), work on governance / hard-fork models and distributed-ledger mechanisms.</li>
-                <li>Applied machine-learning projects (e.g. game AI / reinforcement learning) alongside theoretical work.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="grid-2" style="margin-top: 10px">
-            <div>
-              <h2 style="margin-top: 0">Funding (selected)</h2>
-              <ul>
-                <li>EPSRC grant EP/H016015/1 (flows and bottlenecks) — £414,367.</li>
-                <li>Project leadership on funded research totalling £400k+ (research assistants and PhD students).</li>
-              </ul>
-            </div>
-            <div>
-              <h2 style="margin-top: 0">PhD supervision (selected)</h2>
-              <ul>
-                <li>Stefan Dantchev (now academic; Durham).</li>
-                <li>Sun Yun (now in industry; Deutsche Bank).</li>
-                <li>Bei Zhou (reinforcement learning and game AI).</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2>Publications</h2>
-          <p class="muted">
-            The list below is loaded from
-            <a href="https://dblp.org/pid/19/2253.html" target="_blank" rel="noopener">DBLP</a>
-            (with light de-duplication of preprint/journal variants).
-          </p>
-
-          <div id="pubControls" class="pub-controls" aria-label="Publication filters">
-            <label>
-              Search
-              <input id="pubFilter" type="search" placeholder="title, venue, coauthor…" />
-            </label>
-            <label>
-              Year
-              <select id="pubYear">
-                <option value="">All years</option>
-              </select>
-            </label>
-            <button class="pill" type="button" id="pubReset" style="height: 42px; justify-content: center; cursor: pointer">
-              Reset
-            </button>
-          </div>
-
-          <div id="pubStatus" class="pub-status">Loading publications…</div>
-          <ul id="pubList" class="pub-list" aria-label="Publications list"></ul>
-          <p class="muted" style="margin-top: 10px">
-            Tip: to produce a complete PDF (including the DBLP list), wait until the status says the publications are loaded, then use
-            <span class="mono">Print / Save as PDF</span>.
-          </p>
-        </section>
-
-        <section>
-          <h2>Talks (recent)</h2>
-          <ul>
-            <li>
-              <span class="item-title">Coin racing and waiting-time paradoxes: why fair coins are exceptional</span>
-              <span class="muted">(DIMAP Seminar, University of Warwick, 26 Jan 2026)</span>
-            </li>
-          </ul>
-        </section>
-
-        <section>
-          <h2>Awards (selected)</h2>
-          <ul>
-            <li>Prize winner (USD 5,000), <em>Humanity’s Last Exam</em> (Outlier), 2025.</li>
-          </ul>
-        </section>
-      </div>
-    </div>
-
-    <script>
-      "use strict";
-
-      const printBtn = document.getElementById("printBtn");
-      if (printBtn) printBtn.addEventListener("click", () => window.print());
-
-      const listEl = document.getElementById("pubList");
-      const statusEl = document.getElementById("pubStatus");
-      const filterEl = document.getElementById("pubFilter");
-      const yearEl = document.getElementById("pubYear");
-      const resetEl = document.getElementById("pubReset");
-
-      function setStatus(msg) {
-        if (statusEl) statusEl.textContent = msg;
-      }
-
-      function decodeHtmlText(x) {
-        if (x === null || x === undefined) return "";
-        try {
-          const doc = new DOMParser().parseFromString(String(x), "text/html");
-          return (doc && doc.documentElement && doc.documentElement.textContent) ? doc.documentElement.textContent : String(x);
-        } catch (e) {
-          return String(x);
-        }
-      }
-
-      function safeText(x) {
-        if (x === null || x === undefined) return "";
-        return decodeHtmlText(x).replace(/\s+/g, " ").trim();
-      }
-
-      function uniq(arr) {
-        const seen = new Set();
-        const out = [];
-        for (const x of arr) {
-          if (!x) continue;
-          if (seen.has(x)) continue;
-          seen.add(x);
-          out.push(x);
-        }
-        return out;
-      }
-
-      async function fetchJson(url) {
-        const res = await fetch(url, { mode: "cors" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return await res.json();
-      }
-
-      function normalizeTitleKey(title) {
-        return safeText(title)
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, " ")
-          .trim();
-      }
-
-      function parseAuthors(author) {
-        if (!author) return [];
-        const arr = Array.isArray(author) ? author : [author];
-        return arr.map((a) => safeText(a.text || a)).filter(Boolean);
-      }
-
-      function formatAuthors(authors) {
-        if (!authors || !authors.length) return "";
-        if (authors.length <= 3) return authors.join(", ");
-        return authors.slice(0, 3).join(", ") + ", …";
-      }
-
-      function labelForUrl(u) {
-        try {
-          const url = new URL(u);
-          if (url.hostname.includes("arxiv.org")) return "arXiv";
-          if (url.hostname.includes("nature.com")) return "Nature";
-          if (url.hostname.includes("sciencedirect.com")) return "ScienceDirect";
-          if (url.hostname.includes("epubs.siam.org")) return "SIAM";
-          return url.hostname.replace(/^www\./, "");
-        } catch (e) {
-          return "Link";
-        }
-      }
-
-      function pickYear(info) {
-        const y = safeText(info.year);
-        if (y && /^\d{4}$/.test(y)) return parseInt(y, 10);
-        const venue = safeText(info.venue);
-        const m = venue.match(/\b(19|20)\d{2}\b/);
-        if (m) return parseInt(m[0], 10);
-        return null;
-      }
-
-      function isCorrDblp(dblpUrl) {
-        return dblpUrl && String(dblpUrl).includes("/corr/");
-      }
-
-      function scorePub(p) {
-        let s = 0;
-        if (p.primaryLink) s += 3;
-        if (p.venue) s += 2;
-        if (p.year) s += 2;
-        if (p.dblp) s += 1;
-        if (p.links && p.links.length) s += 1;
-        if (isCorrDblp(p.dblp)) s -= 2;
-        return s;
-      }
-
-      function dedupe(pubs) {
-        const map = new Map();
-        for (const p of pubs) {
-          const key = p.titleKey;
-          if (!map.has(key)) {
-            map.set(key, p);
-            continue;
-          }
-          const cur = map.get(key);
-          const best = scorePub(p) > scorePub(cur) ? p : cur;
-          const other = best === p ? cur : p;
-          // merge links
-          best.links = uniq([...(best.links || []), ...(other.links || [])]);
-          if (!best.primaryLink && other.primaryLink) best.primaryLink = other.primaryLink;
-          if (!best.venue && other.venue) best.venue = other.venue;
-          if (!best.year && other.year) best.year = other.year;
-          if (!best.dblp && other.dblp) best.dblp = other.dblp;
-          map.set(key, best);
-        }
-        return Array.from(map.values());
-      }
-
-      async function loadPubs() {
-        const queries = ['author:Søren_Riis:', 'author:"Søren Riis"', 'author:Soren_Riis:', 'author:"Soren Riis"'];
-        let data = null;
-        let usedQuery = null;
-
-        for (const q of queries) {
-          const url = "https://dblp.org/search/publ/api?format=json&h=1000&q=" + encodeURIComponent(q);
-          try {
-            const json = await fetchJson(url);
-            const total = parseInt((json && json.result && json.result.hits && json.result.hits["@total"]) || "0", 10);
-            if (total > 0) {
-              data = json;
-              usedQuery = q;
-              break;
-            }
-          } catch (e) {
-            // try next query
-          }
-        }
-
-        if (!data) throw new Error("Could not load publications from DBLP.");
-
-        const hits = data.result && data.result.hits && data.result.hits.hit;
-        const hitArr = hits ? (Array.isArray(hits) ? hits : [hits]) : [];
-
-        const pubsRaw = [];
-        for (const hit of hitArr) {
-          const info = hit && hit.info ? hit.info : null;
-          if (!info) continue;
-          const title = safeText(info.title).replace(/\.$/, "");
-          if (!title) continue;
-
-          const venue = safeText(info.venue || info.journal || info.booktitle || "");
-          const year = pickYear(info);
-          const dblp = safeText(info.url);
-          const links = [];
-
-          if (info.ee) {
-            const eeArr = Array.isArray(info.ee) ? info.ee : [info.ee];
-            eeArr.forEach((u) => links.push(safeText(u)));
-          }
-
-          pubsRaw.push({
-            title,
-            titleKey: normalizeTitleKey(title),
-            authors: parseAuthors(info.authors && info.authors.author),
-            venue,
-            year,
-            dblp,
-            links: uniq(links),
-            primaryLink: ""
-          });
-        }
-
-        const pubs = dedupe(pubsRaw).sort((a, b) => {
-          const ay = a.year || 0;
-          const by = b.year || 0;
-          if (ay !== by) return by - ay;
-          return a.title.localeCompare(b.title);
-        });
-
-        // Populate year select
-        if (yearEl) {
-          const years = uniq(
-            pubs
-              .map((p) => p.year)
-              .filter((y) => !!y)
-              .sort((a, b) => b - a)
-          );
-          years.forEach((y) => {
-            const opt = document.createElement("option");
-            opt.value = String(y);
-            opt.textContent = String(y);
-            yearEl.appendChild(opt);
-          });
-        }
-
-        if (listEl) listEl.innerHTML = "";
-        const frag = document.createDocumentFragment();
-
-        pubs.forEach((p) => {
-          const li = document.createElement("li");
-          li.className = "pub-item";
-          li.dataset.search = (p.title + " " + (p.authors || []).join(" ") + " " + p.venue).toLowerCase();
-          li.dataset.year = p.year ? String(p.year) : "";
-
-          const titleLink = document.createElement("a");
-          titleLink.className = "pub-title";
-          titleLink.textContent = p.title;
-          titleLink.href = p.links[0] || p.dblp || "#";
-          titleLink.target = "_blank";
-          titleLink.rel = "noopener";
-
-          const meta = document.createElement("div");
-          meta.className = "pub-meta";
-          meta.textContent =
-            (p.authors ? formatAuthors(p.authors) : "") +
-            (p.venue ? (" — " + p.venue) : "") +
-            (p.year ? (" (" + p.year + ")") : "");
-
-          const linksDiv = document.createElement("div");
-          linksDiv.className = "pub-links";
-          let shown = 0;
-          (p.links || []).forEach((u) => {
-            if (shown >= 3) return;
-            if (!u) return;
-            const a = document.createElement("a");
-            a.href = u;
-            a.target = "_blank";
-            a.rel = "noopener";
-            a.textContent = labelForUrl(u);
-            linksDiv.appendChild(a);
-            shown += 1;
-          });
-          if (p.dblp) {
-            const d = document.createElement("a");
-            d.href = p.dblp;
-            d.target = "_blank";
-            d.rel = "noopener";
-            d.textContent = "DBLP";
-            linksDiv.appendChild(d);
-          }
-
-          li.appendChild(titleLink);
-          li.appendChild(meta);
-          li.appendChild(linksDiv);
-          frag.appendChild(li);
-        });
-
-        if (listEl) listEl.appendChild(frag);
-        setStatus("Loaded " + pubs.length + " publications from DBLP (" + usedQuery + ").");
-
-        function applyFilters() {
-          const term = filterEl ? filterEl.value.trim().toLowerCase() : "";
-          const year = yearEl ? yearEl.value : "";
-          let visible = 0;
-          const items = listEl ? listEl.querySelectorAll(".pub-item") : [];
-          items.forEach((item) => {
-            let ok = true;
-            if (term && !item.dataset.search.includes(term)) ok = false;
-            if (year && item.dataset.year !== year) ok = false;
-            item.style.display = ok ? "" : "none";
-            if (ok) visible += 1;
-          });
-          setStatus("Showing " + visible + " / " + pubs.length + " publications.");
-        }
-
-        if (filterEl) filterEl.addEventListener("input", applyFilters);
-        if (yearEl) yearEl.addEventListener("change", applyFilters);
-        if (resetEl)
-          resetEl.addEventListener("click", () => {
-            if (filterEl) filterEl.value = "";
-            if (yearEl) yearEl.value = "";
-            applyFilters();
-          });
-      }
-
-      (async () => {
-        try {
-          await loadPubs();
-        } catch (e) {
-          setStatus("Could not load publications automatically. Please use DBLP: dblp.org/pid/19/2253");
-          if (listEl) {
-            listEl.innerHTML = "";
-            const li = document.createElement("li");
-            li.className = "pub-item";
-            li.innerHTML =
-              'Please use <a href="https://dblp.org/pid/19/2253.html" target="_blank" rel="noopener">DBLP</a> for the full list.';
-            listEl.appendChild(li);
-          }
-        }
-      })();
-    </script>
-  </body>
-</html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Academic CV · Søren Riis · Queen Mary</title><meta name="description" content="Academic curriculum vitae for Søren Riis: appointments, research, publications, teaching and service, with academic and AI research CV downloads."><link rel="canonical" href="https://webspace.eecs.qmul.ac.uk/s.riis/Soren_Riis_CV.html"><meta property="og:type" content="website"><meta property="og:title" content="Academic CV · Søren Riis · Queen Mary"><meta property="og:description" content="Academic curriculum vitae for Søren Riis: appointments, research, publications, teaching and service, with academic and AI research CV downloads."><meta property="og:url" content="https://webspace.eecs.qmul.ac.uk/s.riis/Soren_Riis_CV.html"><meta property="og:image" content="https://webspace.eecs.qmul.ac.uk/s.riis/profile.jpg"><link rel="stylesheet" href="assets/site.css"><meta name="author" content="Søren Riis"></head><body>
+<a class="skip" href="#main">Skip to main content</a><header class="masthead"><div class="container"><div class="masthead-top"><a class="identity" href="index.html">Søren Riis</a><a class="institution" href="https://www.qmul.ac.uk/">Queen Mary University of London</a></div><nav class="site-nav" aria-label="Main navigation"><a href="research.html">Research</a><a href="publications.html">Publications</a><a href="research-demos.html">Explore</a><a href="watch.html">Talks &amp; videos</a><a href="data-software.html">Data &amp; software</a><a href="about.html#teaching">Teaching</a><a href="about.html">About &amp; contact</a></nav></div></header>
+<main class="container" id="main" tabindex="-1"><div class="page-heading"><p class="breadcrumbs"><a href="index.html">Home</a> / Academic CV</p><h1>Academic CV</h1><p class="intro">Research, publications, teaching and academic service.</p></div><p class="role">Søren Riis · Reader in Computer Science, Queen Mary University of London</p>
+<p><a href="mailto:s.riis@qmul.ac.uk">s.riis@qmul.ac.uk</a> · School of EECS, Mile End Road, London E1 4NS, United Kingdom</p>
+<div class="cv-downloads">
+  <div class="cv-download"><h3><a href="Soren_Riis_CV.pdf">Academic CV</a></h3><p class="meta">PDF · 6 pages</p><p>Research, publications, teaching and academic service.</p></div>
+  <div class="cv-download"><h3><a href="Soren_Riis_AI_CV.pdf">AI Research &amp; Industry CV</a></h3><p class="meta">PDF · 2 pages</p><p>AI evaluation, reinforcement learning, consulting and selected projects.</p></div>
+</div>
+
+<p class="small cv-html-note">Updated 14 September 2026. The academic PDF and this HTML edition contain the same CV.</p>
+<nav class="jump-links cv-contents" aria-label="CV contents"><a href="#research-profile">Research profile</a><a href="#appointments-and-research-visits">Appointments and research visits</a><a href="#education">Education</a><a href="#award">Award</a><a href="#research-leadership-and-funding">Research leadership and funding</a><a href="#selected-research-contributions">Selected research contributions</a><a href="#interactive-research-and-software">Interactive research and software</a><a href="#teaching-and-doctoral-supervision">Teaching and doctoral supervision</a><a href="#academic-service">Academic service</a><a href="#selected-talks-and-lectures">Selected talks and lectures</a><a href="#publications">Publications</a></nav>
+<article class="cv-body"><section class="cv-section" id="research-profile"><h2>Research profile</h2>
+<p>Mathematician and computer scientist working on mathematical logic, proof complexity, information theory, combinatorics and the foundations of learning. Recent work connects the limits of reinforcement learning, expert-level AI evaluation, original term-coding research and interactive presentations of theory with accompanying Lean-checked proofs.</p>
+</section>
+<section class="cv-section" id="appointments-and-research-visits"><h2>Appointments and research visits</h2>
+<p><strong>2000-present  |  </strong><strong>Queen Mary University of London. </strong>Current role: Reader in Computer Science, School of EECS.</p>
+<p><strong>Jun 2018-Mar 2019  |  </strong><strong>Fetch.AI, Cambridge. </strong>Part-time Research Scientist Consultant; consensus protocols, hard-fork models, governance and distributed-ledger mechanisms.</p>
+<p><strong>1998-2000  |  </strong><strong>BRICS International PhD School, Aarhus University. </strong>Associate Professor; research and doctoral-level teaching.</p>
+<p><strong>1998  |  </strong><strong>The Fields Institute, Toronto. </strong>Research Fellow.</p>
+<p><strong>1995-1997  |  </strong><strong>Carlsberg-supported visiting research fellowship. </strong>Research visits and lecture series in Lund, Copenhagen, Ohio, Jerusalem and Leeds.</p>
+<p><strong>1994-1995  |  </strong><strong>BRICS International PhD School, Aarhus University. </strong>Research Fellow; research and doctoral-level teaching.</p>
+<p>Additional research fellowships and visits include the Isaac Newton Institute, Cambridge, and Institut Henri Poincaré, Paris.</p>
+</section>
+<section class="cv-section" id="education"><h2>Education</h2>
+<p><strong>University of Oxford</strong>  |  DPhil in Mathematics, Mathematical Logic, 1994</p>
+<p><strong>University of Copenhagen</strong>  |  MSc in Mathematics and Physics, 1989</p>
+</section>
+<section class="cv-section" id="award"><h2>Award</h2>
+<p>Humanity’s Last Exam prize, US$5,000 (2025). Contributed expert questions to the benchmark; member of the HLE Contributors Consortium on the Nature paper published in 2026.</p>
+</section>
+<section class="cv-section" id="research-leadership-and-funding"><h2>Research leadership and funding</h2>
+<ul>
+<li>Co-founder and director of the Centre for Discrete Mathematics at Queen Mary University of London.</li>
+<li>Research leadership on EPSRC grant EP/H016015/1, on information flows and bottlenecks, awarded £414,367; support for research staff and doctoral research.</li>
+</ul>
+</section>
+<section class="cv-section" id="selected-research-contributions"><h2>Selected research contributions</h2>
+<p><strong>Logic and proof complexity. </strong>Classified implications between the modular counting principles studied in Count(q) Does Not Imply Count(p); developed complexity-gap results for tree resolution and work on resolution with Stefan Dantchev.</p>
+<p><strong>Information theory and network coding. </strong>Developed graph guessing-game methods linking local information constraints to global information flow; collaborative work on guessing graphs, Boolean-network fixed points and non-Shannon information inequalities.</p>
+<p><strong>Combinatorics and collective choice. </strong>With Charles Leedham-Green and Klas Markström, proved that the largest Condorcet domain on eight alternatives has 224 orders and is unique up to isomorphism. Related work covers classification, heuristic search and research software.</p>
+<p><strong>AI evaluation and reinforcement learning. </strong>With Bei Zhou, studied AlphaZero-style learning in impartial games and distinguished champion performance from expert mastery. Further work explores multi-frame learning and mathematical models of drift and selection in LLM text ecosystems.</p>
+</section>
+<section class="cv-section" id="interactive-research-and-software"><h2>Interactive research and software</h2>
+<h3>Interactive term-coding paper and Lean proof explorer  |  2026</h3>
+<p>Original mathematical research on the boundary between polynomial-time computation and undecidability with disequality constraints. The interactive edition links the paper to explanations, formal statements, proof states and dependencies in an accompanying Lean-checked formalisation. External assumptions and the scope of verification are documented.</p>
+<p><a href="https://sr123.github.io/term-coding-disequality-lean/">Interactive paper</a>  |  <a href="https://github.com/SR123/term-coding-disequality-lean">Lean source</a></p>
+<h3>Gomulda AI search and learning lab  |  2026</h3>
+<p>Exact graph-colouring optimisation, Monte Carlo tree search and minimax endgame search, with a separate experimental neural agent trained through self-play. Browser tools support training, checkpoints and comparisons. Based on the game invented by Cristoffer Crone.</p>
+<p><a href="https://sr123.github.io/Gomulda/">Live project</a>  |  <a href="https://github.com/SR123/Gomulda">Source</a></p>
+<h3>Solar Eclipse Explorer  |  2026-present</h3>
+<p>Scientific computation and visualisation for the 2 August 2027 eclipse: local circumstances, totality duration, obscuration and the Sun’s position, using NASA/GSFC Besselian elements.</p>
+<p><a href="https://sr123.github.io/eclipse-2027/">Live explorer</a>  |  <a href="https://github.com/SR123/eclipse-2027">Source</a></p>
+<p>Further resources include the seven-alternative Condorcet atlas and interactive tools for guessing games, impartial games, waiting-time comparisons and text-ecosystem models.</p>
+<p><a href="https://webspace.eecs.qmul.ac.uk/s.riis/research-demos.html">Research tools</a>  |  <a href="https://webspace.eecs.qmul.ac.uk/s.riis/data-software.html">Data and software</a></p>
+</section>
+<section class="cv-section" id="teaching-and-doctoral-supervision"><h2>Teaching and doctoral supervision</h2>
+<ul>
+<li>Undergraduate and postgraduate teaching in logic, discrete structures, complexity and computation, with 3,000+ students taught.</li>
+<li>Module organisation for large cohorts and supervision and mentoring of student projects.</li>
+<li>Modules taught include ECS407U, Introduction to Logic and Discrete Structures, and ECS651U, Complexity and Computation.</li>
+<li>Doctoral supervision includes Stefan Dantchev, Sun Yun and Bei Zhou; involvement in the EPSRC Centre for Doctoral Training in Intelligent Games and Game Intelligence (IGGI).</li>
+</ul>
+</section>
+<section class="cv-section" id="academic-service"><h2>Academic service</h2>
+<ul>
+<li>EPSRC College of Peer Reviewers; member since 2010. Grant-review panel service in the UK and internationally.</li>
+<li>50+ refereeing reports across logic, complexity, information theory, combinatorics and theoretical computer science.</li>
+<li>External examination and assessment of PhD research and student projects.</li>
+</ul>
+</section>
+<section class="cv-section" id="selected-talks-and-lectures"><h2>Selected talks and lectures</h2>
+<p><strong>2026  |  </strong><em>Coin racing and waiting-time paradoxes: why fair coins are exceptional. </em>DIMAP Seminar, University of Warwick, 26 January.</p>
+<p><strong>2016  |  </strong><em>Finite Dynamical Systems, Causal Networks and Information Inequalities. </em>Lecture series, Institut Henri Poincaré, Paris, February.</p>
+<p><strong>2015  |  </strong><em>Ada Lovelace, a scientist in the archives. </em>Ada Lovelace 200 Symposium, University of Oxford, 9 December; with Ursula Martin and an introductory contribution by Nick Woodhouse.</p>
+<p><strong>2013  |  </strong><em>Graph guessing games and non-Shannon information inequalities. </em>Workshop on Entropy and Information Inequalities, Chinese University of Hong Kong, 17 April.</p>
+<p><strong>2013  |  </strong><em>Network Coding with Distributed Coding Functions. </em>Chinese University of Hong Kong EECS Seminar, 12 April.</p>
+<p><strong>2012  |  </strong><em>Graph Entropy, Network Coding and Guessing Games. </em>ZiF Workshop, Bielefeld, November.</p>
+<p><strong>2012  |  </strong><em>Valiant’s Shift Problem. </em>Isaac Newton Institute, Cambridge, 9 May.</p>
+<p><strong>2012  |  </strong><em>A logician’s approach to Network Coding. </em>Isaac Newton Institute, Cambridge, 10 February.</p>
+<p><strong>1998  |  </strong><em>Complexity Gaps for Unsatisfiability Problems. </em>BRICS Seminar, Aarhus, 14 December.</p>
+<p><strong>1998  |  </strong><em>Complexity Gaps for Nullstellensatz Proofs. </em>Fields Institute Workshop, Toronto.</p>
+<p><strong>1996  |  </strong><em>More on the relative strength of counting principles. </em>DIMACS Workshop, Rutgers University, May.</p>
+<p><a href="https://webspace.eecs.qmul.ac.uk/s.riis/watch.html">Available recordings and slides</a></p>
+</section>
+<section class="cv-section" id="publications"><h2>Publications</h2>
+<h3>Journal articles</h3>
+<p class="cv-citation"><strong>1. </strong>Center for AI Safety, Scale AI and HLE Contributors Consortium (including S. Riis). A benchmark of expert-level academic questions to assess AI capabilities. <em>Nature</em> 649, 1139-1146 (2026). <a href="https://www.nature.com/articles/s41586-025-09962-4">Read</a></p>
+<p class="cv-citation"><strong>2. </strong><strong>B. Zhou</strong>, <strong>S. Riis</strong>. Impartial Games: A Challenge for Reinforcement Learning. <em>Machine Learning</em> 115, article 54 (2026). <a href="https://doi.org/10.1007/s10994-026-06996-1">Read</a></p>
+<p class="cv-citation"><strong>3. </strong><strong>B. Zhou</strong>, <strong>S. Riis</strong>. An efficient heuristic search algorithm for discovering large Condorcet domains. <em>4OR</em> 23, 193-216 (2025). <a href="https://doi.org/10.1007/s10288-025-00583-1">Read</a></p>
+<p class="cv-citation"><strong>4. </strong><strong>A. Karpov</strong>, <strong>K. Markström</strong>, <strong>S. Riis</strong>, <strong>B. Zhou</strong>. Coherent domains and improved lower bounds for the maximum size of Condorcet domains. <em>Discrete Applied Mathematics</em> 370, 57-70 (2025). <a href="https://doi.org/10.1016/j.dam.2025.03.007">Read</a></p>
+<p class="cv-citation"><strong>5. </strong><strong>D. Akello-Egwel</strong>, <strong>C. R. Leedham-Green</strong>, <strong>A. Litterick</strong>, <strong>K. Markström</strong>, <strong>S. Riis</strong>. Condorcet domains on at most seven alternatives. <em>Mathematical Social Sciences</em> 133, 23-33 (2025). <a href="https://doi.org/10.1016/j.mathsocsci.2024.12.002">Read</a></p>
+<p class="cv-citation"><strong>6. </strong><strong>B. Zhou</strong>, <strong>K. Markström</strong>, <strong>S. Riis</strong>. CDL: A fast and flexible library for the study of permutation sets with structural restrictions. <em>SoftwareX</em> 28, article 101951 (2024). <a href="https://doi.org/10.1016/j.softx.2024.101951">Read</a></p>
+<p class="cv-citation"><strong>7. </strong><strong>C. R. Leedham-Green</strong>, <strong>K. Markström</strong>, <strong>S. Riis</strong>. The largest Condorcet domain on 8 alternatives. <em>Social Choice and Welfare</em> 62, 109-116 (2024). <a href="https://doi.org/10.1007/s00355-023-01481-3">Read</a></p>
+<p class="cv-citation"><strong>8. </strong><strong>S. Riis</strong>, <strong>M. Gadouleau</strong>. Max-flow min-cut theorems on dispersion and entropy measures for communication networks. <em>Information and Computation</em> 267, 49-73 (2019). <a href="https://doi.org/10.1016/j.ic.2019.03.004">Read</a></p>
+<p class="cv-citation"><strong>9. </strong><strong>R. Baber</strong>, <strong>D. Christofides</strong>, <strong>N. A. Dang</strong>, <strong>E. R. Vaughan</strong>, <strong>S. Riis</strong>. Graph Guessing Games and Non-Shannon Information Inequalities. <em>IEEE Transactions on Information Theory</em> 63, 4257-4267 (2017). <a href="https://doi.org/10.1109/TIT.2016.2628819">Read</a></p>
+<p class="cv-citation"><strong>10. </strong><strong>P. J. Cameron</strong>, <strong>N. A. Dang</strong>, <strong>S. Riis</strong>. Guessing Games on Triangle-Free Graphs. <em>Electronic Journal of Combinatorics</em> 23, P1.48 (2016). <a href="https://doi.org/10.37236/4731">Read</a></p>
+<p class="cv-citation"><strong>11. </strong><strong>M. Gadouleau</strong>, <strong>A. Richard</strong>, <strong>S. Riis</strong>. Fixed Points of Boolean Networks, Guessing Graphs, and Coding Theory. <em>SIAM Journal on Discrete Mathematics</em> 29, 2312-2335 (2015). <a href="https://doi.org/10.1137/140988358">Read</a></p>
+<p class="cv-citation"><strong>12. </strong><strong>M. Gadouleau</strong>, <strong>S. Riis</strong>. Memoryless computation: New results, constructions, and extensions. <em>Theoretical Computer Science</em> 562, 129-145 (2015). <a href="https://doi.org/10.1016/j.tcs.2014.09.040">Read</a></p>
+<p class="cv-citation"><strong>13. </strong><strong>S. Riis</strong>. What makes a chess program original? Revisiting the Rybka case. <em>Entertainment Computing</em> 5, 189-204 (2014). <a href="https://doi.org/10.1016/j.entcom.2014.04.004">Read</a></p>
+<p class="cv-citation"><strong>14. </strong><strong>P. J. Cameron</strong>, <strong>M. Gadouleau</strong>, <strong>S. Riis</strong>. Combinatorial representations. <em>Journal of Combinatorial Theory, Series A</em> 120, 671-682 (2013). <a href="https://doi.org/10.1016/j.jcta.2012.12.002">Read</a></p>
+<p class="cv-citation"><strong>15. </strong><strong>M. Gadouleau</strong>, <strong>S. Riis</strong>. Graph-Theoretical Constructions for Graph Entropy and Network Coding Based Communications. <em>IEEE Transactions on Information Theory</em> 57, 6703-6717 (2011). <a href="https://doi.org/10.1109/TIT.2011.2155618">Read</a></p>
+<p class="cv-citation"><strong>16. </strong><strong>T. Wu</strong>, <strong>P. J. Cameron</strong>, <strong>S. Riis</strong>. On the guessing number of shift graphs. <em>Journal of Discrete Algorithms</em> 7, 220-226 (2009). <a href="https://doi.org/10.1016/j.jda.2008.09.009">Read</a></p>
+<p class="cv-citation"><strong>17. </strong><strong>S. Riis</strong>. Information Flows, Graphs and their Guessing Numbers. <em>Electronic Journal of Combinatorics</em> 14, R44 (2007). <a href="https://doi.org/10.37236/962">Read</a></p>
+<p class="cv-citation"><strong>18. </strong><strong>S. Riis</strong>. Reversible and Irreversible Information Networks. <em>IEEE Transactions on Information Theory</em> 53, 4339-4349 (2007). <a href="https://doi.org/10.1109/TIT.2007.907345">Read</a></p>
+<p class="cv-citation"><strong>19. </strong><strong>S. Riis</strong>. A complexity gap for tree resolution. <em>Computational Complexity</em> 10, 179-209 (2001). <a href="https://doi.org/10.1007/s00037-001-8194-y">Read</a></p>
+<p class="cv-citation"><strong>20. </strong><strong>S. Riis</strong>, <strong>M. Sitharam</strong>. Generating hard tautologies using predicate logic and the symmetric group. <em>Logic Journal of the IGPL</em> 8, 787-795 (2000). <a href="https://doi.org/10.1093/jigpal/8.6.787">Read</a></p>
+<p class="cv-citation"><strong>21. </strong><strong>S. Riis</strong>. Bootstrapping the primitive recursive functions by only 27 colors. <em>Discrete Mathematics</em> 169, 269-272 (1997). <a href="https://doi.org/10.1016/S0012-365X(97)87041-0">Read</a></p>
+<p class="cv-citation"><strong>22. </strong><strong>S. Riis</strong>. Count(q) Does Not Imply Count(p). <em>Annals of Pure and Applied Logic</em> 90, 1-56 (1997). <a href="https://doi.org/10.1016/S0168-0072(97)00029-8">Read</a></p>
+<p class="cv-citation"><strong>23. </strong><strong>S. Riis</strong>. Count(q) versus the pigeon-hole principle. <em>Archive for Mathematical Logic</em> 36, 157-188 (1997). <a href="https://doi.org/10.1007/s001530050060">Read</a></p>
+<h3>Conference papers chapters and abstracts</h3>
+<p class="cv-citation"><strong>24. </strong><strong>S. Riis</strong>, <strong>U. Martin</strong>, <strong>N. Woodhouse</strong>. Ada Lovelace, a scientist in the archives. <em>Ada Lovelace Symposium</em>, 14 (2015). <a href="https://doi.org/10.1145/2867731.2867747">Read</a></p>
+<p class="cv-citation"><strong>25. </strong><strong>R. Baber</strong>, <strong>D. Christofides</strong>, <strong>N. A. Dang</strong>, <strong>S. Riis</strong>, <strong>E. R. Vaughan</strong>. Multiple unicasts, graph guessing games, and non-Shannon inequalities. <em>International Symposium on Network Coding</em>, 1-6 (2013). <a href="https://doi.org/10.1109/NetCod.2013.6570823">Read</a></p>
+<p class="cv-citation"><strong>26. </strong><strong>S. Riis</strong>, <strong>M. Gadouleau</strong>. A dispersion theorem for communication networks based on term sets. <em>IEEE International Symposium on Information Theory</em>, 593-597 (2011). <a href="https://doi.org/10.1109/ISIT.2011.6034198">Read</a></p>
+<p class="cv-citation"><strong>27. </strong><strong>M. Gadouleau</strong>, <strong>S. Riis</strong>. Max-flow min-cut theorem for Rényi entropy in communication networks. <em>IEEE International Symposium on Information Theory</em>, 603-607 (2011). <a href="https://doi.org/10.1109/ISIT.2011.6034200">Read</a></p>
+<p class="cv-citation"><strong>28. </strong><strong>S. Riis</strong>. On the Asymptotic Nullstellensatz and Polynomial Calculus Proof Complexity. <em>IEEE Symposium on Logic in Computer Science</em>, 272-283 (2008). <a href="https://doi.org/10.1109/LICS.2008.30">Read</a></p>
+<p class="cv-citation"><strong>29. </strong><strong>S. Riis</strong>, <strong>R. Ahlswede</strong>. Problems in Network Coding and Error Correcting Codes Appended by a Draft Version of S. Riis &quot;Utilising Public Information in Network Coding&quot;. <em>GTIT-C</em>, 861-897 (2006). <a href="https://doi.org/10.1007/11889342_56">Read</a></p>
+<p class="cv-citation"><strong>30. </strong><strong>S. S. Dantchev</strong>, <strong>S. Riis</strong>. On Relativisation and Complexity Gap. <em>Computer Science Logic</em>, 142-154 (2003). <a href="https://doi.org/10.1007/978-3-540-45220-1_14">Read</a></p>
+<p class="cv-citation"><strong>31. </strong><strong>S. S. Dantchev</strong>, <strong>S. Riis</strong>. &quot;Planar&quot; Tautologies Hard for Resolution. <em>IEEE Symposium on Foundations of Computer Science</em>, 220-229 (2001). <a href="https://doi.org/10.1109/SFCS.2001.959896">Read</a></p>
+<p class="cv-citation"><strong>32. </strong><strong>S. S. Dantchev</strong>, <strong>S. Riis</strong>. Tree Resolution Proofs of the Weak Pigeon-Hole Principle. <em>IEEE Conference on Computational Complexity</em>, 69-75 (2001). <a href="https://doi.org/10.1109/CCC.2001.933873">Read</a></p>
+<p class="cv-citation"><strong>33. </strong><strong>K. Hägele</strong>, <strong>C. Ó&#x27;Dúnlaing</strong>, <strong>S. Riis</strong>. The complexity of scheduling TV commercials. <em>Mathematical Foundations of Computer Science and Information Technology</em>, 162-185 (2000). <a href="https://doi.org/10.1016/S1571-0661(05)80043-X">Read</a></p>
+<p class="cv-citation"><strong>34. </strong><strong>P. Beame</strong>, <strong>S. Riis</strong>. More on the relative strength of counting principles. <em>Proof Complexity and Feasible Arithmetics</em>, 13-35 (1996). <a href="https://web.archive.org/web/*/https://doi.org/10.1090/dimacs/039/02">Read</a></p>
+<p class="cv-citation"><strong>35. </strong><strong>A. Andersson</strong>, <strong>P. B. Miltersen</strong>, <strong>S. Riis</strong>, <strong>M. Thorup</strong>. Static Dictionaries on AC0 RAMs: Query Time <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mtext>Θ(</mtext></mrow><msqrt><mrow><mfrac><mrow><mrow><mtext>log n</mtext></mrow></mrow><mrow><mrow><mtext>log log n</mtext></mrow></mrow></mfrac></mrow></msqrt><mrow><mtext>)</mtext></mrow></mrow></math> is Necessary and Sufficient. <em>IEEE Symposium on Foundations of Computer Science</em>, 441-450 (1996). <a href="https://doi.org/10.1109/SFCS.1996.548503">Read</a></p>
+<h3>Preprints</h3>
+<p class="cv-citation"><strong>36. </strong><strong>S. Riis</strong>. One Unit Separates Polynomial Time from Undecidability in Term Coding. Author manuscript, revised 12 September 2026. <a href="https://webspace.eecs.qmul.ac.uk/s.riis/papers/one-unit-term-coding-2026-09-12.pdf">Manuscript</a> | <a href="https://sr123.github.io/term-coding-disequality-lean/">Interactive edition</a></p>
+<p class="cv-citation"><strong>37. </strong><strong>S. Riis</strong>, <strong>M. Paterson</strong>. Coin flipping and waiting times paradoxes: Why fair coins are exceptional. Preprint, arXiv:2601.16580 (2026). <a href="https://arxiv.org/abs/2601.16580">Read</a></p>
+<p class="cv-citation"><strong>38. </strong><strong>S. Riis</strong>. Drift and selection in LLM text ecosystems. Preprint, arXiv:2604.08554 (2026). <a href="https://doi.org/10.48550/arXiv.2604.08554">Read</a></p>
+<p class="cv-citation"><strong>39. </strong><strong>A. Karpov</strong>, <strong>K. Markström</strong>, <strong>S. Riis</strong>, <strong>B. Zhou</strong>. Improved lower bounds for the maximum size of Condorcet domains. Preprint, arXiv:2601.07336 (2026). <a href="https://doi.org/10.48550/arXiv.2601.07336">Read</a></p>
+<p class="cv-citation"><strong>40. </strong><strong>S. Riis</strong>. Mastering NIM and Impartial Games with Weak Neural Networks: An AlphaZero-inspired Multi-Frame Approach. Preprint, arXiv:2411.06403 (2026). First submitted 2024; updated 2026. <a href="https://doi.org/10.48550/arXiv.2411.06403">Read</a></p>
+<p class="cv-citation"><strong>41. </strong><strong>S. Riis</strong>. Term Coding: An Entropic Framework for Extremal Combinatorics and the Guessing-Number Sandwich Theorem. Preprint, arXiv:2601.16614 (2026). <a href="https://doi.org/10.48550/arXiv.2601.16614">Read</a></p>
+<p class="cv-citation"><strong>42. </strong><strong>K. Markström</strong>, <strong>S. Riis</strong>, <strong>B. Zhou</strong>. Arrow&#x27;s single peaked domains, richness, and domains for plurality and the Borda count. Preprint, arXiv:2401.12547 (2024). <a href="https://doi.org/10.48550/arXiv.2401.12547">Read</a></p>
+<p class="cv-citation"><strong>43. </strong><strong>A. Karpov</strong>, <strong>K. Markström</strong>, <strong>S. Riis</strong>, <strong>B. Zhou</strong>. Local Diversity of Condorcet Domains. Preprint, arXiv:2401.11912 (2024). <a href="https://doi.org/10.48550/arXiv.2401.11912">Read</a></p>
+<p class="cv-citation"><strong>44. </strong><strong>B. Zhou</strong>, <strong>S. Riis</strong>. Exploring Parity Challenges in Reinforcement Learning through Curriculum Learning with Noisy Labels. Preprint, arXiv:2312.05379 (2023). <a href="https://doi.org/10.48550/arXiv.2312.05379">Read</a></p>
+<p class="cv-citation"><strong>45. </strong><strong>S. Riis</strong>. Graph Entropy, Network Coding and Guessing games. Preprint, arXiv:0711.4175 (2007). <a href="https://arxiv.org/abs/0711.4175">Read</a></p>
+<h3>Technical reports</h3>
+<p class="cv-citation"><strong>46. </strong><strong>S. Riis</strong>. On the asymptotic Nullstellensatz and Polynomial Calculus proof complexity. <em>Electronic Colloquium on Computational Complexity</em>, TR09-014 (2009). <a href="https://eccc.weizmann.ac.il/report/2009/014">Read</a></p>
+<p class="cv-citation"><strong>47. </strong><strong>S. Riis</strong>, <strong>M. Sitharam</strong>. Non-constant Degree Lower Bounds imply linear Degree Lower Bounds. <em>Electronic Colloquium on Computational Complexity</em>, TR97-048 (1997). <a href="https://eccc.weizmann.ac.il/eccc-reports/1997/TR97-048/index.html">Read</a></p>
+<h3>Editorial</h3>
+<p class="cv-citation"><strong>48. </strong><strong>C. Butz</strong>, <strong>U. Kohlenbach</strong>, <strong>S. Riis</strong>, <strong>G. Winskel</strong>. Preface. <em>Annals of Pure and Applied Logic</em> 104, 1-2 (2000). <a href="https://doi.org/10.1016/S0168-0072(00)00004-X">Read</a></p>
+</section></article>
+</main><footer class="site-footer"><div class="container"><div class="footer-top"><div><strong>Søren Riis</strong><p>School of EECS · Queen Mary University of London<br><a href="mailto:s.riis@qmul.ac.uk">s.riis@qmul.ac.uk</a></p></div><div><a href="publications.html">All papers and PDFs</a><p><a href="Soren_Riis_CV.pdf">Academic CV (PDF)</a> · <a href="Soren_Riis_AI_CV.pdf">AI Research &amp; Industry CV (PDF)</a></p><p>Content updated 14 September 2026</p></div></div></div></footer></body></html>
